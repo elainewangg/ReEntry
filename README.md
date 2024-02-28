@@ -1,8 +1,8 @@
 # <a href="http://newera412.com/" target="_blank">NewERA412 Platform</a>
 
-* Organization: ReEntry412
+* Organization: RealisticReEntry
 * Client Contact: <a href="mailto:bvbaseball42@gmail.com">`Taili Thompson`</a>
-* Student Consultants: <a href="https://github.com/brentthongg">`Brent Hong`</a>, <a href="">`Max Kornyev`</a>, and <a href="https://github.com/epiccrash">`Joseph Perrino`</a>
+* Student Consultants: <a href="https://github.com/elainewangg">`Elaine Wang`</a>, <a href="https://github.com/adrienneli104">`Adrienne Li`</a>, and <a href="https://github.com/claricedu">`Clarice Du`</a>
 * `See the GitHub Wiki for more important information`
 
 ### Application Versions
