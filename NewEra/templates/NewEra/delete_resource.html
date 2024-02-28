@@ -1,0 +1,19 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Delete Resource
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <form method="POST" enctype="multipart/form-data" class="resource-form">
+        {% csrf_token %}
+        <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+            Are you sure you want to delete {{ resource.name }}?
+        </h3>
+        <div style="margin: auto; margin-top: 50px; text-align: center;">
+            <p><u>WARNING</u>: The resource will be permanently deleted, unless it has been referred before, in which case it will be made inactive.</p>
+            <p><button class="btn btn-primary" type="submit">Delete</button>
+            <a href="javascript:history.back()" class="btn">Cancel</a></p>
+        </div>
+    </form>
+{% endblock %}

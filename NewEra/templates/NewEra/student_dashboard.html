@@ -1,0 +1,85 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}
+	Student 
+{% endblock %}
+
+{% block content %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <div class="container">
+        <canvas id="gpaChart"></canvas>
+        <canvas id="resourcesChart"></canvas>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get the average GPA values from the context
+            var average_q1_gpa = {{ average_q1_gpa }};
+            var average_q2_gpa = {{ average_q2_gpa }};
+            var average_q3_gpa = {{ average_q3_gpa }};
+            var average_q4_gpa = {{ average_q4_gpa }};
+            
+            // Create a line chart
+            var ctx = document.getElementById('gpaChart').getContext('2d');
+            var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                label: 'Average GPA',
+                data: [average_q1_gpa, average_q2_gpa, average_q3_gpa, average_q4_gpa],
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                y: {
+                    beginAtZero: true
+                }
+                }
+            }
+            });
+
+            // Get the resource counts from the context
+            var q1_resources = {{ q1_resources }};
+            var q2_resources = {{ q2_resources }};
+            var q3_resources = {{ q3_resources }};
+            var q4_resources = {{ q4_resources }};
+            
+            // Create a bar chart for resource counts
+            var resourcesCtx = document.getElementById('resourcesChart').getContext('2d');
+            var resourcesChart = new Chart(resourcesCtx, {
+                type: 'bar',
+                data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Resource Count',
+                    data: [q1_resources, q2_resources, q3_resources, q4_resources],
+                    backgroundColor: 'rgb(75, 192, 192)'
+                }]
+                },
+                options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1, // Step size between ticks
+                            callback: function (value) {
+                                if (value % 1 === 0) {
+                                return value.toString();
+                                }
+                            }
+                        }
+                    }
+                }
+                }
+            });
+        });
+    </script>
+{% endblock %}

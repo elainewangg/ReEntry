@@ -1,0 +1,86 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}
+Activity Map
+{% endblock %}
+
+
+{% block content %}
+<style>
+    /* Always set the map height explicitly to define the size of the div
+        * element that contains the map. */
+    #map {
+        height: 600px;
+    }
+</style>
+
+<h1 style="margin: auto; margin-top: 50px; text-align: center;">
+    Activity Map
+</h1>
+
+<div class="row">
+    <div class="col-12">
+        <div id="map"></div>
+    </div>
+</div>
+
+<script>
+    let map;
+
+    function initMap() {
+        map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 10.5,
+            center: { lat: 40.4406, lng: -79.9959 },
+        });
+
+        map.data.addGeoJson(
+            JSON.parse('{{ output | escapejs}}')
+        )
+
+        const colorMap = {
+            '0': 'grey',
+            '1': 'green',
+            '2': 'yellow',
+            '3': 'orange',
+            '4': 'red'
+        };
+        map.data.setStyle(function (feature) {
+            return {
+                fillColor: colorMap[feature.getProperty('x_risk')] || 'grey',
+                fillOpacity: 0.6,
+                strokeWeight: 1
+            };
+        });
+
+        // Create an infowindow object to use later
+        var infowindow = new google.maps.InfoWindow();
+
+        /* Create a "listener" that will wait for the user to click an earthquake point,
+        * and then display the infowindow with details about that earthquake.
+        */
+        map.data.addListener('click', function (event) {
+            let name = event.feature.getProperty("hood") || event.feature.getProperty("LABEL");
+            // TODO: Update to use string interpolation
+            let html = "<p>"
+                + "<h3>" + name + "</h3>"
+                + "<h5> Latest Risk Assessment: " + event.feature.getProperty("x_risk") + " </h5>"
+                + "<h5> Active Cases: " + event.feature.getProperty("x_active_cases") + " </h5>"
+                + "<h5> Referrals (last 30 days): " + event.feature.getProperty("x_referrals") + " </h5>"
+                + "</p>";
+            infowindow.setContent(html); // show the html variable in the infowindow
+            console.log(event.feature)
+            console.log(event.feature.getGeometry())
+            infowindow.setPosition({ lat: Number(event.feature.getProperty("intptlat10")), lng: Number(event.feature.getProperty("intptlon10")) }); // anchor the infowindow at the marker
+            infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -30) }); // move the infowindow up slightly to the top of the marker icon
+            infowindow.open(map);
+        });
+    }
+</script>
+
+<!-- Async script executes immediately and must be after any DOM elements used in callback. -->
+<script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfreIweP7EW3oeQ8Ne72R6CU4uEqtHh94&callback=initMap&libraries=&v=weekly"
+    async></script>
+{% endblock %}

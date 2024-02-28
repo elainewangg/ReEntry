@@ -1,0 +1,70 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}{% block navtitle %}
+	Edit Resource
+{% endblock %}{% endblock %}
+
+{% block content %}
+<div class="container ">
+    <div class="row">
+        <div class="col">
+
+            <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+                {{ action }} Resource
+            </h3>
+
+            <br/>
+            <form method="POST" enctype="multipart/form-data" class="resource-form">
+                {% csrf_token %}
+                <table>
+                    {{ form }}
+                </table>
+
+                <br/>
+                <br/>
+                <button class="btn btn-primary" type="submit">Save Resource</button>
+            </form>
+            <br><br>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_specific_scripts %}
+{{ form.media }}
+<script>
+    function displayFields (event) {
+        console.log("displaying fields");
+
+        $(".form-control.hidden").css('visibility', 'hidden')
+        $(".form-control.hidden").val("")
+        $(".form-control.hidden").parent().parent().find("label").css('visibility', 'hidden')
+
+        $(".form-control.organization").hide()
+        $(".form-control.organization").parent().parent().find("label").hide()
+
+        $(".form-control.attachment").hide()
+        $(".form-control.attachment").parent().parent().find("label").hide()
+
+        $(".form-control.embed").hide()
+        $(".form-control.embed").parent().parent().find("label").hide()
+
+        let selected = $("#id_resource_type").val() ? $("#id_resource_type").val() : "organization";
+
+        if (selected === "video" || selected === "link") {
+            selected = "common";
+        }
+
+        $(".form-control." + selected).show()
+        $(".form-control." + selected).parent().parent().find("label").show()
+    }
+
+    $("#id_resource_type").on("change", displayFields);
+    $(document).ready(function() {
+        console.log("document loaded");
+        displayFields();
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+CASE_LABEL_LIST = [
+  ("Looking for Work","Looking for Work"),
+  ("Looking for Housing","Looking for Housing"),
+  ("Looking for Clothing","Looking for Clothing"),
+  ("Looking for Training","Looking for Training"),
+  ("Transportation Needs","Transportation Needs"),
+  ("Food Assistance","Food Assistance"),
+  ("Medical Assistance","Medical Assistance"),
+  ("Legal Assistance","Legal Assistance"),
+  ("Educational Opportunities","Educational Opportunities"),
+  ("Counseling","Counseling"),
+  ("ReentryServices","ReentryServices"),
+  ("OBB Intake","OBB Intake"),
+  ("OBB Workforce Development","OBB Workforce Development"),
+  ("OBB Services","OBB Services"),
+  ("Other","Other"),
+]

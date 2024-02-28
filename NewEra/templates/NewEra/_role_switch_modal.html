@@ -1,0 +1,39 @@
+<div id="role-switch-modal" role="dialog" class="modal fade" aria-hidden="true" data-backdrop="static" style="z-index: 1050;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="background-color: white; opacity: 100%">
+            <div class="modal-header">
+                <h5 class="text-center" style="margin: 0 auto; color: black">Select a Role</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="close"
+                    style="border: none; background-color: white;">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/switch_role/">
+                <div class="modal-body">
+                    {% csrf_token %}
+
+                    <div class="btn-group-vertical" data-toggle="buttons" style="width: 100%;">
+                        {% for key, value in user.get_user_type_buttons.items %}
+                        <label class="btn btn-outline-secondary user-role" style="width: 70%; margin: 5px auto;" onclick="enableContinue()">
+                            <input type="radio" name="role" id="{{key}}" value="{{key}}" style="display: none;"> {{value}}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" id="role-switch-continue" class="btn btn-primary" style="margin: 0 auto;" disabled>Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% block page_specific_scripts %}
+    <script>
+        function enableContinue() {
+            let continueBtn = document.getElementById('role-switch-continue');
+            continueBtn.disabled = false;
+        }
+    </script>
+{% endblock %}

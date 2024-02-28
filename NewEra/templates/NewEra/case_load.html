@@ -1,0 +1,102 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}
+	Case Load 
+{% endblock %}
+
+{% block content %}
+    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
+		Case Load
+	</h1>
+
+    <div class="container">
+
+        <hr>
+        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseCaseLoadUser" aria-expanded="false" aria-controls="collapseCaseLoadUser">Add to Caseload</button>
+        <br>
+
+        <div class="collapse {{ modalStatus }}" id="collapseCaseLoadUser">
+            <br>
+            <div class="card card-body">
+                <form method="POST" action="{% url 'Case Load' %}">
+                    <table>
+                        {{form}}
+                    </table>
+                    
+                    <!-- Give admins the ability to add a new individual to the case load of a specific user -->
+                    {% if user.is_superuser %}
+                        <div style="margin-left: 10px;">
+                            <label><b>User:</b></label><br>
+                            <select name="staff_id">
+                                <!-- List users in staff -->
+                                {% for user in staff %}
+                                    <option value="{{ user.id }}">{{ user.first_name|add:' '|add:user.last_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div><br>
+                    {% else %}
+                        <input type="hidden" name="staff_id" value="{{ user.id }}"><br>
+                        <!-- Logged in user_id --> 
+                    {% endif %}
+                    
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>  
+            </div>
+        </div>
+
+        <br>
+
+        <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
+        {% if user.is_superuser %}
+            <h2>All Users:</h2>
+        {% else %}
+            <h2>Your Caseload:</h2>
+        {% endif %}
+
+        <!-- List the case load users in a table format -->
+        {% if caseload_users.count > 0 %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        {% if user.is_superuser %}
+                            <th>Assignee</th>
+                        {% endif %}
+                        <th>Active?</th>
+                    </tr>
+                    {% for caseload_user in caseload_users %}
+                        <tr>
+                            <td>{{ caseload_user.get_full_name }}</td>
+                            <td>{{ caseload_user.email }}</td>
+                            <td>{{ caseload_user.phone }}</td>
+                            {% if user.is_superuser %}
+                                <td>{{ caseload_user.user.first_name|add:' '|add:caseload_user.user.last_name }}</td>
+                            {% endif %}
+                            {% if caseload_user.is_active %}
+                                <td>&#10004;</td>
+                            {% else %}
+                                <td>&#10060;</td>
+                            {% endif %}
+                            <td class="button-cell"><a href="{% url 'Show Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            {% if perms.resource.edit_resource %}
+                <em><p style="margin: auto;">There are currently no case load users.</p></em>
+            {% else %}
+                <em><p style="margin: auto;">There is no one currently on your case load.</p></em>
+            {% endif %}
+        {% endif %}
+        
+        <br></br>
+    </div>
+{% endblock %}

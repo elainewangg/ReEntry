@@ -1,0 +1,21 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Select Data
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="margin: auto; margin-top: 4%; width: 80%;">
+        <h3>Select Referral Data Timeframe:</h3>
+        <hr/>
+        <form method="POST" action="{% url 'Export Data' %}">
+            <table>
+                {{form}}
+            </table>
+            {% csrf_token %}
+            <hr/>
+            <button id="id_risk_button" class="btn btn-primary" type="submit">Download Data</button>
+        </form>
+        <br/>
+    </div>
+{% endblock %}

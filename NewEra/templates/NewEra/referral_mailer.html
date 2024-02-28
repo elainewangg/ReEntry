@@ -1,0 +1,21 @@
+<div>
+    <h1>Referral from NewERA412</h1>
+    <p>
+        <ul> 
+        {% for r in resources %}
+        <li>
+            <a href="http://newera412.com/resources/{{ r.id }}?key={{ timeStamp }}">{{ r.name|add:': ' }}</a>
+            {% if r.description %}
+                {{ r.description|slice:"0:45"|add:'...' }}
+            {% endif %}
+        </li>
+        {% endfor %}
+        </ul>
+        {% if clientName %}
+            Hi {{ clientName }},<br><br>
+        {% endif %}
+        {{ notes }}<br><br>
+        See our <a href="http://newera412.com?key={{ timeStamp }}">online resources</a> for more.
+    </p>
+    <p> {{ '--'|add:userName }}</p>
+</div>

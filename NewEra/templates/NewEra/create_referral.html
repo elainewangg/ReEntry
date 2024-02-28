@@ -1,0 +1,160 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+{% endblock %}
+
+{% block title %}{% block navtitle %}
+	Create Referral
+{% endblock %}{% endblock %}
+
+{% block content %}
+
+    <!-- Modal that appears to confirm resource removal from referral; initially hidden -->
+    <div id="del-confirm" class="modal">
+        <div class="container text-center">
+            <h3 class="text-white">Are you sure you want to remove this resource?</h3>
+            <p class="text-white">Note: If this is the last resource, it will redirect you out of this page!</p>
+            <div class="clearfix">
+                <button type="button" onclick="cancel()" class="btn btn-light">Cancel</button>
+                <button type="button" onclick="confirmDelete()" class="btn btn-danger">Remove</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top: 5%; padding-bottom: 5%;">
+        <h4 class="text-left"><b>Let's finish the referral:</b></h4>
+        <br><br>
+
+        <div class="text-left">
+            <h4>Referrals</h4>
+            <p style="font-size: 1.15em">First, verify that the correct resources have been selected. You can delete any if necessary:</p>
+            <br />
+
+            <!-- Loop through the resources being referred and display their names, descriptions, URL, and a delete option -->
+            {% for r in resources %}
+                <div class="row">
+                    <div class="col">
+                    <div id="resource-{{r.id}}" class="card resource-card border-0 shadow">
+                        <div class="card-body">
+                            <h5 class="card-title">{{r.name}}</h5>
+                            <p class="card-text">{{r.description|truncatewords:35}}</p>
+                            <a href="{{r.url}}" class="read-link">{{r.url}}</a>
+                            <br><br>
+                            <a id="{{r.id}}-del" href="#!" class="delete-link" onclick="deleteResource({{r.id}})"><b>Remove</b></a>
+                        </div>  
+                    </div>
+                    </div>
+                </div>
+                <input type="hidden" name="resources[]" value="{{ r.id }}">
+                <br>
+            {% endfor %}
+            <br>
+            <h4>Recipient Info</h4>
+            <p style="font-size: 1.15em;">We just need the details about the recipient. Please click one:</p>
+
+            <!-- Referral options, displayed as tabs -->
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <a class="nav-item nav-link" id="nav-caseload-tab" data-toggle="tab" href="#nav-caseload" role="tab" aria-controls="nav-caseload" aria-selected="true" style="color: DodgerBlue;">Select From Caseload</a>
+                    <a class="nav-item nav-link" id="nav-new-tab" data-toggle="tab" href="#nav-new" role="tab" aria-controls="nav-new" aria-selected="false" style="color: DodgerBlue;">Create an Out of System Referral</a>
+                </div>
+            </nav>
+
+            <!-- Case load user referral -->
+            <div class="tab-content" id="nav-tabContent">
+                <div id="nav-caseload" class="tab-pane fade show" role="tabpanel" aria-labelledby="nav-caseload-tab">
+                    <br>
+                    {% if recipients.count > 0 %}
+                        <form action="{% url 'Create Referral' %}" method="POST">
+                            {% for r in resources %}
+                                <input type="hidden" name="resources[]" value="{{ r.id }}">
+                            {% endfor %}
+
+                            <br>
+                            <label><b class="inline-label">Select User(s):</b>
+                                <p>Start typing to search</p>
+                                <select class="js-example-basic-multiple" name="user_ids[]" multiple="multiple" id="e1">
+                                    {% for r in recipients %}
+                                        {% if r.user == request.user and r.nickname %}
+                                            <option value="{{ r.id }}">{{ '('|add:r.nickname|add:')'|add:' '|add:r.first_name|add:' '|add:r.last_name }}</option>
+                                        {% else %}
+                                            <option value="{{ r.id }}">{{ r.first_name|add:' '|add:r.last_name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                              </select>
+                            </label>
+                            <br>
+                            <input type="checkbox" id="checkbox-all"> Select All
+                            <br>
+                            <br>
+                            <label><b>Add Notes:</b></label><br>
+                            <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><hr>
+
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-primary">Make Referral</button>
+                        </form>
+                    {% else %}
+                        {% if perms.resource.edit_resource %}
+                            <em><p style="margin: auto;">There are currently no case load users.</p></em>
+                        {% else %}
+                            <em><p style="margin: auto;">There is no one currently on your case load.</p></em>
+                        {% endif %}
+                    {% endif %}
+                </div>
+
+                <!-- Out of system referral -->
+                <div id="nav-new" class="tab-pane fade" role="tabpanel" aria-labelledby="nav-new-tab">
+                    <br>
+                    <form id="outOfSystemForm" action="{% url 'Create Referral' %}" method="POST">
+                        {% for r in resources %}
+                            <input type="hidden" name="resources[]" value="{{ r.id }}">
+                        {% endfor %}
+
+                        <label><b>Name:</b></label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter a name...">
+                        
+                        <label><b>Phone:</b></label>
+                        <input id="outOfSystemPhone" type="tel" name="phone" placeholder="Enter a phone number..." class="form-control" minlength="10" maxlength="10" pattern="[0-9]{10}">
+
+                        <label><b>Email:&nbsp;&nbsp;</b></label>
+                        <input id="outOfSystemEmail" type="email" name="email" placeholder="Enter an email..." class="form-control">
+
+                        <label><b>Add Notes:</b></label><br>
+                        <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><hr>
+
+                        {% csrf_token %}
+                        <!-- Perform a validation check when the form is submitted -->
+                        <button onsubmit="return validateOutOfSystemForm();" type="submit" class="btn btn-primary">Make Referral</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+{% block page_specific_scripts %}
+
+{% if user.is_staff %}{%load static %}
+<script src="{% static 'NewEra/referrals.js' %}" type="text/javascript"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+    // Initialize multiple select for users
+    $(document).ready(function() {
+        $('.js-example-basic-multiple').select2({ width: '100%'});
+    });
+    
+    // Select all functionality
+    $("#checkbox-all").click(function(){
+    if($("#checkbox-all").is(':checked') ){
+        $("#e1 > option").prop("selected","selected");
+        $("#e1").trigger("change");
+    }else{
+        $("#e1").val(null).trigger("change");
+     }
+});
+</script>
+
+{% endif %}
+
+{% endblock %}

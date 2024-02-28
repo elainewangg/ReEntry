@@ -1,0 +1,33 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+    Log In
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="margin: auto; margin-top: 4%; width: 80%;">
+        <h6><em>If you are not a street outreach worker or administrator, you do not need to log in.</em></h6>
+        <br/>
+        <h3>Log In to NewEra:</h3>
+        <hr/>
+        <form id='login-form' method="POST" action="{% url 'Login' %}" class="login">
+            <table>
+                {{ form }}
+            </table>
+            {% csrf_token %}
+            <hr/>
+            <button id="id_login_button" class="btn btn-primary" type="submit" data-target="#role-switch-modal">Log In
+            </button>
+        </form>
+        <br/>
+        <p><a href="{% url 'reset_password' %}"><u>Forgot your password?</u></a></p>
+    </div>
+{% endblock %}
+
+{% block page_specific_scripts %}
+    {% if user.is_authenticated and user.has_more_than_one_role %}
+        <script>
+            $('#role-switch-modal').modal('show');
+        </script>
+    {% endif %}
+{% endblock %}

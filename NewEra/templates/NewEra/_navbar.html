@@ -1,0 +1,169 @@
+{% block navbar %}
+<nav id="app-nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
+	<!-- Render the logo -->
+	<a class="navbar-brand" href="{% url 'Home' %}">
+		{% load static %}
+		<img src="{% static 'NewEra/reentry_logo.jpg' %}" width="35" height="33" class="d-inline-block align-top"
+			alt="ReEntry Logo">
+		<b>&nbsp;&nbsp;NewERA412&nbsp;&nbsp;</b>
+	</a>
+
+	<!-- Create the hamburger button -->
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText"
+		aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="navbarText">
+		<ul class="navbar-nav ml-auto">
+
+			<!-- Set up the resources link -->
+			<li class="nav-item">
+				{% url 'Resources' as resources_url %}
+				<a class="nav-link {% if request.path == resources_url %}active{% endif %}"
+					href="{{ resources_url }}">Resources</a>
+			</li>
+
+			<!-- Only show the tags link if the user is logged in and an admin -->
+			{% if request.session.role == 'is_superuser' %}
+			<li class="nav-item">
+				{% url 'Tags' as tags_url %}
+				<a class="nav-link {% if request.path == tags_url %}active{% endif %}" href="{{ tags_url }}">Tags</a>
+			</li>
+			{% endif %}
+
+			<!-- Only show the referrals link if the user is logged in and not safe_passage_coordinator -->
+			{% if user.is_authenticated and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
+			<li class="nav-item dropdown">
+				{% url 'Referrals' as referrals_url %}
+				{% url 'Student Referrals' as student_referrals_url %}
+				<a class="nav-link dropdown-toggle {% if request.path == referrals_url %}active{% endif %}"
+					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false">
+					Referrals
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="{% url 'Referrals' %}">General Referrals</a>
+					<a class="dropdown-item" href="{% url 'Student Referrals' %}">Student Referrals</a>
+				</div>
+			</li>
+			{% endif %}
+
+			<!-- Only show the case load link if the user is logged in and not safe_passage_coordinator -->
+			{% if request.session.role == 'is_staff' and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
+			<li class="nav-item">
+				{% url 'Case Load' as case_load_url %}
+				<a class="nav-link {% if request.path == case_load_url %}active{% endif %}"
+					href="{{ case_load_url }}">Case Load</a>
+			</li>
+			{% endif %}
+
+			<!-- Only show the forms link if the user is logged in and not user.is_safe_passage_coordinator -->
+			{% if request.session.role == 'is_staff' and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
+			<li class="nav-item dropdown">
+				{% url 'Meeting Tracker' as meeting_tracker_url %}
+				<a class="nav-link dropdown-toggle {% if request.path == meeting_tracker_url %}active{% endif %}"
+					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false">
+					Forms
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="{% url 'Meeting Tracker' %}">Meetings Tracker</a>
+					<a class="dropdown-item" href="{% url 'Biweekly' %}">Bi-Weekly Tracker</a>
+					<a class="dropdown-item" href="{% url 'Risk Assessment' %}">Weekly Risk Assessment</a>
+				</div>
+			</li>
+			{% endif %}
+
+			<!-- Only show the school forms link if the user is logged in and user.is_safe_passage_coordinator or user.is_safe_passage_coordinator_supervisor -->
+			{% if request.session.role == 'is_safe_passage_coordinator' or request.session.role == 'is_safe_passage_coordinator_supervisor' or request.session.role == 'is_superuser' %}
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle {% if 'schools' in request.path %}active{% endif %}"
+					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+					aria-expanded="false">
+					School Forms
+				</a>
+				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="{% url 'Student Dashboard' %}">Dashboard</a>
+					<a class="dropdown-item" href="{% url 'Student' %}">Students</a>
+					<a class="dropdown-item" href="{% url 'Weekly Student Update' %}">Weekly Update</a>
+					<a class="dropdown-item" href="{% url 'Quarterly Student Update' %}">Quarterly Update</a>
+				</div>
+			</li>
+			{% endif %}
+
+			<!-- Only show the maps link if the user is logged in and an admin -->
+			{% if request.session.role == 'is_superuser' %}
+			<li class="nav-item">
+				{% url 'Maps' as maps_url %}
+				<a class="nav-link {% if request.path == maps_url %}active{% endif %}" href="{{ maps_url }}">Maps</a>
+			</li>
+			{% endif %}
+
+			<!-- Only show the dashboard link if the user is logged in and an admin -->
+			{% if request.session.role == 'is_superuser' %}
+			<li class="nav-item">
+				{% url 'Dashboard' as dashboard_url %}
+				<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
+					href="{{ dashboard_url }}">Dashboard</a>
+			</li>
+			{% endif %}
+
+			<!-- Only show the dashboard link if the user is logged in and a supervisor -->
+			{% if request.session.role == 'is_supervisor' %}
+			<li class="nav-item">
+				{% url 'Supervisor Dashboard' as supervisor_dashboard_url %}
+				<a class="nav-link {% if request.path == supervisor_dashboard_url %}active{% endif %}"
+					href="{{ supervisor_dashboard_url }}">Dashboard</a>
+			</li>
+			{% endif %}
+
+			{% if not user.is_authenticated %}
+			<!-- Only show the log in link if the user is logged out -->
+			<li class="nav-item">
+				{% url 'Login' as login_url %}
+				<a class="nav-link {% if request.path == login_url %}active{% endif %}" href="{{ login_url }}">Log
+					In</a>
+			</li>
+
+			<!-- Only show the about link if the user is logged out -->
+			<li class="nav-item">
+				{% url 'About' as about_url %}
+				<a class="nav-link {% if request.path == about_url %}active{% endif %}" href="{{ about_url }}">About</a>
+			</li>
+			{% endif %}
+
+			{% if user.is_authenticated %}
+			<li class="nav-item dropdown">
+				{% url 'password_change' as change_password_url %}
+				<a class="nav-link dropdown-toggle" 
+					href="#" 
+					id="navbarDropdownMenuLink" 
+					data-toggle="dropdown" 
+					aria-haspopup="true" 
+					aria-expanded="false">
+					<i class="material-icons" style="font-size: 20px;">account_circle</i>
+					{% if request.session.role == 'is_safe_passage_coordinator' %}
+                        SPC
+					{% elif request.session.role == 'is_supervisor' %}
+                        Supervisor
+					{% elif request.session.role == 'is_superuser' %}
+                        Admin
+					{% elif request.session.role == 'is_safe_passage_coordinator_supervisor' %}
+                        SPC Supervisor
+                    {% elif request.session.role == 'is_staff' %}
+                        SOW
+                    {% endif %}
+				</a>
+				<div class="dropdown-menu"
+					aria-labelledby="navbarDropdownMenuLink">
+					<a class="dropdown-item" href="#" data-toggle="modal" data-target="#role-switch-modal">Switch Role</a>
+					<a class="dropdown-item" href="{{ change_password_url }}">Change Password</a>
+					<a class="dropdown-item" href="{% url 'Logout' %}">Log Out</a>
+				</div>
+			</li>
+			{% endif %}
+		</ul>
+	</div>
+</nav>
+{% endblock %}

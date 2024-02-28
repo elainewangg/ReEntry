@@ -1,0 +1,82 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Response
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+
+            <!-- Display the nickname of the case load user if they have one -->
+            {% if response.user.nickname %}
+                <h1>{{ response.user.get_full_name }} ({{ response.user.nickname }})</h1>
+            {% else %}
+                <h1>{{ response.user.get_full_name }}</h1>
+            {% endif %}
+            {{response.date}}
+            <br>
+            <br>
+
+            <h4>Start of the pay period</h4>
+            <p>{{ response.pay_start }}</p>
+
+            <h4>End of the pay period</h4>
+            <p>{{ response.pay_end }}</p>
+
+            <h4>Total Hours work this pay period?</h4>
+            <p>{{ response.work_hours }}</p>
+
+            <h4>Total hours of special event</h4>
+            <p>{{ response.special_hours }} </p>
+            
+            <h4>Number of special events?</h4>
+            <p>{{ response.special_events}}</p>
+
+            <h4>Total hours of meetings attended?</h4>
+            <p>{{ response.meeting_hours }}</p>
+
+            <h4>Number of meetings attended?</h4>
+            <p>{{response.num_meetings}}</p>
+
+            <h4>Other hours</h4>
+            <p>{{response.other}}</p>
+
+            <h4>Number Served</h4>
+            <p>{{response.num_served}}</p>
+
+            <h4>Location</h4>
+            <p>{{response.loaction}}</p>
+
+            <h4>During the period GVI's received calls for intervention and prevention services the details are as follows.</h4>
+            <p>{{response.intervention}}</p>
+
+            <h4>Number of Incident responses</h4>
+            <p>{{response.num_responses}}</p>
+
+            <h4>Number of Community Meetings/Events</h4>
+            <p>{{response.num_events}}</p>
+
+            <h4>Number of Home Visits</h4>
+            <p>{{response.num_visits}}</p>
+
+            <h4>Number of Mediations</h4>
+            <p>{{response.num_mediations}}</p>
+
+            <h4>Summary of the first week</h4>
+            <p>{{response.first_summary}}</p>
+
+            <h4>Summary of the second week</h4>
+            <p>{{response.second_summary}}</p>
+        </div>
+
+        <br><hr><br>
+
+        <a href="{% url 'Edit Biweekly Response' response.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+
+        <a href="{% url 'Delete Biweekly Response' response.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

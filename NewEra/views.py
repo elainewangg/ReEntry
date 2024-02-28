@@ -1,0 +1,2984 @@
+import ast
+import json
+import operator
+import os
+import pprint
+import re
+from datetime import date, datetime, timedelta
+from dateutil.parser import isoparse
+from decimal import Decimal
+from pathlib import Path
+
+import openpyxl
+from django.contrib import messages
+from django.contrib.auth import authenticate
+from django.contrib.auth import login as auth_login
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db import IntegrityError, transaction
+from django.db.models import Avg, Prefetch, Q
+from django.http import Http404, HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
+from django.utils import timezone
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from openpyxl import Workbook
+from openpyxl.styles import Alignment, Font
+from openpyxl.utils import get_column_letter
+import pytz
+
+from NewEra.forms import (BiweeklyForm, CaseLoadUserForm, CreateNoteForm,
+                          CreateResourceForm, EditOrganizationForm,
+                          EditReferralNotesForm, EditSelfUserForm, EditStudentReferralNotesForm,
+                          EditUserForm, LoginForm, MeetingTrackerForm,
+                          RegistrationForm, ResourceFilter, RiskAssessmentForm,
+                          SelectDataTimeframe, StudentForm,
+                          StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm,
+                          StudentWeeklyUpdateUploadFormset, TagForm, RoleSwitchForm)
+from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
+                           Organization, Referral, Resource, RiskAssessment,
+                           Student, StudentQuarterlyUpdate, StudentReferral,
+                           StudentWeeklyUpdate, Tag, User)
+
+# region CONSTANTS
+
+###################################### 
+#              CONSTANTS 
+######################################
+
+# Define the number of referrals or paginations shown on a page
+RESOURCE_PAGINATION_COUNT = 30
+REFERRAL_PAGINATION_COUNT = 20
+
+# endregion
+
+# region MISC ACTIONS
+
+###################################### 
+#              MISC ACTIONS  
+######################################
+
+# function to display home page
+def home(request): 
+    markReferralAsSeen(request)
+    markStudentReferralAsSeen(request)
+    return render(request, 'NewEra/home.html', {})
+
+# function to login
+def login(request):
+    if request.user.is_authenticated:
+        return redirect(reverse('Home'))
+
+    context = {}
+
+    if request.method == 'GET':
+        context['form'] = LoginForm()
+        return render(request, 'NewEra/login.html', context)
+
+    form = LoginForm(request.POST)
+    context['form'] = form
+
+    if not form.is_valid():
+        return render(request, 'NewEra/login.html', context)
+
+    user = authenticate(username=form.cleaned_data['username'],
+                            password=form.cleaned_data['password'])
+
+    auth_login(request, user)
+
+    messages.success(request, 'Logged in as {} {}.'.format(user.first_name, user.last_name))
+
+    if not user.has_more_than_one_role():
+        request.session['role'] = user.get_user_types()[0]
+    else:
+        return render(request, 'NewEra/login.html', context)
+
+    return redirect(reverse('Home'))
+
+def switch_role(request):
+    if (request.method == 'POST'):
+        form = RoleSwitchForm(request.POST)
+        role = request.POST['role']
+
+        request.session['role'] = role
+
+        request.session.modified = True
+    else:
+        form = RoleSwitchForm()
+
+    return redirect(reverse('Home'))
+
+# function to logout
+@login_required
+def logout(request):
+    auth_logout(request)
+    messages.success(request, 'Successfully logged out.')
+    return redirect(reverse('Login'))
+
+# function to display about page
+def about(request):
+    return render(request, 'NewEra/about.html')
+
+# Function to update the referral given a GET request (to a resource) with a querystring timestamp
+def markReferralAsSeen(request):
+
+    if 'key' not in request.GET:
+        return 
+
+    try:
+        key_str = request.GET['key'].replace(' 00:00', '')  # Remove ' 00:00' from the string
+        keyDate = isoparse(key_str)
+        keyDate = keyDate.replace(tzinfo=pytz.utc)  # Make the datetime object timezone-aware (assuming UTC)
+    except ValueError as e:
+        # Log the error and return
+        print(f"Error parsing 'key' parameter: {str(e)}")
+        return
+
+    referrals = Referral.objects.filter(referral_date=keyDate)
+
+    if referrals.count() == 1:
+        referral = referrals.first()
+        referral.date_accessed = datetime.now()
+        referral.save()
+
+# Function to update the student referral given a GET request (to a resource) with a querystring timestamp
+def markStudentReferralAsSeen(request):
+
+    if 'key' not in request.GET:
+        return 
+
+    try:
+        key_str = request.GET['key'].replace(' 00:00', '')  # Remove ' 00:00' from the string
+        keyDate = isoparse(key_str)
+        keyDate = keyDate.replace(tzinfo=pytz.utc)  # Make the datetime object timezone-aware (assuming UTC)
+    except ValueError as e:
+        # Log the error and return
+        print(f"Error parsing 'key' parameter: {str(e)}")
+        return
+
+    referrals = StudentReferral.objects.filter(referral_date=keyDate)
+    print(referrals)
+
+    if referrals.count() == 1:
+        referral = referrals.first()
+        referral.date_accessed = datetime.now()
+        print(referral.date_accessed)
+        referral.save()
+
+# Function to check visitor cookie, and see if they accessed the resource
+def isUniqueVisit(request, response, id): 
+    siteStaff = request.COOKIES.get('siteStaff', '')
+
+    if request.user.is_authenticated or siteStaff == 'true':
+        response.set_cookie('siteStaff', 'true')
+        return False 
+
+    visitedResources = request.COOKIES.get('visitedResources', '').split(';')
+
+    if visitedResources == ['']:
+        response.set_cookie('visitedResources', str(id))
+        return True 
+    elif str(id) in visitedResources:
+        return False
+    else: 
+        val = ';'.join(visitedResources)
+        val = val + ';' + str(id)
+        response.set_cookie('visitedResources', val)
+        return True 
+    
+    return False 
+
+# endregion
+
+# region RESOURCES
+
+###################################### 
+#              RESOURCES  
+######################################
+
+# function to display all resources
+def resources(request):
+    all_resources = Resource.objects.all()
+    context = { 'filter': ResourceFilter(request.GET, queryset=all_resources) }
+
+    if request.method == 'GET':
+        # SEARCH QUERY
+        query = request.GET.get('query')
+
+        # Set context value based on if the filter is set on the resources page
+        if query:
+            context['active_resources'] = context['filter'].qs.filter( Q(is_active=True) & (Q(name__icontains=query) | Q(description__icontains=query)) )
+            context['inactive_resources'] = context['filter'].qs.filter( Q(is_active=False) & (Q(name__icontains=query) | Q(description__icontains=query)) )
+        else: 
+            context['active_resources'] = context['filter'].qs.filter(is_active=True)
+            context['inactive_resources'] = context['filter'].qs.filter(is_active=False)
+
+        # FILTER QUERY - build a query param for use in pagination links
+        filterParams = request.GET.getlist('tags', '')
+        filterQueryString = ''
+
+        if filterParams: 
+            for id in filterParams:
+                filterQueryString += '&tags='
+                filterQueryString += id
+
+        context['filterQuery'] = filterQueryString
+
+        # PAGINATION
+        active_page = request.GET.get('a_page', 1)
+        inactive_page = request.GET.get('i_page', 1)
+        paginator = Paginator(context['active_resources'], RESOURCE_PAGINATION_COUNT)
+        inactive_paginator = Paginator(context['inactive_resources'], RESOURCE_PAGINATION_COUNT)
+        
+        # Render the user's selected page for active resources
+        try:
+            activeResources = paginator.page(active_page)
+        except PageNotAnInteger:
+            activeResources = paginator.page(1)
+        except EmptyPage:
+            activeResources = paginator.page(paginator.num_pages)
+
+        # Render the user's selected page for inactive resources
+        try:
+            inactiveResources = inactive_paginator.page(inactive_page)
+        except PageNotAnInteger:
+            inactiveResources = inactive_paginator.page(1)
+        except EmptyPage:
+            inactiveResources = inactive_paginator.page(inactive_paginator.num_pages)
+
+        context['active_resources'] = activeResources
+        context['inactive_resources'] = inactiveResources
+
+    return render(request, 'NewEra/resources.html', context)
+
+# function to display a certain resource detail
+def get_resource(request, id):
+    resource = get_object_or_404(Resource, id=id)
+    context = { 'resource': resource, 'tags': resource.tags.all() }
+
+    # provide a YouTube ID if this resource is a video
+    if resource.resource_type == "video":
+        pattern = r"(.*?)(^|\/|v=)([a-z0-9_-]{11})(.*)?"
+        match = re.match(pattern, resource.url, re.IGNORECASE)
+        if match and match.group(3):
+            context['youtube_id'] = match.group(3)
+    
+    response = render(request, 'NewEra/get_resource.html', context)
+
+    # Update the resource clicks
+    if isUniqueVisit(request, response, id):
+        resource.clicks = resource.clicks + 1
+        resource.save()
+
+    markReferralAsSeen(request)
+    markStudentReferralAsSeen(request)
+    return response
+
+# get resource attachment when uploading a new resource
+@xframe_options_sameorigin
+def get_resource_attachment(request, id): 
+    resource = get_object_or_404(Resource, id=id)
+
+    if not resource.image:
+        raise Http404
+
+    response = HttpResponse(resource.attachment, content_type=resource.attachment_content_type)
+    response['Content-Disposition'] = 'filename="' + resource.attachment_content_type +'"'
+
+    return response
+
+# Deletes the given image if it exists
+@login_required
+def deleteAttachment(request, oldAttachment):
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    ATT_ROOT = os.path.join(BASE_DIR, 'NewEra/user_uploads/' + oldAttachment.name)
+    os.remove(ATT_ROOT)
+
+# ***** Note about images *****
+# They are uploaded to the system as type .JPEG or .PNG etc.
+# And then saved as type django.FileField() 
+# *****************************
+def get_resource_image(request, id): 
+    resource = get_object_or_404(Resource, id=id)
+
+    if not resource.image:
+        raise Http404
+
+    return HttpResponse(resource.image, content_type=resource.content_type)
+
+# Deletes the given image if it exists
+@login_required
+def deleteImage(request, oldImage):
+    if oldImage: 
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        IMAGE_ROOT = os.path.join(BASE_DIR, 'NewEra/user_uploads/' + oldImage.name)
+        os.remove(IMAGE_ROOT)
+
+# create new resources
+@login_required
+def create_resource(request):
+    if not request.user.is_superuser:
+        raise Http404
+
+    context = {}
+    form = CreateResourceForm()
+
+    if request.method == 'POST':
+        resource = Resource()
+        form = CreateResourceForm(request.POST, request.FILES, instance=resource)
+        
+        if form.is_valid():
+            # Update the Resource content_type MANUALLY 
+            pic = form.cleaned_data['image']
+            if pic and pic != '':
+                resource.content_type = form.cleaned_data['image'].content_type
+
+            att = form.cleaned_data['attachment']
+            if att and att != '':
+                resource.attachment_content_type = form.cleaned_data['attachment'].content_type
+
+            form.save()
+            resource.save()
+
+            messages.success(request, 'Resource successfully created!')
+
+            return redirect('Resources')
+    else:
+        form = CreateResourceForm(initial={'is_active': True})
+
+    context['action'] = 'Create'
+    context['form'] = form
+
+    return render(request, 'NewEra/edit_resource.html', context)
+
+# edit resource
+@login_required
+def edit_resource(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+    resource = get_object_or_404(Resource, id=id)
+    oldImage = resource.image
+    oldAttachment = resource.attachment
+
+    if request.method == "POST":
+        form = CreateResourceForm(request.POST, request.FILES, instance=resource)
+    
+        if form.is_valid():
+
+            pic = form.cleaned_data['image']
+            if pic and pic != '':
+                
+                # Update content type & remove old image
+                try: 
+                    # THE FOLLOWING LINE MAY THROW:
+                    # After being set, the resource image is saved as a FileField type (and not an Image)
+                    # As a result, it will not have a content_type attribute the way image files will
+                    resource.content_type = form.cleaned_data['image'].content_type
+                    deleteImage(request, oldImage)
+                except: 
+                    pass
+
+
+                pic = form.cleaned_data['attachment']
+            if pic and pic != '':
+                
+                # Update content type & remove old attachment
+                try: 
+                    resource.attachment_content_type = form.cleaned_data['attachment'].content_type
+                    deleteAttachment(request, oldAttachment)
+                except: 
+                    pass
+
+            form.save()
+            resource.save()
+
+            messages.success(request, '{} successfully edited.'.format(resource.name))
+            return redirect('Show Resource', id=resource.id)
+    else:
+        form = CreateResourceForm(instance=resource)
+    return render(request, 'NewEra/edit_resource.html', {'form': form, 'resource': resource, 'action': 'Edit'})
+
+@login_required
+def delete_resource(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    resource = get_object_or_404(Resource, id=id)
+
+    if request.method == 'POST':
+        # Delete the resource (and its image) only if it has never been referred
+        if (resource.referrals.count() == 0):
+            deleteImage(request, resource.image)
+            resource.delete()
+            messages.success(request, '{} successfully deleted.'.format(resource.name))
+            return redirect('Resources')
+        # Otherwise, deactivate the resource
+        else:
+            resource.is_active = False
+            resource.save()
+            messages.success(request, '{} was made inactive.'.format(resource.name))
+            return redirect('Show Resource', id=resource.id)
+    return render(request, 'NewEra/delete_resource.html', {'resource': resource})
+
+@login_required
+def resetViews(request):
+    if request.method == 'POST':
+        Resource.objects.all().update(clicks=0)
+        messages.success(request, 'Reset all resource views')
+        return redirect(reverse('Dashboard'))
+    return render(request, 'NewEra/reset_view_counts.html', {})
+
+# endregion
+
+# region REFERRALS
+
+###################################### 
+#              REFERRALS  
+######################################
+
+@login_required
+def create_referral(request):
+    resources = request.GET.get('resources', None)	
+    recipients = []
+    nameInputs = []
+    referrals = []
+    
+    if request.user.is_superuser: 
+        recipients = CaseLoadUser.objects.filter(is_active=True).all()
+    elif request.user.is_staff: 
+        recipients = CaseLoadUser.objects.filter(is_active=True).filter(user=request.user)
+
+    if request.method == 'GET' and resources:
+        resources = [digit.strip() for digit in ast.literal_eval(resources)] # Safely parse array
+        resources = [ get_object_or_404(Resource, id=resourceId) for resourceId in resources ]
+
+        return render(request, 'NewEra/create_referral.html', {'resources': resources, 'recipients': recipients })
+
+    elif request.method == 'POST': 
+        phoneInput = ''.join(digit for digit in request.POST.get('phone', '') if digit.isdigit())
+        
+        # Referral to people on a case load (in the system)
+        if 'resources[]' in request.POST and 'user_ids[]' in request.POST and 'notes' in request.POST: 
+            caseload_users = [get_object_or_404(CaseLoadUser, id=num) for num in request.POST.getlist('user_ids[]')]
+            resources = [get_object_or_404(Resource, id=num) for num in request.POST.getlist('resources[]')]
+
+            for caseload_user in caseload_users:
+                # Change the message introduction depending on whether the case load user has a nickname or not
+                if caseload_user.nickname:
+                    nameInputs.append(caseload_user.nickname)
+                else:
+                    nameInputs.append(caseload_user.first_name)
+
+                referral = Referral(email=caseload_user.email, phone=caseload_user.phone, notes=request.POST['notes'], user=request.user, caseUser=caseload_user)
+                referrals.append(referral)
+
+        # Out of system referral
+        elif 'resources[]' in request.POST and 'phone' in request.POST and 'email' in request.POST and 'notes' in request.POST and (len(phoneInput) == 10 or len(phoneInput) == 0): 
+            resources = [get_object_or_404(Resource, id=num) for num in request.POST.getlist('resources[]')]
+            referral = Referral(email=request.POST['email'], phone=phoneInput, notes=request.POST['notes'], user=request.user)
+            referrals.append(referral)
+            nameInput = request.POST['name']
+            nameInputs.append(nameInput)
+
+        else: 
+            messages.error(request, 'Please fill out all fields.')
+            return render(request, 'NewEra/create_referral.html', {'resources': resources, 'recipients': recipients })
+
+        # add resource(s) to referral(s)
+        for ref in referrals:
+            ref.save()
+            for r in resources: 
+                ref.resource_set.add(r)
+        
+        # Send the referral(s) via email and SMS
+        for i, name in enumerate(nameInputs):
+            referralTimeStamp = str(referrals[i].referral_date)
+            referrals[i].sendEmail(referralTimeStamp, name)
+            referrals[i].sendSMS(referralTimeStamp, name)
+
+    messages.success(request, 'Successfully created a new referral.')
+
+    return redirect(reverse('Resources'))
+
+@login_required
+def create_student_referral(request):
+    resources = request.GET.get('resources', None)	
+    recipients = []
+    nameInputs = []
+    referrals = []
+    
+    if request.user.is_superuser: 
+        recipients = Student.objects.filter(is_active=True).all()
+    elif request.user.is_staff: 
+        recipients = Student.objects.filter(is_active=True, user=request.user)
+
+    if request.method == 'GET' and resources:
+        resources = [digit.strip() for digit in ast.literal_eval(resources)] # Safely parse array
+        resources = [ get_object_or_404(Resource, id=resourceId) for resourceId in resources ]
+
+        return render(request, 'NewEra/create_student_referral.html', {'resources': resources, 'recipients': recipients })
+
+    elif request.method == 'POST': 
+        if 'resources[]' in request.POST and 'user_ids[]' in request.POST and 'notes' in request.POST: 
+            students = [get_object_or_404(Student, id=num) for num in request.POST.getlist('user_ids[]')]
+            resources = [get_object_or_404(Resource, id=num) for num in request.POST.getlist('resources[]')]
+
+            for student in students:
+                nameInputs.append(student.first_name)    
+
+                referral = StudentReferral(email=student.email, phone=student.phone, notes=request.POST['notes'], user=request.user, student=student, quarter=request.POST['quarter'])
+                referrals.append(referral)
+        else: 
+            messages.error(request, 'Please fill out all fields.')
+            return render(request, 'NewEra/create_student_referral.html', {'resources': resources, 'recipients': recipients })
+
+        # add resource(s) to referral(s)
+        for ref in referrals:
+            ref.save()
+            for r in resources: 
+                ref.resource_set.add(r)
+        
+        # Send the referral(s) via email and SMS
+        for i, name in enumerate(nameInputs):
+            referralTimeStamp = str(referrals[i].referral_date)
+            referrals[i].sendEmail(referralTimeStamp, name)
+            referrals[i].sendSMS(referralTimeStamp, name)
+
+    messages.success(request, 'Successfully created a new referral.')
+
+    return redirect(reverse('Resources'))
+
+def load_referrals(request, referrals, template_name):
+    page = request.GET.get('page', 1)
+    paginator = Paginator(referrals, REFERRAL_PAGINATION_COUNT)
+
+    try:
+        referrals = paginator.page(page)
+    except PageNotAnInteger:
+        referrals = paginator.page(1)
+    except EmptyPage:
+        referrals = paginator.page(paginator.num_pages)
+
+    context = {'referrals': referrals}
+    return render(request, template_name, context)
+
+@login_required
+def referrals(request):
+    # Show admins all referrals, and SOWs only their referrals
+    if (request.user.is_superuser):
+        referrals = Referral.objects.all().order_by('-referral_date')
+    elif (request.user.is_supervisor):
+        referrals = Referral.objects.all().filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-referral_date')
+    elif (request.user.is_staff):
+        referrals = Referral.objects.all().filter(user=request.user).order_by('-referral_date')
+
+    page = request.GET.get('page', 1)
+
+    generalPaginator = Paginator(referrals, REFERRAL_PAGINATION_COUNT)
+
+    try:
+        referrals = generalPaginator.page(page)
+    except PageNotAnInteger:
+        referrals = generalPaginator.page(1)
+    except EmptyPage:
+        referrals = generalPaginator.page(generalPaginator.num_pages)
+
+    context = { 'referrals': referrals }
+
+    return render(request, 'NewEra/referrals.html', context)
+
+@login_required
+def student_referrals(request):
+    # Show admins all referrals, and SOWs only their referrals
+    if (request.user.is_superuser):
+        studentReferrals = StudentReferral.objects.all().order_by('-referral_date')
+    elif (request.user.is_supervisor):
+        studentReferrals = StudentReferral.objects.all().filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-referral_date')
+    elif (request.user.is_staff):
+        studentReferrals = StudentReferral.objects.all().filter(user=request.user).order_by('-referral_date')
+
+    # PAGINATION
+    page = request.GET.get('page', 1)
+
+    studentPaginator = Paginator(studentReferrals, REFERRAL_PAGINATION_COUNT)
+
+    try:
+        studentReferrals = studentPaginator.page(page)
+    except PageNotAnInteger:
+        studentReferrals = studentPaginator.page(1)
+    except EmptyPage:
+        studentReferrals = studentPaginator.page(studentPaginator.num_pages)
+
+    context = { 'studentReferrals': studentReferrals }
+
+    return render(request, 'NewEra/student_referrals.html', context)
+
+@login_required
+def get_referral(request, id):
+    referral = get_object_or_404(Referral, id=id)
+    if referral.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == referral.user.organization ):
+        raise Http404
+    context = { 'referral': referral, 'resources': Resource.objects.all().filter(referrals=referral) }
+    return render(request, 'NewEra/get_referral.html', context)
+
+def edit_referral_notes(request, id):
+    referral = get_object_or_404(Referral, id=id)
+    if referral.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == "POST":
+        form = EditReferralNotesForm(request.POST, instance=referral)
+    
+        if form.is_valid():
+            form.save()
+            referral.save()
+
+            messages.success(request, 'Referral notes updated.')
+            return redirect('Show Referral', id=referral.id)
+    else:
+        form = EditReferralNotesForm(instance=referral)
+    return render(request, 'NewEra/edit_referral_notes.html', {'form': form, 'referral': referral, 'action': 'Edit'})
+
+@login_required
+def get_studentReferral(request, id):
+    referral = get_object_or_404(StudentReferral, id=id)
+    if referral.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == referral.user.organization ):
+        raise Http404
+    context = { 'referral': referral, 'resources': Resource.objects.all().filter(student_referrals=referral) }
+    return render(request, 'NewEra/get_studentReferral.html', context)
+
+def edit_studentReferral_notes(request, id):
+    referral = get_object_or_404(StudentReferral, id=id)
+    if referral.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == "POST":
+        form = EditStudentReferralNotesForm(request.POST, instance=referral)
+    
+        if form.is_valid():
+
+            form.save()
+            referral.save()
+
+            messages.success(request, 'Referral notes updated.')
+            return redirect('Show Referral', id=referral.id)
+    else:
+        form = EditStudentReferralNotesForm(instance=referral)
+    return render(request, 'NewEra/edit_studentReferral_notes.html', {'form': form, 'referral': referral, 'action': 'Edit'})
+# endregion
+
+# region CASE LOAD
+###################################### 
+#              CASE LOAD  
+######################################
+
+@login_required
+def case_load(request):
+    users = []
+    context = {} 
+
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        users = CaseLoadUser.objects.all()	
+        # Changed to account for inactive users
+        context['staff'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
+    elif request.user.is_supervisor:
+        users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
+    elif request.user.is_staff:
+        users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    if request.method == 'POST' and 'staff_id' in request.POST:
+        staff_user = get_object_or_404(User, id=request.POST['staff_id'])
+        load_user = CaseLoadUser(user=staff_user)
+        form = CaseLoadUserForm(request.POST, instance=load_user)
+        
+        if not form.is_valid():
+            context['form'] = form 
+            context['caseload_users'] = users
+            context['modalStatus'] = 'show'
+            return render(request, 'NewEra/case_load.html', context)
+
+        form.save()
+        load_user.save()
+        messages.success(request, 'Successfully added {} {} to the CaseLoad.'.format(load_user.first_name, load_user.last_name))
+
+    context['caseload_users'] = users
+    context['form'] = CaseLoadUserForm()
+    return render(request, 'NewEra/case_load.html', context)
+
+@login_required
+def get_case_load_user(request, id):
+    case_load_user = get_object_or_404(CaseLoadUser, id=id)
+    if case_load_user.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == case_load_user.user.organization ):
+        raise Http404
+    notes = Note.objects.filter(case=case_load_user).order_by("-date")
+    context = { 'case_load_user': case_load_user, 'notes': notes }
+
+    return render(request, 'NewEra/get_case_load_user.html', context)
+
+@login_required
+def edit_case_load_user(request, id):
+    case_load_user = get_object_or_404(CaseLoadUser, id=id)
+    if case_load_user.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == "POST":
+        form = CaseLoadUserForm(request.POST, instance=case_load_user)
+
+        if form.is_valid():
+
+            form.save()
+            case_load_user.save()
+
+            messages.success(request, '{} successfully edited.'.format(case_load_user.get_full_name()))
+            return redirect('Show Case Load User', id=case_load_user.id)
+    else:
+        form = CaseLoadUserForm(instance=case_load_user)
+    return render(request, 'NewEra/edit_case_load_user.html', {'form': form, 'case_load_user': case_load_user, 'action': 'Edit'})
+
+@login_required
+def delete_case_load_user(request, id):
+    case_load_user = get_object_or_404(CaseLoadUser, id=id)
+    if case_load_user.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == 'POST':
+        # Delete the case load user only if they have never been referred
+        if (case_load_user.get_referrals().count() == 0):
+            notes = Note.objects.filter(case=case_load_user)
+            for n in notes:
+                n.delete()
+            case_load_user.delete()
+            messages.success(request, '{} successfully deleted.'.format(case_load_user.get_full_name()))
+            return redirect('Case Load')
+        # Otherwise, delete the case load user
+        else:
+            case_load_user.is_active = False
+            case_load_user.save()
+            messages.success(request, '{} was made inactive.'.format(case_load_user.get_full_name()))
+            return redirect('Show Case Load User', id=case_load_user.id)
+    return render(request, 'NewEra/delete_case_load_user.html', {'case_load_user': case_load_user})
+
+@login_required
+def create_note(request, id):
+    case_load_user = get_object_or_404(CaseLoadUser, id=id)
+    if case_load_user.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    context = {}
+    form = CreateNoteForm()
+    context['case_load_user'] = case_load_user 
+    context['form'] = form
+    context['action'] = 'Create'
+
+    if request.method == 'POST':
+        note = Note(case=case_load_user)
+        form = CreateNoteForm(request.POST, instance=note)
+        
+        if form.is_valid():
+            note.notes=form.cleaned_data['notes']
+            note.activity_type=form.cleaned_data['activity_type']
+            note.hours = form.cleaned_data['hours']
+            note.date = form.cleaned_data['date']
+            form.save()
+            note.save()
+
+            messages.success(request, 'Note successfully created!')
+
+            return redirect('Show Case Load User', id=case_load_user.id)
+    else:
+        note = CreateNoteForm()
+
+    return render(request, 'NewEra/edit_note.html', context)
+
+@login_required
+def edit_note(request, id):
+    note = Note.objects.filter(id=id).first()
+    
+    case_load_user = note.case
+    if case_load_user.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    context = {}
+    context['case_load_user'] = case_load_user 
+    context['action'] = 'Edit'
+
+    if request.method == "POST":
+        form = CreateNoteForm(request.POST, instance=note)
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+            note.save()
+
+            messages.success(request, 'Note successfully edited!')
+            return redirect('Show Case Load User', id=case_load_user.id)
+            
+    else:
+        form = CreateNoteForm(instance=note)
+        context['form'] = form
+    return render(request, 'NewEra/edit_note.html', context)
+
+@login_required
+def delete_note(request, id):    
+    note = Note.objects.filter(id=id).first()
+    cid = note.case.id
+    if note.case.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == 'POST':
+        note.delete()
+        messages.success(request, 'Note successfully deleted.')
+        return redirect('Show Case Load User', id=cid)
+
+    return render(request, 'NewEra/delete_note.html', {'note': note})
+
+# endregion
+
+# region MAPS
+def get_maps(request):
+    if not request.user.is_superuser:
+        raise Http404
+    
+    # read json file of neighborhoods
+    with open('NewEra/static/NewEra/pgh_neighborhoods.geojson') as file:
+        neighborhoods = json.load(file)
+
+    # read json file of second neighborhoods
+    with open('NewEra/static/NewEra/Allegheny_County.geojson') as file:
+        second_neighborhoods = json.load(file)
+
+    neighborhoods['features'].extend(second_neighborhoods['features'])
+
+    # # Filter out entries with name "PITTSBURGH"
+    neighborhoods['features'] = [neighborhood for neighborhood in neighborhoods['features'] if not is_pittsburgh(neighborhood)]
+
+    for neighborhood in neighborhoods['features'] :
+        # Extract the neighborhood name from the appropriate field
+        if 'hood' in neighborhood['properties']:
+            name = neighborhood['properties']['hood']
+        elif 'NAME' in neighborhood['properties']:
+            name = neighborhood['properties']['LABEL']
+        else:
+            # Handle the case when the name field is not found in the properties
+            name = None  # Update this with appropriate handling
+        
+        if name is not None:
+            # get the risk assessment
+            risks = RiskAssessment.objects.filter(neighborhood=name).order_by('-risk_level')		
+            risk = 0
+            if len(risks) > 0 :
+                risk = risks[0].risk_level
+            neighborhood['properties']['x_risk'] = risk
+
+            # get the active cases
+            active_cases = CaseLoadUser.objects.filter(neighborhood=name, is_active=True)
+            neighborhood['properties']['x_active_cases'] = len(active_cases)
+
+            # get the number of referrals
+            referrals = Referral.objects.filter(referral_date__gte=timezone.now()-timedelta(days=30), caseUser__neighborhood=name)
+            neighborhood['properties']['x_referrals'] = len(referrals)
+
+    output = json.dumps(neighborhoods)
+
+    context = { 'output': output }
+    
+    response = render(request, 'NewEra/maps.html', context)
+
+    return response
+
+def is_pittsburgh(neighborhood):
+    if 'hood' in neighborhood['properties']:
+        name = neighborhood['properties']['hood']
+    elif 'NAME' in neighborhood['properties']:
+        name = neighborhood['properties']['NAME']
+    else:
+        name = None
+
+    return name == "PITTSBURGH"
+
+# endregion
+
+# region USER MANAGEMENT
+
+###################################### 
+#              USER MANAGEMENT  
+######################################
+
+@login_required
+def dashboard(request): 
+    if not request.user.is_superuser:
+        raise Http404
+
+    admins = User.objects.filter(is_superuser=True)
+    sows = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator=False)
+    safe_passage_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator=True)
+    safe_passage_coordinator_supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator_supervisor=True)
+    supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=True)
+    orgs = Organization.objects.all().order_by('name')
+    context = {
+        'admins': admins, 
+        'sows': sows, 
+        'orgs': orgs, 
+        'supervisors': supervisors, 
+        'form': RegistrationForm(), 
+        'user' : request.user,
+        'safe_passage_coordinators': safe_passage_coordinators,
+        'safe_passage_coordinator_supervisors': safe_passage_coordinator_supervisors
+    }
+
+    if request.method == 'POST':
+        if 'username' in request.POST:
+            form = RegistrationForm(request.POST)
+            context['form'] = form
+
+            if not form.is_valid():
+                context['modalStatus'] = 'show'
+                return render(request, 'NewEra/dashboard.html', context)
+
+            user = User.objects.create_user(username=form.cleaned_data['username'], 
+                                            password=form.cleaned_data['password'],
+                                            email=form.cleaned_data['email'],
+                                            phone=form.cleaned_data['phone'],
+                                            first_name=form.cleaned_data['first_name'],
+                                            last_name=form.cleaned_data['last_name'],
+                                            organization=form.cleaned_data['organization'])
+            user.is_staff = True 
+            user.is_superuser = False
+            user.is_supervisor = False
+
+            # User role checkboxes
+            if 'user_type' in request.POST:
+                roles = request.POST.getlist('user_type')
+
+                user.is_superuser = 'admin' in roles
+                user.is_supervisor = 'supervisor' in roles
+                user.is_safe_passage_coordinator = 'safe_passage_coordinator' in roles
+                user.is_safe_passage_coordinator_supervisor = 'safe_passage_coordinator_supervisor' in roles
+            else:
+                form.clean_roles()
+            
+            user.save()
+            
+            messages.success(request, 'Added a new user to the system.')
+        elif 'org_name' in request.POST:
+            organization = Organization(name=request.POST['org_name'])
+            organization.save()
+            messages.success(request, 'Added a new organization to the system.')
+    
+    context['form'] = RegistrationForm()
+    return render(request, 'NewEra/dashboard.html', context)
+
+@login_required
+def supervisor_dashboard(request): 
+    if not request.user.is_supervisor:
+        raise Http404
+
+    admins = User.objects.filter(is_superuser=True)
+    sows = User.objects.filter(is_superuser=False).filter(is_staff=True).filter(is_supervisor=False)
+    supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=True)
+    orgs = Organization.objects.all().order_by('name')
+    context = {'admins':admins, 'sows':sows, 'orgs':orgs, 'supervisors':supervisors, 'form': RegistrationForm(), 'user' : request.user}
+
+    context['form'] = RegistrationForm()
+    return render(request, 'NewEra/supervisor_dashboard.html', context)
+
+@login_required
+def edit_user(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    user = get_object_or_404(User, id=id)
+
+    if request.method == "POST":
+        # If a user is editing themselves, get the form for only that user
+        if user == request.user:
+            form = EditSelfUserForm(request.POST, instance=user)
+        # If an admin is editing someone else, get the appropriate form
+        else:
+            form = EditUserForm(request.POST, instance=user)
+
+            if 'user_type' in request.POST:
+                roles = request.POST.getlist('user_type')
+
+                user.is_superuser = 'admin' in roles
+                user.is_supervisor = 'supervisor' in roles
+                user.is_safe_passage_coordinator = 'safe_passage_coordinator' in roles
+                user.is_safe_passage_coordinator_supervisor = 'safe_passage_coordinator_supervisor' in roles
+
+    
+        if form.is_valid():
+            form.save()
+            user.save()
+
+            messages.success(request, '{} successfully edited.'.format(str(user)))
+            return redirect('Dashboard')
+    else:
+        # If a user is editing themselves, get the form for only that user
+        if user == request.user:
+            form = EditSelfUserForm(instance=user)
+        # If an admin is editing someone else, get the appropriate form
+        else:
+            form = EditUserForm(instance=user)
+            form.initial['user_type'] = user.get_user_types()
+
+    return render(request, 'NewEra/edit_user.html', {'form': form, 'user': user, 'action': 'Edit'})
+
+@login_required
+def edit_org(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    org = get_object_or_404(Organization, id=id)
+
+    if request.method == "POST":
+        
+        form = EditOrganizationForm(request.POST, instance=org)
+    
+        if form.is_valid():
+
+            form.save()
+            org.save()
+
+            messages.success(request, '{} successfully edited.'.format(str(org)))
+            return redirect('Dashboard')
+    else:
+        form = EditOrganizationForm(instance=org)
+    return render(request, 'NewEra/edit_org.html', {'form': form, 'org': org, 'action': 'Edit'})
+
+@login_required
+def delete_user(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    user = get_object_or_404(User, id=id)
+
+    if request.method == 'POST':
+        # Delete the user only if they have never made a referral and there is no one on their case load
+        if (user.get_referrals().count() == 0 and user.get_case_load().count() == 0):
+            user.delete()
+            messages.success(request, 'User successfully deleted.')
+            return redirect('Dashboard')
+        # Otherwise, deactivate the user
+        else:
+            user.is_active = False
+            user.save()
+            messages.success(request, '{} was made inactive.'.format(user.get_full_name()))
+            return redirect('Dashboard')
+    return render(request, 'NewEra/delete_user.html', {'user': user})
+
+@login_required
+def delete_org(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+        
+    org = get_object_or_404(Organization, id=id)
+
+    if request.method == 'POST':
+        org.delete()
+        messages.success(request, 'Organization successfully deleted.')
+        return redirect('Dashboard')
+    return render(request, 'NewEra/delete_org.html', {'org': org})
+
+# endregion
+
+# region FORMS
+
+###################################### 
+#              FORMS
+######################################
+
+@login_required
+def meeting_tracker(request):
+    context = {} 
+    if request.user.is_superuser: 
+        context['responses'] = MeetingTracker.objects.all().order_by('-date')
+    elif request.user.is_supervisor:
+        context['responses'] = MeetingTracker.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
+    elif request.user.is_staff:
+        context['responses'] = MeetingTracker.objects.filter(user=request.user).order_by('-date')
+    else:  
+        raise Http404
+    return render(request, 'NewEra/meeting_tracker.html', context)
+
+@login_required
+def create_meeting_tracker_response(request):
+    context = {}
+    form = MeetingTrackerForm(initial={'duration': 0})
+    context['form'] = form
+    context['action'] = 'Create'
+    if request.method == 'POST':
+        response = MeetingTracker(user=request.user)
+        form = MeetingTrackerForm(request.POST, instance=response)
+        
+        if form.is_valid():
+            response.with_who=form.cleaned_data['with_who']
+            response.purpose=form.cleaned_data['purpose']
+            response.neighborhood=form.cleaned_data['neighborhood']
+            response.duration=form.cleaned_data['duration']
+            response.notes=form.cleaned_data['notes']
+            response.date=form.cleaned_data['date']
+            response.time=form.cleaned_data['time']
+            form.save()
+            response.save()
+
+            messages.success(request, 'Meeting Tracker Form successfully submitted!')
+
+            return redirect('Show Meeting Tracker Response', id=response.id)
+        
+    else:
+        response = MeetingTrackerForm()
+    
+    return render(request, 'NewEra/edit_meeting_tracker_response.html', context)
+
+@login_required
+def edit_meeting_tracker_response(request, id):
+    
+    response = MeetingTracker.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    context = {}
+    context['action'] = 'Edit'
+    
+    if request.method == "POST":
+        form = MeetingTrackerForm(request.POST, instance=response)
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+            response.save()
+
+            messages.success(request, 'Submission successfully edited!')
+            return redirect('Show Meeting Tracker Response', id=response.id)
+        
+    else:
+        form = MeetingTrackerForm(instance=response)
+        context['form'] = form
+    return render(request, 'NewEra/edit_meeting_tracker_response.html', context)
+
+@login_required
+def get_meeting_tracker_response(request, id):
+    context = {}
+    response = MeetingTracker.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == response.user.organization ):
+        raise Http404
+    context['response'] = response
+    return render(request, 'NewEra/meeting_tracker_response.html', context)
+
+@login_required
+def delete_meeting_tracker_response(request, id):
+    response = MeetingTracker.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == 'POST':
+        response.delete()
+        messages.success(request, 'Response successfully deleted.')
+        return redirect('Meeting Tracker')
+    
+    return render(request, 'NewEra/delete_meeting_tracker_response.html', {'response': response})
+
+@login_required
+def risk_assessment(request):
+    context = {} 
+    if request.user.is_superuser: 
+        context['responses'] = RiskAssessment.objects.all().order_by('-date')
+    elif request.user.is_supervisor:
+        context['responses'] = RiskAssessment.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
+    elif request.user.is_staff:
+        context['responses'] = RiskAssessment.objects.filter(user=request.user).order_by('-date')
+    else:  
+        raise Http404
+    return render(request, 'NewEra/risk_assessment.html', context)
+
+@login_required
+def create_risk_assessment_response(request):
+    context = {}
+    form = RiskAssessmentForm()
+    context['form'] = form
+    context['action'] = 'Create'
+
+    if request.method == 'POST':
+        response = RiskAssessment(user=request.user)
+        form = RiskAssessmentForm(request.POST, instance=response)
+        
+        if form.is_valid():
+            response.risk_level=form.cleaned_data['risk_level']
+            response.actions=form.cleaned_data['actions']
+            response.neighborhood=form.cleaned_data['neighborhood']
+            response.notes=form.cleaned_data['notes']
+            response.date=form.cleaned_data['date']
+            response.time=form.cleaned_data['time']
+            form.save()
+            response.save()
+
+            messages.success(request, 'Risk Assessment Form successfully submitted!')
+
+            if int(response.risk_level) > 2:
+                response.send_email()
+
+            return redirect('Show Risk Assessment Response', id=response.id)
+        
+    else:
+        response = RiskAssessmentForm()
+    
+    return render(request, 'NewEra/edit_risk_assessment_response.html', context)
+
+@login_required
+def edit_risk_assessment_response(request, id):
+    response = RiskAssessment.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    context = {}
+    context['action'] = 'Edit'
+
+    if request.method == "POST":
+        form = RiskAssessmentForm(request.POST, instance=response)
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+            response.save()
+
+            messages.success(request, 'Submission successfully edited!')
+            return redirect('Show Risk Assessment Response', id=response.id)
+        
+    else:
+        form = RiskAssessmentForm(instance=response)
+        context['form'] = form
+    return render(request, 'NewEra/edit_risk_assessment_response.html', context)
+
+@login_required
+def get_risk_assessment_response(request, id):
+    context = {}
+    response = RiskAssessment.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == response.user.organization ):
+        raise Http404
+    context['response'] = response
+    return render(request, 'NewEra/risk_assessment_response.html', context)
+
+@login_required
+def delete_risk_assessment_response(request, id):
+    response = RiskAssessment.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == 'POST':
+        response.delete()
+        messages.success(request, 'Response successfully deleted.')
+        return redirect('Risk Assessment')
+    
+    return render(request, 'NewEra/delete_risk_assessment_response.html', {'response': response})
+
+@login_required
+def biweekly(request):
+    context = {} 
+    if request.user.is_superuser: 
+        context['responses'] = Biweekly.objects.all().order_by('-date')
+    elif request.user.is_supervisor:
+        context['responses'] = Biweekly.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
+    elif request.user.is_staff:
+        context['responses'] = Biweekly.objects.filter(user=request.user).order_by('-date')
+    else:  
+        raise Http404
+    return render(request, 'NewEra/biweekly.html', context)
+
+@login_required
+def create_biweekly_response(request):
+    context = {}
+    cases = CaseLoadUser.objects.filter(user=request.user)
+    hours = 0
+    for case in cases:
+      notes = Note.objects.filter(case=case, date__gte=timezone.now()-timedelta(days=14)).exclude(activity_type="Group Meeting")
+      for note in notes:
+          hours += note.hours
+
+    form = BiweeklyForm(initial={'work_hours': hours})
+
+    context['form'] = form
+    context['action'] = 'Create'
+    if request.method == 'POST':
+        response = Biweekly(user=request.user)
+        form = BiweeklyForm(request.POST, instance=response)
+        
+        if form.is_valid():
+            response.pay_start=form.cleaned_data['pay_start']
+            response.pay_end=form.cleaned_data['pay_end']
+            response.work_hours=form.cleaned_data['work_hours']
+            response.special_hours=form.cleaned_data['special_hours']
+            response.meeting_hours=form.cleaned_data['meeting_hours']
+            response.num_meetings=form.cleaned_data['num_meetings']
+            response.other=form.cleaned_data['other']
+            response.num_served=form.cleaned_data['num_served']
+            response.location=form.cleaned_data['location']
+            response.intervention=form.cleaned_data['intervention']
+            response.num_response=form.cleaned_data['num_responses']
+            response.num_events=form.cleaned_data['num_events']
+            response.num_visits=form.cleaned_data['num_visits']
+            response.num_mediations=form.cleaned_data['num_mediations']
+            response.first_summary=form.cleaned_data['first_summary']
+            response.second_summary=form.cleaned_data['second_summary']
+            response.date=form.cleaned_data['date']
+            form.save()
+            response.save()
+
+            messages.success(request, 'Bi-Weekly Attendance Form successfully submitted!')
+
+            return redirect('Show Biweekly Response', id=response.id)
+        
+    else:
+        response = BiweeklyForm()
+    
+    return render(request, 'NewEra/edit_biweekly_response.html', context)
+
+@login_required
+def edit_biweekly_response(request, id):
+    response = Biweekly.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    context = {}
+    context['action'] = 'Edit'
+
+    if request.method == "POST":
+        form = BiweeklyForm(request.POST, instance=response)
+        context['form'] = form
+
+        if form.is_valid():
+            form.save()
+            response.save()
+
+            messages.success(request, 'Submission successfully edited!')
+            return redirect('Show Biweekly Response', id=response.id)
+        
+    else:
+        form = BiweeklyForm(instance=response)
+        context['form'] = form
+    return render(request, 'NewEra/edit_biweekly_response.html', context)
+
+@login_required
+def get_biweekly_response(request, id):
+    context = {}
+    response = Biweekly.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == response.user.organization ):
+        raise Http404
+    context['response'] = response
+    return render(request, 'NewEra/biweekly_response.html', context)
+
+@login_required
+def delete_biweekly_response(request, id):
+    response = Biweekly.objects.filter(id=id).first()
+    if response.user != request.user and not(request.user.is_superuser):
+        raise Http404
+    if request.method == 'POST':
+        response.delete()
+        messages.success(request, 'Response successfully deleted.')
+        return redirect('Biweekly')
+    
+    return render(request, 'NewEra/delete_biweekly_response.html', {'response': response})
+
+# endregion
+
+# region TAGS
+
+###################################### 
+#              TAGS 
+######################################
+
+@login_required
+def tags(request):
+    if not request.user.is_superuser:
+        raise Http404
+    context = {
+        'tags': Tag.objects.all()
+    }
+    return render(request, 'NewEra/tags.html', context)
+
+@login_required
+def create_tag(request):
+    if not request.user.is_superuser:
+        raise Http404
+    context = {}
+    form = TagForm()
+    context['form'] = form
+    context['action'] = 'Create'
+
+    if request.method == 'POST':
+        tag = Tag()
+        form = TagForm(request.POST, instance=tag)
+        
+        if form.is_valid():
+            form.save()
+            tag.save()
+
+            messages.success(request, 'Tag successfully created!')
+
+            return redirect('Tags')
+    else:
+        tag = TagForm()
+
+    return render(request, 'NewEra/edit_tag.html', context)
+
+@login_required
+def edit_tag(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+    tag = get_object_or_404(Tag, id=id)
+
+    if request.method == "POST":
+        form = TagForm(request.POST, instance=tag)
+    
+        if form.is_valid():
+            form.save()
+            tag.save()
+
+            messages.success(request, '{} successfully edited.'.format(tag.name))
+            return redirect('Tags')
+    else:
+        form = TagForm(instance=tag)
+    return render(request, 'NewEra/edit_tag.html', {'form': form, 'tag': tag, 'action': 'Edit'})
+
+@login_required
+def delete_tag(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+    tag = get_object_or_404(Tag, id=id)
+
+    if request.method == 'POST':
+        tag.delete()
+        messages.success(request, '{} successfully deleted.'.format(tag.name))
+        return redirect('Tags')
+
+    return render(request, 'NewEra/delete_tag.html', {'tag': tag})
+
+# endregion
+
+# region KPI SPREADSHEET EXPORT
+
+###################################### 
+# KPI SPREADSHEET EXPORT 
+######################################
+
+@login_required
+def select_data(request):
+    if not request.user.is_superuser:
+        raise Http404
+    form = SelectDataTimeframe()
+    return render(request, 'NewEra/select_data.html', {'form': form})
+
+def select_referral_data(request):
+    if not request.user.is_superuser:
+        raise Http404
+    form = SelectDataTimeframe()
+    return render(request, 'NewEra/select_referral_data.html', {'form': form})
+
+@login_required 
+def export_selected_data(request):
+    if not request.user.is_superuser:
+        raise Http404
+    if request.method == "GET":
+        form = SelectDataTimeframe()
+        return render(request, 'NewEra/select_data.html', {'form': form})
+    else:
+        form  =  SelectDataTimeframe(request.POST)
+        if form.is_valid():
+            risk_assessments = RiskAssessment.objects.all().filter(date__range=(form.cleaned_data["start_date"],form.cleaned_data["end_date"]))
+            meeting_trackers  = MeetingTracker.objects.all().filter(date__range=(form.cleaned_data["start_date"],form.cleaned_data["end_date"])).order_by('user')
+
+            # Define the workbook and sheet
+            wb = Workbook()
+            ws = wb.active
+
+            # Set the bold font
+            bold = Font(bold=True)
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+
+            ws['A1'] = "Date"
+            ws['B1'] = "User"
+            ws['C1'] = "Neighborhood"
+            ws['D1'] = "Risk Level"
+            ws['E1'] = "Actions"
+            ws['F1'] = "Notes"
+
+            for r in risk_assessments:
+                date = r.date.__str__()
+                user = r.user.__str__()
+                neighborhood = r.neighborhood
+                risk_level = r.risk_level
+                actions = r.actions
+                notes = r.notes
+                ws.append([date,user, neighborhood, risk_level, actions, notes])
+
+            
+
+            ws = wb.worksheets[0]
+            ws.auto_filter.ref = ws.dimensions
+            
+            ws.title = "Risk Level Assessments"
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+            ws.column_dimensions[get_column_letter(3)].width = 50
+            ws.column_dimensions[get_column_letter(4)].width = 50
+            ws.column_dimensions[get_column_letter(5)].width = 50
+            ws.column_dimensions[get_column_letter(6)].width = 50
+
+            ws1 = wb.create_sheet("Meeting Tracker Forms")
+            ws = ws1
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+            ws['G1'].font = bold
+
+            ws['A1'] = "Date"
+            ws['B1'] = "User"
+            ws['C1'] = "With Who"
+            ws['D1'] = "Purpose"
+            ws['E1'] = "Neighborhood"
+            ws['F1'] = "Duration"
+            ws['G1'] = "Notes"
+
+            for m in meeting_trackers:
+                date = m.date.__str__()
+                user = m.user.__str__()
+                with_who = m.with_who
+                purpose = m.purpose
+                neighborhood = m.neighborhood
+                duration = m.duration
+                notes = m.notes
+                ws.append([date, user, with_who, purpose, neighborhood, duration,notes ])
+
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+            ws.column_dimensions[get_column_letter(3)].width = 50
+            ws.column_dimensions[get_column_letter(4)].width = 50
+            ws.column_dimensions[get_column_letter(5)].width = 50
+            ws.column_dimensions[get_column_letter(6)].width = 50
+            ws.column_dimensions[get_column_letter(7)].width = 50
+
+            ws.auto_filter.ref = ws.dimensions
+
+            ws2 = wb.create_sheet("Average Risk Level")
+            ws = ws2
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+
+            ws['A1'] = "Neighborhood"
+            ws['B1'] = "Average Risk Level"
+
+            risk_dict = dict()
+            for r in risk_assessments:
+                user = r.user.__str__()
+                neighborhood = r.neighborhood
+                risk_level = int(r.risk_level)
+                if neighborhood not in risk_dict:
+                    risk_dict[neighborhood] = []
+                else:
+                    risk_dict[neighborhood].append(risk_level)
+
+            new_list = []
+
+            for key in risk_dict:
+                lst = risk_dict[key]
+                if len(lst) > 0:
+                    new_list.append( (key, round( (sum(lst) / len(lst) ), 2) ) )
+                else:
+                    new_list.append((key, 0))
+
+            new_list.sort(key = lambda x: x[1], reverse = True)
+            
+            for (k,v) in new_list:
+                ws.append([k,v])
+
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+
+            ws2 = wb.create_sheet("Actions Count")
+            ws = ws2
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+
+            ws['A1'] = "Action"
+            ws['B1'] = "Count"
+
+            risk_dict = dict()
+            for r in risk_assessments:
+                user = r.user.__str__()
+                neighborhood = r.neighborhood
+                actions = r.actions
+                if actions not in risk_dict:
+                    risk_dict[actions] = 0
+                else:
+                    risk_dict[actions]+=1
+            
+            new_list = []
+            for key in risk_dict:
+                new_list.append( (key, risk_dict[key]) )
+            
+            new_list.sort(key = lambda x: x[1], reverse = True)
+            
+            for (k,v) in new_list:
+                ws.append([k,v])
+
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+            
+
+            ws3 = wb.create_sheet("Meeting With Who Count")
+            ws = ws3
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+
+            ws['A1'] = "Meeting With Who"
+            ws['B1'] = "Count"
+
+            risk_dict = dict()
+            for m in meeting_trackers:
+                with_who = m.with_who
+                if with_who not in risk_dict:
+                    risk_dict[with_who] = 0
+                else:
+                    risk_dict[with_who]+=1
+            
+            new_list = []
+            for key in risk_dict:
+                new_list.append( (key, risk_dict[key]) )
+            
+            new_list.sort(key = lambda x: x[1], reverse = True)
+            
+            for (k,v) in new_list:
+                ws.append([k,v])
+                
+
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+
+            ws4 = wb.create_sheet("Outreach Worker Time")
+            ws = ws4
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+
+            ws['A1'] = "Outreach Worker"
+            ws['B1'] = "With Who"
+            ws['C1'] = "Total Duration (Hours)"
+            new_dict = dict()
+            for m in meeting_trackers:
+                user = m.user.__str__()
+                with_who = m.with_who
+                durations = m.duration
+                if (user, purpose) not in risk_dict:
+                    new_dict[(user, with_who)] = durations
+                else:
+                    new_dict[(user, with_who)] += durations
+            
+            for (user, with_who) in new_dict:
+                ws.append([user, with_who, new_dict[(user, with_who)]])
+
+            ws.column_dimensions[get_column_letter(1)].width = 50
+            ws.column_dimensions[get_column_letter(2)].width = 50
+            ws.column_dimensions[get_column_letter(3)].width = 50
+            ws.auto_filter.ref = ws.dimensions
+
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = "attachment; filename=newera412_selected_data_spreadsheet.xlsx"
+            wb.save(response)
+
+            return response
+        else:
+            return Http404
+
+# Export data on resources and referrals
+@login_required
+def export_data(request):
+    if not request.user.is_superuser:
+        raise Http404
+    if request.method == "GET":
+        form = SelectDataTimeframe()
+        return render(request, 'NewEra/select_referral_data.html', {'form': form})
+    else:
+        form  =  SelectDataTimeframe(request.POST)
+        if form.is_valid():
+            # Get resources
+            start_date = form.cleaned_data["start_date"]
+            end_date = form.cleaned_data["end_date"]
+            resources = Resource.objects.filter(is_active=True, referrals__referral_date__gte=start_date, referrals__referral_date__lte=end_date).distinct()
+            student_resources = Resource.objects.filter(is_active=True, student_referrals__referral_date__gte=start_date, student_referrals__referral_date__lte=end_date).distinct()
+    
+            # Define the workbook and sheet
+            wb = Workbook()
+            ws = wb.active
+
+            # Set the bold font
+            bold = Font(bold=True)
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+
+            ws['A1'] = "Resource"
+            ws['B1'] = "# Referrals"
+            ws['C1'] = "# Accessed Referrals"
+            ws['D1'] = "# Views"
+
+            # Write resources
+            for r in resources:
+                # Get name
+                name = r.name
+                # Get referrals including the resource
+                referrals_count = r.referrals.count()
+                # Get accessed referrals
+                accessed_count = r.referrals.exclude(date_accessed=None).count()
+                # Get clicks
+                clicks = r.clicks
+                # Write to the Excel file
+                ws.append([name, referrals_count, accessed_count, clicks])
+            
+            ws = wb.worksheets[0]
+            ws.title = "General Referral Resources"
+            ws.column_dimensions[get_column_letter(1)].width = 60
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+
+            # Export breakdown by tag
+
+            ws_student = wb.create_sheet("Student Referral Resources")
+            ws = ws_student
+
+             # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+
+            ws['A1'] = "Resource"
+            ws['B1'] = "# Referrals"
+            ws['C1'] = "# Accessed Referrals"
+            ws['D1'] = "# Views"
+
+            # Write resources
+            for r in student_resources:
+                # Get name
+                name = r.name
+                # Get referrals including the resource
+                referrals_count = r.student_referrals.count()
+                # Get accessed referrals
+                accessed_count = r.student_referrals.exclude(date_accessed=None).count()
+                # Get clicks
+                clicks = r.clicks
+                # Write to the Excel file
+                ws.append([name, referrals_count, accessed_count, clicks])
+            
+            ws.column_dimensions[get_column_letter(1)].width = 60
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+
+            # Export breakdown by tag
+
+            ws1 = wb.create_sheet("By Tag")
+            ws = ws1
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+            ws['G1'].font = bold
+
+            ws['A1'] = "Tag"
+            ws['B1'] = "# Resources"
+            ws['C1'] = "# General Referrals"
+            ws['D1'] = "# Accessed General Referrals"
+            ws['E1'] = "# Student Referrals"
+            ws['F1'] = "# Accessed Student Referrals"
+            ws['G1'] = "# Views"
+
+            # Get tags
+            tags = Tag.objects.all().exclude(resource=None)
+
+            for t in tags:
+                # Get name
+                name = t.name
+
+                resources_count = 0
+
+                general_referrals_count_by_tag = 0
+                student_referrals_count_by_tag = 0
+                accessed_count = 0
+                student_accessed_count = 0
+                clicks = 0
+
+                for r in resources:
+                    if t in r.tags.all():
+                        # Increment number of resources with this tag
+                        resources_count += 1
+                        # Get general referrals associated with the tag
+                        general_referrals_count_by_tag += r.referrals.count()
+                        # Get student referrals associated with the tag
+                        student_referrals_count_by_tag += r.student_referrals.count()
+                        # Get accessed referrals by tag
+                        accessed_count += r.referrals.exclude(date_accessed=None).count()
+                        # Get accessed student referrals by tag
+                        student_accessed_count += r.student_referrals.exclude(date_accessed=None).count()
+                        # Get clicks
+                        clicks += r.clicks
+
+                # Write to the Excel file
+                ws.append([name, resources_count, general_referrals_count_by_tag, accessed_count, student_referrals_count_by_tag, student_accessed_count, clicks])
+            
+            ws.column_dimensions[get_column_letter(1)].width = 30
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 30
+            ws.column_dimensions[get_column_letter(5)].width = 20
+            ws.column_dimensions[get_column_letter(6)].width = 30
+            ws.column_dimensions[get_column_letter(7)].width = 20
+
+
+            # Export user data
+
+            ws2 = wb.create_sheet("By User")
+            ws = ws2
+
+            # Create Header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+            ws['G1'].font = bold
+
+            ws['A1'] = "User"
+            ws['B1'] = "# Case Load Users"
+            ws['C1'] = "# General Referrals"
+            ws['D1'] = "# Accessed General Referrals"
+            ws['E1'] = "# Student Referrals"
+            ws['F1'] = "# Accessed Student Referrals"
+            ws['G1'] = "Date of Last Referral"
+
+            # Get users
+            users = User.objects.all()
+
+            for u in users:
+                case_load_count = u.get_case_load().count()
+                referrals_count = u.get_referrals().count()
+                accessed_referrals_count = u.get_referrals().exclude(date_accessed=None).count()
+                student_referrals_count = u.get_student_referrals().count()
+                accessed_student_referrals_count = u.get_student_referrals().exclude(date_accessed=None).count()
+                last_general_referral_date = u.get_referrals().order_by('-referral_date').first()
+                last_student_referral_date = u.get_referrals().order_by('-referral_date').first()
+                if last_general_referral_date is not None or last_student_referral_date is not None:
+                    if last_general_referral_date.referral_date > last_student_referral_date.referral_date:
+                        last_referral_date = last_general_referral_date.referral_date.strftime('%m-%d-%Y')
+                    elif last_student_referral_date:
+                        last_referral_date = last_student_referral_date.referral_date.strftime('%m-%d-%Y')
+                else:
+                    last_referral_date = "No referrals made"
+
+                # Write to the Excel file
+                ws.append([str(u), case_load_count, referrals_count, accessed_referrals_count, student_referrals_count, accessed_student_referrals_count, last_referral_date])
+
+            ws.column_dimensions[get_column_letter(1)].width = 30
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 30
+            ws.column_dimensions[get_column_letter(5)].width = 20
+            ws.column_dimensions[get_column_letter(6)].width = 30
+            ws.column_dimensions[get_column_letter(7)].width = 20
+
+
+            # Export referral data by phone
+            ws3 = wb.create_sheet("By Referred Phone")
+            ws = ws3
+
+            # Create header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+
+            ws['A1'] = "Phone"
+            ws['B1'] = "Case Load User"
+            ws['C1'] = "# Referrals"
+            ws['D1'] = "# Accessed Referrals"
+            ws['E1'] = "Date of Last Referral"
+
+            # Get referrals
+            referrals = Referral.objects.filter(referral_date__gte=start_date, referral_date__lte=end_date).order_by('-referral_date')
+
+            # Sets to keep track of phones and emails seen
+            phones = set()
+            emails = set()
+            case_load_dict = dict()
+            referrals_dict = dict()
+            accessed_referrals_dict = dict()
+            last_referral_dict = dict()
+
+            for r in referrals:
+                # Organize and count by phone
+                if r.phone:
+                    # Format phone number
+                    if (len(r.phone) == 10):
+                        phone_number = "(" + r.phone[0:3] + ") " + r.phone[3:6] + "-" + r.phone[6:10]
+                    else:
+                        phone_number = r.phone[0] + " (" + r.phone[1:4] + ") " + r.phone[4:7] + "-" + r.phone[7:11]
+                    referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict = export_attribute(phone_number, phones, referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict, r)
+                # Organize and count by email
+                if r.email:
+                    referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict = export_attribute(r.email, emails, referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict, r)
+
+            for p in phones:
+                # Write to the Excel file
+                ws.append([p, case_load_dict[p], referrals_dict[p], accessed_referrals_dict[p], last_referral_dict[p]])
+
+            ws.column_dimensions[get_column_letter(1)].width = 30
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+
+
+            # Export referral data by email
+            ws4 = wb.create_sheet("By Referred Email")
+            ws = ws4
+
+            # Create header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+
+            ws['A1'] = "Email"
+            ws['B1'] = "Case Load User"
+            ws['C1'] = "# Referrals"
+            ws['D1'] = "# Accessed Referrals"
+            ws['E1'] = "Date of Last Referral"
+
+            for e in emails:
+                # Write to the Excel file
+                ws.append([e, case_load_dict[e], referrals_dict[e], accessed_referrals_dict[e], last_referral_dict[e]])
+
+            ws.column_dimensions[get_column_letter(1)].width = 30
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+
+            # Export referral data by student
+            ws_stud = wb.create_sheet("By Student")
+            ws = ws_stud
+
+            # Create header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+            ws['G1'].font = bold
+            ws['H1'].font = bold
+
+            ws['A1'] = "Student"
+            ws['B1'] = "Email"
+            ws['C1'] = "Phone"
+            ws['D1'] = "Referrer"
+            ws['E1'] = "School"
+            ws['F1'] = "# Referrals"
+            ws['G1'] = "# Accessed Referrals"
+            ws['H1'] = "Date of Last Referral"
+
+            # Get referrals
+            referrals = StudentReferral.objects.filter(referral_date__gte=start_date, referral_date__lte=end_date).order_by('-referral_date')
+
+            # Sets to keep track of phones and emails seen
+            students = set()
+            schools_dict = dict()
+            referrer_dict = dict()
+            phones_dict = dict()
+            emails_dict = dict()
+            referrals_dict = dict()
+            accessed_referrals_dict = dict()
+            last_referral_dict = dict()
+
+            for r in referrals:
+                # Format phone number
+                # if (len(r.phone) == 10):
+                #     phone_number = "(" + r.phone[0:3] + ") " + r.phone[3:6] + "-" + r.phone[6:10]
+                # else:
+                #     phone_number = r.phone[0] + " (" + r.phone[1:4] + ") " + r.phone[4:7] + "-" + r.phone[7:11]
+                referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict = export_student_attribute(r.student, students, referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict, r)
+
+            for s in students:
+                # Write to the Excel file
+                ws.append([s.get_full_name(), emails_dict[s], phones_dict[s], referrer_dict[s], schools_dict[s], referrals_dict[s], accessed_referrals_dict[s], last_referral_dict[s]])
+
+            ws.column_dimensions[get_column_letter(1)].width = 25
+            ws.column_dimensions[get_column_letter(2)].width = 30
+            ws.column_dimensions[get_column_letter(3)].width = 20
+            ws.column_dimensions[get_column_letter(4)].width = 20
+            ws.column_dimensions[get_column_letter(5)].width = 20
+            ws.column_dimensions[get_column_letter(6)].width = 20
+            ws.column_dimensions[get_column_letter(7)].width = 20
+
+            # Export referral data by team
+            ws5 = wb.create_sheet("By Team")
+            ws = ws5
+
+            # Set to keep track of teams seen
+            teams = set()
+            team_cases = dict()
+            team_referrals = dict()
+            team_student_referrals = dict()
+            team_accessed_referrals = dict()
+            team_accessed_student_referrals = dict()
+            team_last_referral_date = dict()
+            users = User.objects.all()
+
+            for u in users:
+
+                teams.add(u.team)
+
+                if u.team in team_cases.keys():
+                    team_cases[u.team] += u.get_case_load().count()
+                else:
+                    team_cases[u.team] = u.get_case_load().count()
+                
+                if u.team in team_referrals.keys():
+                    team_referrals[u.team] += u.get_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                else:
+                    team_referrals[u.team] = u.get_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+
+                if u.team in team_student_referrals.keys():
+                    team_student_referrals[u.team] += u.get_student_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                else:
+                    team_student_referrals[u.team] = u.get_student_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                
+                if u.team in team_accessed_referrals.keys():
+                    team_accessed_referrals[u.team] += u.get_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                else:
+                    team_accessed_referrals[u.team] = u.get_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+
+                if u.team in team_accessed_student_referrals.keys():
+                    team_accessed_student_referrals[u.team] += u.get_student_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                else:
+                    team_accessed_student_referrals[u.team] = u.get_student_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
+                
+                last_referral_date = u.get_referrals().order_by('-referral_date').first()
+                last_student_referral_date = u.get_student_referrals().order_by('-referral_date').first()
+
+                if u.team in team_last_referral_date:
+                    if last_referral_date and last_student_referral_date:
+                        team_last_referral_date[u.team] = max(last_referral_date, last_student_referral_date, key=lambda x: x.referral_date)
+                    elif last_referral_date:
+                        team_last_referral_date[u.team] = last_referral_date
+                    elif last_student_referral_date:
+                        team_last_referral_date[u.team] = last_student_referral_date
+                    else:
+                        team_last_referral_date[u.team] = "No referrals made"
+                else:
+                    if last_referral_date and last_student_referral_date:
+                        team_last_referral_date[u.team] = max(last_referral_date, last_student_referral_date, key=lambda x: x.referral_date)
+                    else:
+                        team_last_referral_date[u.team] = "No referrals made"
+
+            for key in team_last_referral_date:
+                if team_last_referral_date[key] != "No referrals made":
+                    team_last_referral_date[key] = team_last_referral_date[key].referral_date.strftime('%m-%d-%Y')
+
+            # Create header row
+            ws['A1'].font = bold
+            ws['B1'].font = bold
+            ws['C1'].font = bold
+            ws['D1'].font = bold
+            ws['E1'].font = bold
+            ws['F1'].font = bold
+            ws['G1'].font = bold
+
+            ws['A1'] = "Team"
+            ws['B1'] = "# Case Load Users"
+            ws['C1'] = "# General Referrals"
+            ws['D1'] = "# Accessed General Referrals"
+            ws['E1'] = "# Student Referrals"
+            ws['F1'] = "# Accessed Student Referrals"
+            ws['G1'] = "Date of Last Referral"
+
+            for t in teams:
+                # Write to the Excel file
+                ws.append([t, team_cases[t], team_referrals[t], team_accessed_referrals[t], team_student_referrals[t], team_accessed_student_referrals[t], team_last_referral_date[t]])
+
+            ws.column_dimensions[get_column_letter(1)].width = 30
+            ws.column_dimensions[get_column_letter(2)].width = 20
+            ws.column_dimensions[get_column_letter(3)].width = 30
+            ws.column_dimensions[get_column_letter(4)].width = 30
+            ws.column_dimensions[get_column_letter(5)].width = 30
+            ws.column_dimensions[get_column_letter(6)].width = 30
+            ws.column_dimensions[get_column_letter(7)].width = 25
+
+            # Save and download the Excel file
+            response = HttpResponse(content_type='application/vnd.ms-excel')
+            response['Content-Disposition'] = f"attachment; filename=newera412_referral_data_{start_date}_to_{end_date}.xlsx"
+            wb.save(response)
+
+            return response
+        else:
+            return Http404
+
+# Helper method to export attributes in a sheet
+def export_attribute(attr, attr_set, referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict, r):
+    # Add email to set
+    if (attr not in attr_set):
+        attr_set.add(attr)
+        referrals_dict[attr] = 0
+        accessed_referrals_dict[attr] = 0
+
+    # Add the case load user to the dictionary
+    if (r.caseUser):
+        case_load_dict[attr] = r.caseUser.get_full_name()
+    else:
+        case_load_dict[attr] = "-"
+
+    # Add referrals given to this phone number
+    referrals_dict[attr] += 1
+
+    if (r.date_accessed):
+        # Add accessed referrals
+        accessed_referrals_dict[attr] += 1
+
+    # Get the last referral made
+    last_referral_dict[attr] = r.referral_date.strftime('%m-%d-%Y')
+
+    return referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict
+
+# Helper method to export attributes in a sheet
+def export_student_attribute(attr, attr_set, referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict, r):
+    # Add student to set
+    if (attr not in attr_set):
+        attr_set.add(attr)
+        referrals_dict[attr] = 0
+        accessed_referrals_dict[attr] = 0
+
+    # Add the referrer user to the dictionary
+    if (r.user):
+        referrer_dict[attr] = r.user.get_full_name()
+    else:
+        referrer_dict[attr] = "-"
+
+    # Add the referrer's school to the dictionary
+    if (r.user.organization):
+        schools_dict[attr] = r.user.organization.name
+    else:
+        schools_dict[attr] = "-"
+
+    # Add the phone number to the dictionary
+    if (r.phone):
+        phones_dict[attr] = r.phone
+    else:
+        phones_dict[attr] = "-"
+
+    # Add the email to the dictionary
+    if (r.email):
+        emails_dict[attr] = r.email
+    else:
+        emails_dict[attr] = "-"
+
+    # Add referrals given to this student
+    referrals_dict[attr] += 1
+
+    if (r.date_accessed):
+        # Add accessed referrals
+        accessed_referrals_dict[attr] += 1
+
+    # Get the last referral made
+    last_referral_dict[attr] = r.referral_date.strftime('%m-%d-%Y')
+
+    return referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict
+
+# endregion
+
+# region Student
+
+@login_required
+def student(request):
+    students = []
+    context = {} 
+
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        students = Student.objects.all()
+        context['staff'] = User.objects.filter(is_active=True).filter(is_safe_passage_coordinator=True).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization))
+        context['staff'] = User.objects.filter(organization=request.user.organization, is_active=True, is_safe_passage_coordinator=True).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        students = Student.objects.filter(user=request.user)
+    else:  
+        raise Http404
+
+    date_created_filter = request.GET.get('date_created_filter')
+    today = date.today()
+    if date_created_filter:
+        if date_created_filter == '7days':
+            start_date = today - timedelta(days=7)
+            students = students.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'week_to_date':
+            start_of_week = today - timedelta(days=today.weekday())
+            students = students.filter(date_created__date__gte=start_of_week)
+        elif date_created_filter == '30days':
+            start_date = today - timedelta(days=30)
+            students = students.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'month_to_date':
+            start_of_month = date(today.year, today.month, 1)
+            students = students.filter(date_created__date__gte=start_of_month)
+        elif date_created_filter == 'year':
+            start_date = today - timedelta(days=365)
+            students = students.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'year_to_date':
+            start_of_year = date(today.year, 1, 1)
+            students = students.filter(date_created__date__gte=start_of_year)
+        elif date_created_filter == 'all':
+            students = students
+    
+    students_list = list(students)
+    students_list.sort(key=operator.methodcaller('get_full_name'))
+    
+    if request.method == 'POST' and 'staff_id' in request.POST:
+        staff_user = get_object_or_404(User, id=request.POST['staff_id'])
+        student = Student(user=staff_user)
+        form = StudentForm(request.POST, instance=student)
+        
+        if not form.is_valid():
+            context['form'] = form 
+            context['students'] = students_list
+            context['modalStatus'] = 'show'
+            return render(request, 'NewEra/student.html', context)
+
+        form.save()
+        student.save()
+        messages.success(request, 'Successfully added {} {} to Students.'.format(student.first_name, student.last_name))
+
+    context['students'] = students_list
+    context['form'] = StudentForm()
+    return render(request, 'NewEra/student.html', context)
+
+@login_required
+def get_student(request, id):
+    student = get_object_or_404(Student, id=id)
+    
+    if not (student.user == request.user or request.user.is_superuser or (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == student.user.organization)):
+        raise PermissionDenied
+    
+    context = { 'student': student }
+
+    return render(request, 'NewEra/get_student.html', context)
+
+@login_required
+def edit_student(request, id):
+    context = {}
+    student = get_object_or_404(Student, id=id)
+    
+    if request.user.is_superuser: 
+        context['staff'] = User.objects.filter(is_active=True).filter(is_safe_passage_coordinator=True).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        context['staff'] = User.objects.filter(organization=request.user.organization, is_active=True, is_safe_passage_coordinator=True).order_by('first_name', 'last_name')
+
+    if student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == student.user.organization):
+        raise Http404
+    
+    if request.method == "POST":
+        form = StudentForm(request.POST, instance=student)
+        if form.is_valid():
+            form.save()
+            student.save()
+            messages.success(request, '{} successfully edited.'.format(student.get_full_name()))
+            return redirect('Show Student', id=student.id)
+    
+    context['student'] = student
+    context['form'] = StudentForm(instance=student)
+    context['action'] = 'Edit'
+    return render(request, 'NewEra/edit_student.html', context)
+
+@login_required
+def delete_student(request, id):
+    student = get_object_or_404(Student, id=id)
+    if student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == student.user.organization ):
+        raise Http404
+    if request.method == 'POST':
+        # Delete the student only if they have never been referred
+        student.is_active = False
+        student.save()
+        messages.success(request, '{} was made inactive.'.format(student.get_full_name()))
+        return redirect('Show Student', id=student.id)
+    
+    return render(request, 'NewEra/delete_student.html', {'student': student})
+
+@login_required
+def download_student(request):
+    students = []
+    header_labels = []
+
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        students = Student.objects.all()	
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        students = Student.objects.filter(user=request.user).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    # Create a new workbook and select the active sheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+        header_labels = ['SPC Name', 'Student Name', 'Graduation Year', 'Email', 'Phone', 'Parent Name', 'Parent Email', 'Parent Phone', 'Active']
+    else:
+        header_labels = ['Student Name', 'Graduation Year', 'Email', 'Phone', 'Parent Name', 'Parent Email', 'Parent Phone', 'Active']
+    worksheet.append(header_labels)
+
+    # Write the data to the worksheet
+    for row, student in enumerate(students, start=2):
+        if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+            worksheet.cell(row=row, column=1, value=student.user.get_full_name())
+        worksheet.cell(row=row, column=1, value=student.get_full_name())
+        worksheet.cell(row=row, column=2, value=student.graduation_year)
+        worksheet.cell(row=row, column=3, value=student.email)
+        worksheet.cell(row=row, column=4, value=student.phone)
+        worksheet.cell(row=row, column=5, value=student.get_parent_full_name())
+        worksheet.cell(row=row, column=6, value=student.parent_email)
+        worksheet.cell(row=row, column=7, value=student.parent_phone)
+        worksheet.cell(row=row, column=8, value=student.is_active)
+
+    # Adjust column widths based on content, and row heights if needed
+    max_width = 30  # Set the maximum column width
+    for column in worksheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except TypeError:
+                pass
+        adjusted_width = min(max_length + 2, max_width + 1)
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        for cell in column:
+            cell.alignment = Alignment(wrap_text=True)
+            if cell.value:
+                cell.alignment = Alignment(vertical='top', wrap_text=True)
+                cell.font = Font(size=11)
+
+    # Apply bold formatting to header row
+    bold_font = Font(bold=True)
+    for cell in worksheet[1]:
+        cell.font = bold_font
+
+    # Set the appropriate response headers
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=students.xlsx'
+
+    # Save the workbook to the response
+    workbook.save(response)
+
+    return response
+
+# endregion 
+
+# region Weekly Student Update
+
+@login_required
+def student_weekly_update(request):
+    updates = []
+    context = {} 
+
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        updates = StudentWeeklyUpdate.objects.all()
+        students = Student.objects.all()
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        updates = StudentWeeklyUpdate.objects.filter(student__user__in=User.objects.filter(organization=request.user.organization)).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        updates = StudentWeeklyUpdate.objects.filter(student__user=request.user).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user=request.user).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    date_created_filter = request.GET.get('date_created_filter')
+    today = date.today()
+    if date_created_filter:
+        if date_created_filter == '7days':
+            start_date = today - timedelta(days=7)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'week_to_date':
+            start_of_week = today - timedelta(days=today.weekday())
+            updates = updates.filter(date_created__date__gte=start_of_week)
+        elif date_created_filter == '30days':
+            start_date = today - timedelta(days=30)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'month_to_date':
+            start_of_month = date(today.year, today.month, 1)
+            updates = updates.filter(date_created__date__gte=start_of_month)
+        elif date_created_filter == 'year':
+            start_date = today - timedelta(days=365)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'year_to_date':
+            start_of_year = date(today.year, 1, 1)
+            updates = updates.filter(date_created__date__gte=start_of_year)
+        elif date_created_filter == 'all':
+            updates = updates
+    else:
+        start_date = today - timedelta(days=7)
+        updates = updates.filter(date_created__date__gte=start_date)
+
+    updates = updates.prefetch_related('weekly_update_uploads')
+
+    if request.method == 'POST':
+        if 'id_student' not in request.POST:
+            raise Http404("Missing 'id_student' field in the request.")
+        
+        student = get_object_or_404(Student, id=request.POST['id_student'])
+        student_weekly_update = StudentWeeklyUpdate(student=student)
+        form = StudentWeeklyUpdateForm(request.POST, instance=student_weekly_update)
+        
+        if not form.is_valid():
+            context['form'] = form 
+            context['modalStatus'] = 'show'
+            return render(request, 'NewEra/student_weekly_update.html', context)
+
+        form.save()
+        student_weekly_update.save()
+        messages.success(request, 'Successfully added {} to the Weekly Student Updates.'.format(student_weekly_update.student.get_full_name()))
+
+    # Update filenames before passing them to the template
+    for update in updates:
+        for file_upload in update.weekly_update_uploads.all():
+            file_path = Path(file_upload.file.name)
+            file_upload.filename = file_path.name
+
+    context['weekly_student_updates'] = updates
+    context['form'] = StudentWeeklyUpdateForm()
+    context['students'] = students
+    return render(request, 'NewEra/student_weekly_update.html', context)
+
+@login_required
+def get_student_weekly_update(request, id):
+    weekly_update = StudentWeeklyUpdate.objects.select_related('student').prefetch_related('weekly_update_uploads').get(id=id)
+
+    # Perform authorization checks
+    if (weekly_update.student.user != request.user and
+        not request.user.is_superuser and
+        not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == weekly_update.student.user.organization)):
+        raise Http404
+
+    # Update filenames for each file upload in the weekly update
+    for file_upload in weekly_update.weekly_update_uploads.all():
+        file_path = Path(file_upload.file.name)
+        file_upload.filename = file_path.name
+
+    context = {'weekly_update': weekly_update}
+
+    return render(request, 'NewEra/get_student_weekly_update.html', context)
+
+@login_required
+def edit_student_weekly_update(request, id):
+    weekly_update = get_object_or_404(StudentWeeklyUpdate, id=id)
+    if weekly_update.student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == weekly_update.student.user.organization):
+        raise Http404
+    
+    if request.method == "POST":
+        if 'id_student' not in request.POST:
+            raise Http404("Missing 'id_student' field in the request.")
+        
+        student = get_object_or_404(Student, id=request.POST['id_student'])
+        form = StudentWeeklyUpdateForm(request.POST, instance=weekly_update)
+        form.instance.student = student  # Set the student to the student property of weekly_update
+
+        if form.is_valid():
+            form.save()
+            weekly_update.save()
+
+            messages.success(request, '{} successfully edited.'.format(weekly_update.student.get_full_name()))
+            return redirect('Show Weekly Student Update', id=weekly_update.id)
+        
+    form = StudentWeeklyUpdateForm(instance=weekly_update)
+    return render(request, 'NewEra/edit_student_weekly_update.html', {'form': form, 'weekly_update': weekly_update, 'action': 'Edit'})
+
+@login_required
+def delete_student_weekly_update(request, id):
+    weekly_update = get_object_or_404(StudentWeeklyUpdate, id=id)
+    if weekly_update.student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == weekly_update.student.user.organization):
+        raise Http404
+    
+    if request.method == 'POST':
+        weekly_update.is_active = False
+        weekly_update.save()
+        messages.success(request, '{} was made inactive.'.format(weekly_update.student.get_full_name()))
+        return redirect('Show Weekly Student Update', id=weekly_update.id)
+    
+    return render(request, 'NewEra/delete_student_weekly_update.html', {'weekly_update': weekly_update})
+
+@login_required
+def download_student_weekly_update(request):
+    updates = []
+    header_labels = []
+
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        updates = StudentWeeklyUpdate.objects.all()
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        updates = StudentWeeklyUpdate.objects.filter(student__user__in=User.objects.filter(organization=request.user.organization)).order_by('student__first_name', 'student__last_name')
+    elif request.user.is_safe_passage_coordinator:
+        updates = StudentWeeklyUpdate.objects.filter(student__user=request.user).order_by('student__first_name', 'student__last_name')
+    else:  
+        raise Http404
+
+    updates = StudentWeeklyUpdate.objects.prefetch_related('weekly_update_uploads')
+    # Update filenames before passing them to the template
+    for update in updates:
+        file_names = []
+        for file_upload in update.weekly_update_uploads.all():
+            file_path = Path(file_upload.file.name)
+            file_names.append(file_path.name)
+        update.file_names = ', '.join(file_names)
+
+    # Create a new workbook and select the active sheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+        header_labels = ['SPC Name', 'Student Name', 'Weekly Absences', 'Extra Curricular', 'Special Needs', 'Notes', 'Goals', 'Files', 'Date Created', 'Active']
+    else:
+        header_labels = ['Student Name', 'Weekly Absences', 'Extra Curricular', 'Special Needs', 'Notes', 'Goals', 'Files', 'Date Created', 'Active']
+    worksheet.append(header_labels)
+
+    # Write the data to the worksheet
+    for row, update in enumerate(updates, start=2):
+        if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+            worksheet.cell(row=row, column=1, value=update.student.user.get_full_name())
+        worksheet.cell(row=row, column=1, value=update.student.get_full_name())
+        worksheet.cell(row=row, column=2, value=update.weekly_absences)
+        worksheet.cell(row=row, column=3, value=update.extra_curricular)
+        worksheet.cell(row=row, column=4, value=update.special_needs)
+        worksheet.cell(row=row, column=5, value=update.notes)
+        worksheet.cell(row=row, column=6, value=update.goals)
+        worksheet.cell(row=row, column=7, value=update.file_names)
+        worksheet.cell(row=row, column=8, value=update.date_created.__str__())
+        worksheet.cell(row=row, column=9, value=update.is_active)
+
+    # Adjust column widths based on content, and row heights if needed
+    max_width = 30  # Set the maximum column width
+    for column in worksheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except TypeError:
+                pass
+        adjusted_width = min(max_length + 2, max_width + 1)
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        for cell in column:
+            cell.alignment = Alignment(wrap_text=True)
+            if cell.value:
+                cell.alignment = Alignment(vertical='top', wrap_text=True)
+                cell.font = Font(size=11)
+
+    # Apply bold formatting to header row
+    bold_font = Font(bold=True)
+    for cell in worksheet[1]:
+        cell.font = bold_font
+
+    # Set the appropriate response headers
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=weekly_student_updates.xlsx'
+
+    # Save the workbook to the response
+    workbook.save(response)
+
+    return response
+
+@login_required
+def student_weekly_update_upload(request, id):
+    student_weekly_update = get_object_or_404(StudentWeeklyUpdate, id=id)
+
+    if request.method == 'POST':
+        formset = StudentWeeklyUpdateUploadFormset(request.POST, request.FILES)
+        if formset.is_valid():
+            with transaction.atomic():
+                for form in formset:
+                    if form.cleaned_data.get('DELETE'):
+                        # Delete the record and associated file
+                        if form.instance.pk:
+                            form.instance.file.delete()
+                            form.instance.delete()
+                    elif form.cleaned_data.get('file'):
+                        file_upload = form.save(commit=False)
+                        file_upload.student_weekly_update = student_weekly_update
+                        file_upload.save()
+            return redirect(reverse('Upload Weekly Student Update Files', args=[id]))
+        else:
+            # Get all formset errors and concatenate them into a single list
+            form_errors = []
+            for form_errors_dict in formset.errors:
+                for field_errors in form_errors_dict.values():
+                    form_errors += field_errors
+
+            # Display the error messages as flash messages to the user
+            for error in form_errors:
+                messages.error(request, error)
+
+    else:
+        formset = StudentWeeklyUpdateUploadFormset()
+
+    return render(request, 'NewEra/student_weekly_update_upload.html', {'formset': formset})
+
+# endregion 
+
+# region Quarterly Student Update
+
+@login_required
+def student_quarterly_update(request):
+    if request.method == 'POST':
+        if 'id_student' not in request.POST:
+            raise Http404("Missing 'id_student' field in the request.")
+        
+        student = get_object_or_404(Student, id=request.POST['id_student'])
+        student_quarterly_update = StudentQuarterlyUpdate(student=student)
+        form = StudentQuarterlyUpdateForm(request.POST, instance=student_quarterly_update)
+        
+        if not form.is_valid():
+            context['form'] = form 
+            context['modalStatus'] = 'show'
+            return render(request, 'NewEra/student_quarterly_update.html', context)
+
+        try:
+            form.save()
+            student_quarterly_update.save()
+            messages.success(request, 'Successfully added {} to the Quarterly Student Updates.'.format(student_quarterly_update.student.get_full_name()))
+        except IntegrityError:
+            messages.error(request, 'A quarterly update already exists for the selected student.')
+
+    updates = []
+    context = {} 
+    
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        updates = StudentQuarterlyUpdate.objects.all()
+        students = Student.objects.all()
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user__in=User.objects.filter(organization=request.user.organization)).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user=request.user).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user=request.user).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    date_created_filter = request.GET.get('date_created_filter')
+    today = date.today()
+    if date_created_filter:
+        if date_created_filter == '7days':
+            start_date = today - timedelta(days=7)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'week_to_date':
+            start_of_week = today - timedelta(days=today.weekday())
+            updates = updates.filter(date_created__date__gte=start_of_week)
+        elif date_created_filter == '30days':
+            start_date = today - timedelta(days=30)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'month_to_date':
+            start_of_month = date(today.year, today.month, 1)
+            updates = updates.filter(date_created__date__gte=start_of_month)
+        elif date_created_filter == 'year':
+            start_date = today - timedelta(days=365)
+            updates = updates.filter(date_created__date__gte=start_date)
+        elif date_created_filter == 'year_to_date':
+            start_of_year = date(today.year, 1, 1)
+            updates = updates.filter(date_created__date__gte=start_of_year)
+        elif date_created_filter == 'all':
+            updates = updates
+    
+    students = students.prefetch_related(
+        Prefetch('studentreferral_set', queryset=StudentReferral.objects.select_related('student').prefetch_related('resource_set'))
+    )
+    
+    for update in updates:
+        student = update.student
+        student_referrals = list(student.studentreferral_set.all())
+        q1_referrals = [referral for referral in student_referrals if referral.quarter == '1']
+        q2_referrals = [referral for referral in student_referrals if referral.quarter == '2']
+        q3_referrals = [referral for referral in student_referrals if referral.quarter == '3']
+        q4_referrals = [referral for referral in student_referrals if referral.quarter == '4']
+        student.q1_resources_referred = sum(len(referral.resource_set.all()) for referral in q1_referrals)
+        student.q2_resources_referred = sum(len(referral.resource_set.all()) for referral in q2_referrals)
+        student.q3_resources_referred = sum(len(referral.resource_set.all()) for referral in q3_referrals)
+        student.q4_resources_referred = sum(len(referral.resource_set.all()) for referral in q4_referrals)
+
+    context['quarterly_student_updates'] = updates
+    context['form'] = StudentQuarterlyUpdateForm()
+    context['students'] = students
+    return render(request, 'NewEra/student_quarterly_update.html', context)
+
+@login_required
+def get_student_quarterly_update(request, id):
+    quarterly_update = get_object_or_404(StudentQuarterlyUpdate, id=id)
+    if quarterly_update.student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == quarterly_update.student.user.organization):
+        raise Http404
+    
+    student = quarterly_update.student
+
+    student_referrals = student.studentreferral_set.all().prefetch_related('resource_set')
+    q1_referrals = [referral for referral in student_referrals if referral.quarter == '1']
+    q2_referrals = [referral for referral in student_referrals if referral.quarter == '2']
+    q3_referrals = [referral for referral in student_referrals if referral.quarter == '3']
+    q4_referrals = [referral for referral in student_referrals if referral.quarter == '4']
+    student.q1_resources_referred = sum(len(referral.resource_set.all()) for referral in q1_referrals)
+    student.q2_resources_referred = sum(len(referral.resource_set.all()) for referral in q2_referrals)
+    student.q3_resources_referred = sum(len(referral.resource_set.all()) for referral in q3_referrals)
+    student.q4_resources_referred = sum(len(referral.resource_set.all()) for referral in q4_referrals)
+
+    context = { 'quarterly_update': quarterly_update }
+
+    return render(request, 'NewEra/get_student_quarterly_update.html', context)
+
+@login_required
+def edit_student_quarterly_update(request, id):
+    quarterly_update = get_object_or_404(StudentQuarterlyUpdate, id=id)
+    if quarterly_update.student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == quarterly_update.student.user.organization):
+        raise Http404
+    
+    if request.method == "POST":
+        if 'id_student' not in request.POST:
+            raise Http404("Missing 'id_student' field in the request.")
+        
+        student = get_object_or_404(Student, id=request.POST['id_student'])
+        form = StudentQuarterlyUpdateForm(request.POST, instance=quarterly_update)
+        form.instance.student = student
+
+        if form.is_valid():
+            form.save()
+            quarterly_update.save()
+
+            messages.success(request, '{} successfully edited.'.format(quarterly_update.student.get_full_name()))
+            return redirect('Show Quarterly Student Update', id=quarterly_update.id)
+        
+    form = StudentQuarterlyUpdateForm(instance=quarterly_update)
+    return render(request, 'NewEra/edit_student_quarterly_update.html', {'form': form, 'quarterly_update': quarterly_update, 'action': 'Edit'})
+
+@login_required
+def delete_student_quarterly_update(request, id):
+    quarterly_update = get_object_or_404(StudentQuarterlyUpdate, id=id)
+    if quarterly_update.student.user != request.user and not(request.user.is_superuser) and not (request.user.is_safe_passage_coordinator_supervisor and request.user.organization == quarterly_update.student.user.organization):
+        raise Http404
+    
+    if request.method == 'POST':
+        quarterly_update.is_active = False
+        quarterly_update.save()
+        messages.success(request, '{} was made inactive.'.format(quarterly_update.student.get_full_name()))
+        return redirect('Show Quarterly Student Update', id=quarterly_update.id)
+    
+    return render(request, 'NewEra/delete_student_quarterly_update.html', {'quarterly_update': quarterly_update})
+
+@login_required
+def download_student_quarterly_update(request):
+    updates = []
+    header_labels = []
+    
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        updates = StudentQuarterlyUpdate.objects.all()
+        students = Student.objects.all()
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user__in=User.objects.filter(organization=request.user.organization)).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user=request.user).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user=request.user).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    students = students.prefetch_related(
+        Prefetch('studentreferral_set', queryset=StudentReferral.objects.select_related('student').prefetch_related('resource_set'))
+    )
+    
+    for update in updates:
+        update = update.student
+        student_referrals = list(update.studentreferral_set.all())
+        q1_referrals = [referral for referral in student_referrals if referral.quarter == '1']
+        q2_referrals = [referral for referral in student_referrals if referral.quarter == '2']
+        q3_referrals = [referral for referral in student_referrals if referral.quarter == '3']
+        q4_referrals = [referral for referral in student_referrals if referral.quarter == '4']
+        update.q1_resources_referred = sum(len(referral.resource_set.all()) for referral in q1_referrals)
+        update.q2_resources_referred = sum(len(referral.resource_set.all()) for referral in q2_referrals)
+        update.q3_resources_referred = sum(len(referral.resource_set.all()) for referral in q3_referrals)
+        update.q4_resources_referred = sum(len(referral.resource_set.all()) for referral in q4_referrals)
+
+    # Create a new workbook and select the active sheet
+    workbook = openpyxl.Workbook()
+    worksheet = workbook.active
+
+    if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+        header_labels = ['SPC Name', 'Student Name', 'Q1 GPA', 'Q1 Behavioral Infractions', 'Q1 Resources Referred', 'Q2 GPA', 'Q2 Behavioral Infractions', 'Q2 Resources Referred', 'Q3 GPA', 'Q3 Behavioral Infractions', 'Q3 Resources Referred', 'Q4 GPA', 'Q4 Behavioral Infractions', 'Q4 Resources Referred', 'Active']
+    else:
+        header_labels = ['Student Name', 'Q1 GPA', 'Q1 Behavioral Infractions', 'Q1 Resources Referred', 'Q2 GPA', 'Q2 Behavioral Infractions', 'Q2 Resources Referred', 'Q3 GPA', 'Q3 Behavioral Infractions', 'Q3 Resources Referred', 'Q4 GPA', 'Q4 Behavioral Infractions', 'Q4 Resources Referred', 'Active']
+    worksheet.append(header_labels)
+
+    # Write the data to the worksheet
+    for row, update in enumerate(updates, start=2):
+        if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor:
+            worksheet.cell(row=row, column=1, value=update.student.user.get_full_name())
+        worksheet.cell(row=row, column=1, value=update.student.get_full_name())
+        worksheet.cell(row=row, column=2, value=update.q1_gpa)
+        worksheet.cell(row=row, column=3, value=update.q1_behavioral_infractions)
+        worksheet.cell(row=row, column=4, value=update.student.q1_resources_referred)
+        worksheet.cell(row=row, column=5, value=update.q2_gpa)
+        worksheet.cell(row=row, column=6, value=update.q2_behavioral_infractions)
+        worksheet.cell(row=row, column=7, value=update.student.q2_resources_referred)
+        worksheet.cell(row=row, column=8, value=update.q3_gpa)
+        worksheet.cell(row=row, column=9, value=update.q3_behavioral_infractions)
+        worksheet.cell(row=row, column=10, value=update.student.q3_resources_referred)
+        worksheet.cell(row=row, column=11, value=update.q4_gpa)
+        worksheet.cell(row=row, column=12, value=update.q4_behavioral_infractions)
+        worksheet.cell(row=row, column=13, value=update.student.q4_resources_referred)
+        worksheet.cell(row=row, column=14, value=update.is_active)
+
+    # Adjust column widths based on content, and row heights if needed
+    max_width = 30  # Set the maximum column width
+    for column in worksheet.columns:
+        max_length = 0
+        column_letter = column[0].column_letter
+        for cell in column:
+            try:
+                if len(str(cell.value)) > max_length:
+                    max_length = len(cell.value)
+            except TypeError:
+                pass
+        adjusted_width = min(max_length + 2, max_width + 1)
+        worksheet.column_dimensions[column_letter].width = adjusted_width
+
+        for cell in column:
+            cell.alignment = Alignment(wrap_text=True)
+            if cell.value:
+                cell.alignment = Alignment(vertical='top', wrap_text=True)
+                cell.font = Font(size=11)
+
+    # Apply bold formatting to header row
+    bold_font = Font(bold=True)
+    for cell in worksheet[1]:
+        cell.font = bold_font
+
+    # Set the appropriate response headers
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename=quarterly_student_updates.xlsx'
+
+    # Save the workbook to the response
+    workbook.save(response)
+
+    return response
+
+# endregion 
+
+# region Student Dashboard
+
+@login_required
+def student_dashboard(request):
+    updates = []
+    context = {} 
+    
+    # Set users to show differently based on the current user logged in
+    if request.user.is_superuser: 
+        updates = StudentQuarterlyUpdate.objects.filter(is_active=True)
+        students = Student.objects.filter(is_active=True)
+    elif request.user.is_safe_passage_coordinator_supervisor:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user__in=User.objects.filter(organization=request.user.organization), is_active=True).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user__in=User.objects.filter(organization=request.user.organization), is_active=True).order_by('first_name', 'last_name')
+    elif request.user.is_safe_passage_coordinator:
+        updates = StudentQuarterlyUpdate.objects.filter(student__user=request.user, is_active=True).order_by('student__first_name', 'student__last_name')
+        students = Student.objects.filter(user=request.user, is_active=True).order_by('first_name', 'last_name')
+    else:  
+        raise Http404
+
+    students = students.prefetch_related(
+        Prefetch('studentreferral_set', queryset=StudentReferral.objects.select_related('student').prefetch_related('resource_set'))
+    )
+    
+    # Create a dictionary to store accumulated GPA values
+    gpa_totals = {
+        'q1_gpa': Decimal(0),
+        'q2_gpa': Decimal(0),
+        'q3_gpa': Decimal(0),
+        'q4_gpa': Decimal(0),
+        'q1_resources': 0,
+        'q2_resources': 0,
+        'q3_resources': 0,
+        'q4_resources': 0,
+        'count': 0
+    }
+
+    for update in updates:
+        student = update.student
+        student_referrals = list(student.studentreferral_set.all())
+        q1_referrals = [referral for referral in student_referrals if referral.quarter == '1']
+        q2_referrals = [referral for referral in student_referrals if referral.quarter == '2']
+        q3_referrals = [referral for referral in student_referrals if referral.quarter == '3']
+        q4_referrals = [referral for referral in student_referrals if referral.quarter == '4']
+        student.q1_resources_referred = sum(len(referral.resource_set.all()) for referral in q1_referrals)
+        student.q2_resources_referred = sum(len(referral.resource_set.all()) for referral in q2_referrals)
+        student.q3_resources_referred = sum(len(referral.resource_set.all()) for referral in q3_referrals)
+        student.q4_resources_referred = sum(len(referral.resource_set.all()) for referral in q4_referrals)
+
+        # Accumulate GPA values
+        gpa_totals['q1_gpa'] += Decimal(update.q1_gpa) if update.q1_gpa else Decimal(0)
+        gpa_totals['q2_gpa'] += Decimal(update.q2_gpa) if update.q2_gpa else Decimal(0)
+        gpa_totals['q3_gpa'] += Decimal(update.q3_gpa) if update.q3_gpa else Decimal(0)
+        gpa_totals['q4_gpa'] += Decimal(update.q4_gpa) if update.q4_gpa else Decimal(0)
+        gpa_totals['q1_resources'] += student.q1_resources_referred
+        gpa_totals['q2_resources'] += student.q2_resources_referred
+        gpa_totals['q3_resources'] += student.q3_resources_referred
+        gpa_totals['q4_resources'] += student.q4_resources_referred
+        gpa_totals['count'] += 1
+
+    # Calculate average GPAs
+    average_q1_gpa = gpa_totals['q1_gpa'] / gpa_totals['count'] if gpa_totals['count'] != 0 else 0
+    average_q2_gpa = gpa_totals['q2_gpa'] / gpa_totals['count'] if gpa_totals['count'] != 0 else 0
+    average_q3_gpa = gpa_totals['q3_gpa'] / gpa_totals['count'] if gpa_totals['count'] != 0 else 0
+    average_q4_gpa = gpa_totals['q4_gpa'] / gpa_totals['count'] if gpa_totals['count'] != 0 else 0
+
+    context['average_q1_gpa'] = average_q1_gpa
+    context['average_q2_gpa'] = average_q2_gpa
+    context['average_q3_gpa'] = average_q3_gpa
+    context['average_q4_gpa'] = average_q4_gpa
+    context['q1_resources'] = gpa_totals['q1_resources']
+    context['q2_resources'] = gpa_totals['q2_resources']
+    context['q3_resources'] = gpa_totals['q3_resources']
+    context['q4_resources'] = gpa_totals['q4_resources']
+
+    return render(request, 'NewEra/student_dashboard.html', context)
+
+# endregion

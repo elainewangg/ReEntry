@@ -1,0 +1,56 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}
+	Bi-Weekly Attendance Form
+{% endblock %}
+
+{% block content %}
+    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
+		Bi-Weekly Attendance Form
+	</h1>
+
+    <div class="container">
+
+        <hr>
+        <a href="{% url 'Create Biweekly Response' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Response</a><br>
+        <br>
+
+        <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
+        {% if user.is_superuser %}
+            <h2>All Responses:</h2>
+        {% else %}
+            <h2>Your Responses:</h2>
+        {% endif %}
+
+        <!-- List the case load users in a table format -->
+        {% if responses.count > 0 %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        <th>Name</th>
+                        <th>Date</th>
+                    </tr>
+                    {% for r in responses %}
+                        <tr>
+                            <td>{{ r.user.get_full_name }}</td>
+                            <td>{{ r.date }}</td>
+                            <td class="button-cell"><a href="{% url 'Show Biweekly Response' id=r.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Biweekly Response' id=r.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Biweekly Response' id=r.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            {% if perms.resource.edit_resource %}
+                <em><p style="margin: auto;">There are currently no responses.</p></em>
+            {% else %}
+                <em><p style="margin: auto;">You currently have no responses.</p></em>
+            {% endif %}
+        {% endif %}
+        
+        <br>
+    </div>
+{% endblock %}

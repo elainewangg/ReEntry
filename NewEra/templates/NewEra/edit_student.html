@@ -1,0 +1,43 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Edit Student
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div class="container ">
+        <div class="row">
+            <div class="col">
+
+                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+                    Edit Student
+                </h3>
+
+                <form method="POST" enctype="multipart/form-data" class="resource-form">
+                    {% csrf_token %}
+                    <table>
+                        {{ form }}
+                        {% if user.is_superuser or user.is_safe_passage_coordinator_supervisor %}
+                        <tr>
+                            <th><label for="staff_id">Safe Passage Coordinator:</label></th>
+                            <td>
+                                <select name="staff_id" id="staff_id" class="form-control organization">
+                                    <!-- List users in staff -->
+                                    {% for user in staff %}
+                                        <option value="{{ user.id }}">{{ user.first_name|add:' '|add:user.last_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <input type="hidden" name="staff_id" value="{{ user.id }}"><br>
+                    {% endif %}
+                    </table>
+
+                    <button class="btn btn-primary" type="submit">Save Student</button>
+                </form>
+                <br></br>
+            </div>
+        </div>
+    </div>
+{% endblock %}

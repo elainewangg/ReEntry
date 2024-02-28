@@ -1,0 +1,58 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Student Weekly Update
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+            <!-- Display the student name -->
+            <h1>{{ weekly_update.student.get_full_name }}</h1>
+            
+            <!-- Mark the case load user as active or inactive -->
+            {% if weekly_update.is_active %}
+                Status: <p class="text-success">Active</p>
+            {% else %}
+                Status: <p class="text-danger">Inactive</p>
+            {% endif %}
+
+            {% if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor %}
+                <h3>Safe Passage Coordinator</h3>
+                <p>{{ weekly_update.student.user.get_full_name }}</p>
+            {% endif %}
+
+            <h3>Weekly Absences</h3>
+            <p>{{ weekly_update.weekly_absences }}</p>
+
+            <h3>Extra Curricular</h3>
+            <p>{{ weekly_update.extra_curricular|linebreaksbr }}</p>
+
+            <h3>Special Needs</h3>
+            <p>{{ weekly_update.special_needs|linebreaksbr }}</p>
+
+            <h3>Goals</h3>
+            <p>{{ weekly_update.goals|linebreaksbr }}</p>
+
+            <h3>Notes</h3>
+            <p>{{ weekly_update.notes|linebreaksbr }}</p>
+            
+            <h3>Files</h3>
+            <p>
+                {% for file_upload in weekly_update.weekly_update_uploads.all %}
+                    <a href="{{ file_upload.file.url }}" download="{{ file_upload.file.name }}">{{ file_upload.filename }}</a><br>
+                {% empty %}
+                    No Files Uploaded
+                {% endfor %}
+            </p>
+        </div>
+
+        <br><hr><br>
+
+        <a href="{% url 'Edit Weekly Student Update' weekly_update.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+
+        <a href="{% url 'Delete Weekly Student Update' weekly_update.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}{% endblock %}
+
+{% block title %}
+	Quarterly Student Update 
+{% endblock %}
+
+{% block content %}
+    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
+		Quarterly Student Update 
+	</h1>
+
+    <div class="container">
+        <hr>
+        <div class="row">
+            <div class="col">
+                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseStudentQuarterlyUpdate" aria-expanded="false" aria-controls="collapseStudentQuarterlyUpdate">Add Quarterly Student Update</button>
+            </div>
+            <div class="col text-right">
+                <form method="GET" action="{% url 'Quarterly Student Update' %}" class="d-inline-block">
+                    <label for="date_created_filter" class="mr-2">Filter By:</label>
+                    <select name="date_created_filter" onchange="this.form.submit()" class="d-inline-block">
+                        <option value="all" {% if request.GET.date_created_filter == 'all' %}selected{% endif %}>All</option>
+                        <option value="7days" {% if request.GET.date_created_filter == '7days' %}selected{% endif %}>Past 7 days</option>
+                        <option value="week_to_date" {% if request.GET.date_created_filter == 'week_to_date' %}selected{% endif %}>This Week to date</option>
+                        <option value="30days" {% if request.GET.date_created_filter == '30days' %}selected{% endif %}>Past 30 Days</option>
+                        <option value="month_to_date" {% if request.GET.date_created_filter == 'month_to_date' %}selected{% endif %}>This Month to date</option>
+                        <option value="year" {% if request.GET.date_created_filter == 'year' %}selected{% endif %}>Past year</option>
+                        <option value="year_to_date" {% if request.GET.date_created_filter == 'year_to_date' %}selected{% endif %}>This Year to date</option>
+                    </select>
+                </form>
+                <form action="{% url 'Download Quarterly Student Update' %}" method="get" class="d-inline-block">
+                    <button type="submit" class="btn btn-primary">Download</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="collapse {{ modalStatus }}" id="collapseStudentQuarterlyUpdate">
+            <br>
+            <div class="card card-body">
+                <form method="POST" action="{% url 'Quarterly Student Update' %}">
+                    <table>
+                        <tr>
+                            <th><label for="id_student">Select Student:</label></th>
+                            <td>
+                                <select name="id_student" id="id_student" class="form-control">
+                                    {% for student in students %}
+                                        <option value="{{ student.id }}">{{ student.get_full_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                        </tr>
+                        {{form}}
+                    </table>
+                    
+                    <!-- Give admins the ability to add a new individual to the case load of a specific user -->
+                    
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>  
+            </div>
+        </div>
+
+        <br>
+
+        <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
+        {% if user.is_superuser or user.is_safe_passage_coordinator_supervisor %}
+            <h2>All Quarterly Updates:</h2>
+        {% else %}
+            <h2>Your Quarterly Updates:</h2>
+        {% endif %}
+
+        <!-- List the case load users in a table format -->
+        {% if quarterly_student_updates.count > 0 %}
+            <div style="overflow-x: auto;">
+                <table>
+                    <tr>
+                        {% if user.is_superuser or user.is_safe_passage_coordinator_supervisor %}
+                            <th>Safe Passage Coordinator</th>
+                        {% endif %}
+                        <th>Name</th>
+                        <th>Q1 GPA</th>
+                        <th>Q1 Behavioral Infractions</th>
+                        <th>Q1 Resources Referred</th>
+                        <th>Q2 GPA</th>
+                        <th>Q2 Behavioral Infractions</th>
+                        <th>Q2 Resources Referred</th>
+                        <th>Q3 GPA</th>
+                        <th>Q3 Behavioral Infractions</th>
+                        <th>Q3 Resources Referred</th>
+                        <th>Q4 GPA</th>
+                        <th>Q4 Behavioral Infractions</th>
+                        <th>Q4 Resources Referred</th>
+                        <th>Active?</th>
+                    </tr>
+                    {% for update in quarterly_student_updates %}
+                        <tr>
+                            {% if user.is_superuser or user.is_safe_passage_coordinator_supervisor %}
+                                <td>{{ update.student.user.get_full_name }}</td>
+                            {% endif %}
+                            <td>{{ update.student.get_full_name }}</td>
+                            <td>{{ update.q1_gpa }}</td>
+                            <td>{{ update.q1_behavioral_infractions }}</td>
+                            <td>{{ update.student.q1_resources_referred }}</td>
+                            <td>{{ update.q2_gpa }}</td>
+                            <td>{{ update.q2_behavioral_infractions }}</td>
+                            <td>{{ update.student.q2_resources_referred }}</td>
+                            <td>{{ update.q3_gpa }}</td>
+                            <td>{{ update.q3_behavioral_infractions }}</td>
+                            <td>{{ update.student.q3_resources_referred }}</td>
+                            <td>{{ update.q4_gpa }}</td>
+                            <td>{{ update.q4_behavioral_infractions }}</td>
+                            <td>{{ update.student.q4_resources_referred }}</td>
+                            {% if update.is_active %}
+                                <td>&#10004;</td>
+                            {% else %}
+                                <td>&#10060;</td>
+                            {% endif %}
+                            <td class="button-cell"><a href="{% url 'Show Quarterly Student Update' id=update.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Quarterly Student Update' id=update.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Quarterly Student Update' id=update.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        {% else %}
+            {% if perms.resource.edit_resource %}
+                <em><p style="margin: auto;">There are currently no Quarterly Student Updates.</p></em>
+            {% else %}
+                <em><p style="margin: auto;">There is no one currently on Quarterly Student Updates.</p></em>
+            {% endif %}
+        {% endif %}
+        
+        <br></br>
+    </div>
+{% endblock %}

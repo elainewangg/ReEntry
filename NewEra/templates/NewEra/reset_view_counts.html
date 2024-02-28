@@ -1,0 +1,19 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Reset View Counts
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <form method="POST" class="resource-form">
+        {% csrf_token %}
+        <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+            Are you sure you want to reset all view counts?
+        </h3>
+        <div style="margin: auto; margin-top: 50px; text-align: center;">
+            <p><u>WARNING</u>: All resource view counts will be reset to 0.</p>
+            <p><button class="btn btn-danger" type="submit">Reset</button>
+            <a href="javascript:history.back()" class="btn">Cancel</a></p>
+        </div>
+    </form>
+{% endblock %}

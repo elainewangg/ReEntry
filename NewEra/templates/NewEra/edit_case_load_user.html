@@ -1,0 +1,27 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Edit Tag
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div class="container ">
+        <div class="row">
+            <div class="col">
+
+                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+                    Edit Case Load User
+                </h3>
+
+                <form method="POST" enctype="multipart/form-data" class="resource-form">
+                    {% csrf_token %}
+                    <table>
+                        {{ form }}
+                    </table>
+                    <button class="btn btn-primary" type="submit">Save Case Load User</button>
+                </form>
+                <br></br>
+            </div>
+        </div>
+    </div>
+{% endblock %}

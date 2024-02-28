@@ -1,0 +1,22 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Edit Tag
+{% endblock %}{% endblock %}
+
+{% block content %}
+	<h3 style="margin: auto; margin-top: 50px; text-align: center;">
+		{{ action }} Tag
+	</h3>
+
+    <div class="container">
+        <form method="POST" enctype="multipart/form-data" class="resource-form">
+            {% csrf_token %}
+            <table>
+            	{{ form }}
+            </table>
+            <br>
+            <button class="btn btn-primary" type="submit">Save Tag</button>
+        </form>
+    </div>
+{% endblock %}

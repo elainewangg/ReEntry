@@ -1,0 +1,188 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Resource
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div class="container" style="padding-top: 10vh;">
+        <!-- Display attributes depending on if they're provided -->
+        <div class="row">
+            <!-- Main card -->
+            <div class="col-lg-8 mb-3">
+                <div class="card border-0 shadow">
+
+                    {% with types='video' %}
+                        {% if resource.resource_type in types.split %}
+                            {% if resource.url %}
+                                <div class="card-header embed-responsive embed-responsive-16by9">
+                                    <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ youtube_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% with types='attachment' %}
+                        {% if resource.resource_type in types.split %}
+                            {% if resource.attachment %}
+                                <div class="card-header embed-responsive embed-responsive-4by3">
+                                    <iframe class="embed-responsive-item" height="800" src="{% url 'Attachment' resource.id %}" title="Attachment File" frameborder="0" allowfullscreen></iframe>
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+
+                    {% with types='embed' %}
+                        {% if resource.resource_type in types.split %}
+                            {% if resource.embedded_content %}
+                                <div class="card-header">
+                                
+                                    {% autoescape off %}
+                                        {{ resource.embedded_content }}
+                                    {% endautoescape %}
+
+                                    {% comment %} <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeVZc_P1Sczi1r6EiCYxc944dTwGkhW8H7MvzIUm-BngZY5ig/viewform?embedded=true" width="640" height="1445" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe> {% endcomment %}
+                                
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="card-body">
+                        {% with types='organization link' %}
+                            {% if resource.resource_type in types.split %}
+                                <h1>{{ resource.name }}</h1>
+                                {% if tags.count > 0 %}
+                                    {% for tag in tags %}
+                                        <p>{{ tag.name }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if resource.description %}
+                                    <p>{{ resource.description }}</p>
+                                {% endif %}
+
+                                {% if resource.url %}
+                                    <p><a href="{{resource.url}}" class="read-link"><i class="material-icons">link</i>&nbsp;&nbsp;{{ resource.url }}</a></p>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+
+                        {% if resource.phone or resource.email %}
+                            <h3>Contact</h3>
+                        {% endif %}
+                        {% if resource.phone and resource.extension %}
+                            <p><a href="tel:{{resource.phone}}p{{resource.extension}}" class="read-link"><i class="material-icons">phone</i>&nbsp;&nbsp;{{ resource.phone }}x{{resource.extension}}</a></p>
+                        {% else %}
+                            {% if resource.phone %}
+                                <p><a href="tel:{{resource.phone}}" class="read-link"><i class="material-icons">phone</i>&nbsp;&nbsp;{{ resource.phone }}</a></p>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if resource.email %}
+                            <p><a href="mailto:{{resource.email}}" class="read-link"><i class="material-icons">email</i>&nbsp;&nbsp;{{ resource.email }}</a></p>
+                        {% endif %}
+
+                        {% if resource.fax_number %}
+                            <p><a href="tel:{{resource.phone}}" class="read-link"><i class="material-icons">print</i>&nbsp;&nbsp;{{ resource.fax_number }}</a></p>
+                        {% else %}
+                            <p>&nbsp;</p>
+                        {% endif %}
+
+                        {% if resource.contact_name %}
+                            <h3>Contact Person</h3>
+                            {% if resource.contact_position %}
+                                <p>{{ resource.contact_name }}, {{ resource.contact_position }}</p>
+                            {% else %}
+                                <p>{{ resource.contact_name }}</p>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Display street address and hours of operation on a card to the side -->
+            <div class="col-lg-4">
+                {% if resource.image %}
+                    <div class="text-center">
+                        <img class="resource-img shadow" src="{% url 'Image' resource.id %}"></img>
+                    </div>
+                    <br><br>
+                {% endif %}
+
+                <div class="card border-0 shadow">
+                    <div class="card-body">
+
+                        {% if resource.event_datetime %}
+                            <h3>Date &amp; Time</h3>
+                            <p>{{ resource.event_datetime }}</p>
+                        {% endif %}
+
+                        {% with types='video attachment embed' %}
+                            {% if resource.resource_type in types.split %}
+                                <h1>{{ resource.name }}</h1>
+                                {% if tags.count > 0 %}
+                                    {% for tag in tags %}
+                                        <p>{{ tag.name }}</p>
+                                    {% endfor %}
+                                {% endif %}
+
+                                {% if resource.description %}
+                                    <p>{{ resource.description }}</p>
+                                {% endif %}
+
+                                {% if resource.url %}
+                                    <p><a href="{{resource.url}}" class="read-link"><i class="material-icons">link</i>&nbsp;&nbsp;{{ resource.url }}</a></p>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+
+                        {% with types='organization' %}
+                            {% if resource.resource_type in types.split %}
+                                {% if resource.street %}
+                                    <h3>Address</h3>
+                                    {% if resource.street_secondary %}
+                                        <p><i class="material-icons">location_on</i>{{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                                    {% else %}
+                                        <p><i class="material-icons">location_on</i>{{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if resource.hours  %}
+                                    <h3 style="margin: auto;">Hours of Operation</h3>
+                                    <p>{{ resource.hours }}</p>
+                                {% endif %}
+                            {% endif %}
+                        {% endwith %}
+
+
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br><hr></br>
+        {% if perms.resource.edit_resource %}
+            {% if resource.is_active %}
+                Status: <p class="text-success">Active</p>
+            {% else %}
+                Status: <p class="text-danger">Inactive</p>
+            {% endif %}
+        {% endif %}
+
+        {% if perms.resource.edit_resource %}
+            <a href="{% url 'Edit Resource' resource.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+        {% endif %}
+
+        {% if perms.resource.delete_resource %}
+            <a href="{% url 'Delete Resource' resource.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+        {% endif %}
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}
+
+{% block page_specific_scripts %}
+    {{ form.media }}
+{% endblock %}

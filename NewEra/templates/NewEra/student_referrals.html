@@ -1,0 +1,108 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+<!-- {% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css"> -->
+{% endblock %}
+
+{% block title %}
+	Referrals
+{% endblock %}
+
+{% block content %}
+    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
+        Student Referrals
+    </h1>
+    <div class="container">
+        <hr/>
+
+        <!-- Display referrals as tables split into groups across pages -->
+        {% if studentReferrals.paginator.count > 0 %}
+            <div style="overflow-x: auto">
+                <table>
+                    <tr>
+                        <th>Referral Date</th>
+                        <th>Referral Time</th>
+                        {% if perms.studentReferral.edit_referral %}
+                            <th>SOW</th>
+                        {% endif %}
+                        <th>Case Load User</th>
+                        <th>Accessed?</th>
+                    </tr>
+                    {% for referral in studentReferrals %}
+                        <tr>
+                            <td>{{ referral.referral_date|date:'M d, Y' }}</td>
+                            <td>{{ referral.referral_date|time:'g:i A' }}</td>
+                            
+                            {% if perms.referral.edit_referral %}
+                                <td>{{ referral.user }}</td>
+                            {% endif %}
+
+                            {% if referral.student %}
+                                <td>{{ referral.student.get_full_name }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+
+                            {% if referral.date_accessed %}
+                                <td style="text-align: center;">&#10004;</td>
+                            {% else %}
+                                <td style="text-align: center;">&#10060;</td>
+                            {% endif %}
+
+                            <td class="button-cell"><a href="{% url 'Show Student Referral' id=referral.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                            <td style="padding: 2px;"><a href="{% url 'Edit Student Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit Notes</a></td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+                <br>
+                <!-- Referral Pagination -->
+                {% if studentReferrals.has_other_pages %}
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center">
+                            {% if studentReferrals.has_previous %}
+                                <li class="page-item">
+                                    <a href="?page={{ studentReferrals.previous_page_number }}" class="page-link" aria-label="Previous">Previous</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Previous</span></li>
+                            {% endif %}
+
+                            {% for i in studentReferrals.paginator.page_range %}
+                                {% if studentReferrals.number == i %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ i }} <span class="sr-only">(current)</span></span>
+                                    </li>
+                                {% elif i < studentReferrals.number|add:6 and i > studentReferrals.number|add:-6 %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if studentReferrals.has_next %}
+                                <li class="page-item">
+                                    <a href="?page={{ studentReferrals.next_page_number }}" class="page-link" aria-label="Previous">Next</a>
+                                </li>
+                            {% else %}
+                                <li class="page-item disabled"><span class="page-link">Next</span></li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+            </div>
+
+        {% else %}
+            {% if perms.resource.edit_resource %}
+                <em><p style="margin: auto;">No referrals have been made yet.</p></em>
+            {% else %}
+                <em><p style="margin: auto;">You have not made any referrals yet.</p></em>
+            {% endif %}
+        {% endif %}
+
+        <br>
+        <p>To create a referral, go to the resources page and click "Make Referral".</p>
+        <br>
+    </div>
+{% endblock %}

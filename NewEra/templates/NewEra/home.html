@@ -1,0 +1,50 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}{% block navtitle %}
+	Home
+{% endblock %}{% endblock %}
+
+{% block content %}
+
+	<div class="parallax">
+		<span class="parallax-text"><h1 class="text-white parallax-text">NewEra412</h1></span>
+		<p class="text-white parallax-text subtitle">
+			Using tech to deliver resources to our communities.
+		</p>
+        <div class="inline-button">
+            <a href="{% url 'Resources' %}"><button id="resource-btn" type="button" class="btn btn-light">General Resources</button></a>&nbsp;&nbsp;
+            <a href="https://www.realisticreentry.com/"><button id="resource-btn" type="button" class="btn btn-light">For Returning Citizens</button></a>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top: 7.5vh;">
+        <div class="row">
+            <div class="col-sm-6 mb-3">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
+            </div>
+
+            <div class="col-sm-6 mb-3 ">
+                <p>Realistic ReEntry is Pittsburgh's first restorative practice based  interim management firm for social service orginizations, governemnt agencies, employers, and foundations. Our award winning experts assist organizations who are undergoing major change, trying to implement a critical strategy or are looking to plug a critical management gap. </p>
+            </div>
+        </div>
+
+        <div class="row align-items-center" style="padding-top: 5vh;">
+            <div class="col-sm-6 mb-3">
+                <p>Our mission is to reduce the dissonance among social service efforts and that serve communities, while presenting the opportunity to truly diversify the human capital of social service organizations, government agencies, employers, and foundations. Realistic ReEntry emphasizes the historical context of relationships among society and those who offend in our project planning and design. We provide a restorative approach to promote solidarity and stability among organizations on the micro, mezzo, and macro systems level.</p>
+            </div>
+
+            <div class="col-sm-6 mb-3 text-right">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
+                
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

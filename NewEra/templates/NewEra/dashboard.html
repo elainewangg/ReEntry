@@ -1,0 +1,330 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+<!-- {% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css"> -->
+{% endblock %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+<h1 style="margin: auto; margin-top: 50px; text-align: center;">
+    Admin Dashboard
+</h1>
+
+<div class="container">
+    <hr>
+
+    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseUser"
+        aria-expanded="false" aria-controls="collapseUser"><i class="material-icons">person_add</i>Create New
+        User</button>
+    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOrg"
+        aria-expanded="false" aria-controls="collapseOrg"><i class="material-icons">group_add</i>Create New
+        Organization</button>
+    <br>
+
+    <div class="collapse {{ modalStatus }}" id="collapseUser">
+        <br>
+        <div class="card card-body">
+            <form method="POST" action="{% url 'Dashboard' %}">
+                <table>
+                    {{form}}
+                </table>
+
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary"><i class="material-icons">person_add</i>Submit</button>
+            </form>
+        </div>
+
+        <br>
+        <!-- Admin table display -->
+        <h2>Admins:</h2>
+        <div style="overflow-x: auto">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for admin in admins %}
+                <tr>
+                    <td>{{ admin.username }}</td>
+                    <td>{{ admin.first_name }}</td>
+                    <td>{{ admin.last_name }}</td>
+                    <td>{{ admin.email }}</td>
+                    <td>{{ admin.phone }}</td>
+                    <td>{{ admin.organization.name }}</td>
+                    {% if admin.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=admin.id %}" class="btn btn-warning"><i
+                                class="material-icons">edit</i>Edit</a></td>
+                    <!-- Hide a delete option for the admin already logged in -->
+                    {% if admin.id != user.id %}
+                    <td class="button-cell"><a href="{% url 'Delete User' id=admin.id %}" class="btn btn-danger"><i
+                                class="material-icons">delete</i>Delete</a></td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <br>
+        <hr><br>
+
+        <!-- SOW table display -->
+        <h2>SOWs:</h2>
+        {% if sows.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for sow in sows %}
+                <tr>
+                    <td>{{ sow.username }}</td>
+                    <td>{{ sow.first_name }}</td>
+                    <td>{{ sow.last_name }}</td>
+                    <td>{{ sow.email }}</td>
+                    <td>{{ sow.phone }}</td>
+                    <td>{{ sow.organization.name }}</td>
+                    {% if sow.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=sow.id %}" class="btn btn-warning"><i
+                                class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=sow.id %}" class="btn btn-danger"><i
+                                class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no SOWs in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Safe Passage Coordinator table display -->
+        <h2>Safe Passage Coordinators:</h2>
+        {% if safe_passage_coordinators.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for safe_passage_coordinator in safe_passage_coordinators %}
+                <tr>
+                    <td>{{ safe_passage_coordinator.username }}</td>
+                    <td>{{ safe_passage_coordinator.first_name }}</td>
+                    <td>{{ safe_passage_coordinator.last_name }}</td>
+                    <td>{{ safe_passage_coordinator.email }}</td>
+                    <td>{{ safe_passage_coordinator.phone }}</td>
+                    <td>{{ safe_passage_coordinator.organization.name }}</td>
+                    {% if safe_passage_coordinator.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=safe_passage_coordinator.id %}"
+                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=safe_passage_coordinator.id %}"
+                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Safe Passage Coordinators in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Supervisor table display -->
+        <h2>Supervisors:</h2>
+        {% if supervisors.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for supervisor in supervisors %}
+                <tr>
+                    <td>{{ supervisor.username }}</td>
+                    <td>{{ supervisor.first_name }}</td>
+                    <td>{{ supervisor.last_name }}</td>
+                    <td>{{ supervisor.email }}</td>
+                    <td>{{ supervisor.phone }}</td>
+                    <td>{{ supervisor.organization.name }}</td>
+                    {% if supervisor.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=supervisor.id %}" class="btn btn-warning"><i
+                                class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=supervisor.id %}" class="btn btn-danger"><i
+                                class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no supervisors in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Safe Passage Coordinators Supervisor table display -->
+        <h2>Safe Passage Coordinators Supervisors:</h2>
+        {% if safe_passage_coordinator_supervisors.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for safe_passage_coordinator_supervisor in safe_passage_coordinator_supervisors %}
+                <tr>
+                    <td>{{ safe_passage_coordinator_supervisor.username }}</td>
+                    <td>{{ safe_passage_coordinator_supervisor.first_name }}</td>
+                    <td>{{ safe_passage_coordinator_supervisor.last_name }}</td>
+                    <td>{{ safe_passage_coordinator_supervisor.email }}</td>
+                    <td>{{ safe_passage_coordinator_supervisor.phone }}</td>
+                    <td>{{ safe_passage_coordinator_supervisor.organization.name }}</td>
+                    {% if safe_passage_coordinator_supervisor.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=safe_passage_coordinator_supervisor.id %}"
+                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=safe_passage_coordinator_supervisor.id %}"
+                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Safe Passage Coordinators Supervisors in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+    </div>
+
+    <div class="collapse {{ modalStatus }}" id="collapseOrg">
+        <br>
+        <div class="card card-body">
+            <form method="POST" action="{% url 'Dashboard' %}">
+                <label for="orgs">Organization: </label><br>
+                <input type="text" id="name" name="org_name">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary"><i class="material-icons">group_add</i>Submit</button>
+            </form>
+        </div>
+        <br>
+        <!-- Organization table display -->
+        <h2>Organizations:</h2>
+        {% if orgs.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Organization Name</th>
+                    <th>Active?</th>
+                </tr>
+                {% for org in orgs %}
+                <tr>
+                    <td>{{ org.name }}</td>
+                    {% if org.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit Org' id=org.id %}" class="btn btn-warning"><i
+                                class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete Org' id=org.id %}" class="btn btn-danger"><i
+                                class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Organizations in the system.</p>
+        </em>
+        {% endif %}
+
+        <hr>
+        <br>
+
+
+    </div>
+
+    <br>
+
+
+
+
+    <!-- Download spreadsheet or reset resource clicks -->
+    <h2>Data Management:</h2><br>
+
+    <a href="{% url 'Export Selected Data' %}" class="btn btn-success"><i class="material-icons">get_app</i>Download
+        Meeting and Risk Data</a>
+    <a href="{% url 'Export Data' %}" class="btn btn-success"><i class="material-icons">get_app</i>Download Referral Data
+        Spreadsheet</a>
+    <a href="{% url 'Reset Views' %}" class="btn btn-danger">Reset Resource Clicks</a>
+
+    <br><br>
+
+</div>
+{% endblock %}

@@ -1,0 +1,61 @@
+div.heading-banner {
+    margin: auto; 
+    padding-top: 12vh; 
+    padding-bottom: 7vh; 
+    text-align: center;
+    background-color: lightgray;
+}
+
+div.heading-banner h1 {
+    font-size: 2rem;
+}
+
+div.heading-banner p {
+    font-weight: 100;
+}
+
+div.secondary-content {
+    padding-top: 5vh;
+}
+
+.parallax {
+    /* Credit: https://www.w3schools.com/howto/howto_css_parallax.asp */
+    position: relative;
+    background-image: url("/static/NewEra/night_pgh.jpg");
+    height: 300px;
+    padding-top: 12vh; 
+    padding-bottom: 7vh; 
+    text-align: center;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 -25px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+}
+
+.parallax-text {
+    text-shadow: 3px 3px 5px black; 
+}
+
+h1.parallax-text {
+    letter-spacing: 1px;
+}
+
+#resource-btn {
+    opacity: 0.95 !important;
+
+}
+
+#resource-btn:hover {
+    opacity: 1 !important;
+    background-color: white;
+}
+
+.list-unstyled {
+    list-style: none;
+}
+

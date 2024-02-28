@@ -1,0 +1,28 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Edit Student Weekly Update
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div class="container ">
+        <div class="row">
+            <div class="col">
+
+                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+                    Edit Student Weekly Update
+                </h3>
+
+                <form method="POST" enctype="multipart/form-data" class="resource-form">
+                    {% csrf_token %}
+                    <table>
+                        {{ form }}
+                        <input type="hidden" name="id_student" value="{{ weekly_update.student.id }}"><br>
+                    </table>
+                    <button class="btn btn-primary" type="submit">Save Student Weekly Update</button>
+                </form>
+                <br></br>
+            </div>
+        </div>
+    </div>
+{% endblock %}

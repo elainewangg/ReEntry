@@ -1,0 +1,53 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Student
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+
+            <h1>{{ student.get_full_name }}</h1>
+
+            <!-- Mark the student as active or inactive -->
+            {% if student.is_active %}
+                Status: <p class="text-success">Active</p>
+            {% else %}
+                Status: <p class="text-danger">Inactive</p>
+            {% endif %}
+
+            {% if request.user.is_superuser or request.user.is_safe_passage_coordinator_supervisor %}
+                <h3>Safe Passage Coordinator</h3>
+                <p>{{ student.user }}</p>
+            {% endif %}
+
+            <h3>Graduation Year</h3>
+            <p>{{ student.graduation_year }}</p>
+
+            <h3>Phone</h3>
+            <p><a href="tel:{{student.phone}}"><i class="material-icons">phone</i>{{ student.phone }}</a></p>
+
+            <h3>Email</h3>
+            <p><a href="mailto:{{student.email}}"><i class="material-icons">email</i>{{ student.email }}</a></p>
+
+            <h3>Parent</h3>
+            <p>{{ student.get_parent_full_name }}</p>
+
+            <h3>Parent Phone</h3>
+            <p><a href="tel:{{student.parent_phone}}"><i class="material-icons">phone</i>{{ student.parent_phone }}</a></p>
+
+            <h3>Parent Email</h3>
+            <p><a href="mailto:{{student.parent_email}}"><i class="material-icons">email</i>{{ student.parent_email }}</a></p>
+        </div>
+
+        <br><hr><br>
+
+        <a href="{% url 'Edit Student' student.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+
+        <a href="{% url 'Delete Student' student.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

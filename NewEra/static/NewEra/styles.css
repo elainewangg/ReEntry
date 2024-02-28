@@ -1,0 +1,228 @@
+  
+/* Page Styles  */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+#app-nav {
+    padding-left: 10%;
+    padding-right: 10%;
+}
+
+.content {
+    margin: auto;
+    width: 100%;
+}
+
+table th, table td {
+    /* padding-left: 10px; */
+    padding-right: 10px;
+}
+
+ul.errorlist {
+    color: indianred;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+a:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+#backend-messages,
+#backend-messages li div { 
+    margin: 0px; 
+}
+
+.form-control {
+    margin: 4px;
+}
+
+.material-icons {
+    vertical-align: middle;
+    line-height: 0 !important;
+    position: relative;
+    top: -2px;
+    margin-right: 1px;
+}
+
+/* Resource Filters / Search */
+
+#searchBar {
+    display: inline-block;
+    width: calc(100% - 320px);
+}
+
+#searchBarButton {
+    display: inline-block;
+    width: 100px;
+    font-size: 1.2em;
+}
+
+#searchFilter {
+    display: inline-block;
+    width: 200px;
+    font-size: 1.2em;
+}
+
+/* Filter */
+
+#filter-search {
+    display: inline-block;
+    width: 95%;
+}
+
+#filter-card .scroll-section {
+    max-height: 45vh;
+    overflow-y: scroll;
+}
+
+#filter-card ul {
+    list-style: none;
+}
+
+@media screen and (max-width: 600px) {
+    #searchFilter {
+        display: block;
+        margin-top: 10px;
+    }
+
+    #searchBar {
+        display: inline-block;
+        width: calc(100% - 120px);
+    }
+}
+
+/* Resources */
+/*
+#resource-bg {
+    background-size: cover;
+    background-position: 20% 20%;
+    backdrop-filter: brightness(20%);
+    height: 300px;
+    width: 100%;
+}
+*/
+.white-background {
+    background-color: white;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 3px 10px 0 rgba(0, 0, 0, 0.10);
+}
+
+.shadow {
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 3px 10px 0 rgba(0, 0, 0, 0.10);
+}
+
+.read-link {
+    text-decoration: none;
+    color: #089000;
+}
+
+.read-link:hover {
+    color: #0a5d00; 
+    text-decoration: none; 
+    cursor: pointer;  
+}
+
+.delete-link {
+    text-decoration: none;
+    color: #dd0000;
+}
+
+.delete-link:hover {
+    color: #8b0000; 
+    text-decoration: none; 
+    cursor: pointer;  
+}
+
+/* Staging Buttons */
+
+#make-referral {
+    z-index: 100;
+    width: 300px; 
+    position: fixed; 
+    bottom: 20px; 
+    right: 10%;
+    border: 1px solid rgb(191, 191, 191);
+    background-image: linear-gradient(to bottom, rgb(255, 255, 255) 30%, rgb(223, 223, 223) 100%)
+}
+
+#commit-referral {
+    z-index: 100;
+    display: none; 
+    width: 300px; 
+    position: fixed; 
+    bottom: 70px; 
+    right: 10%;
+    border: 1px solid #d8a700;
+    background-image: linear-gradient(to bottom, #fac000 30%, #d8a700 100%)
+}
+
+/* Referrals  */
+
+.button-cell {
+    padding: 2px;
+}
+
+/* Modal Styling */
+
+.modal {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: black;
+  opacity: .8;
+  padding-top: 50px;
+}
+
+.modal-content {
+    color: white;
+    margin: 5% auto 15% auto;
+    width: 70%;
+}
+
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
+.resource-img {
+    max-width: 100%;
+
+    background-size:cover;
+    background-position:50% 50%;
+}
+
+@media screen and (max-width: 300px) {
+  .cancelbtn, .deletebtn {
+     width: 100%;
+  }
+}
+
+.border-3 {
+    border-width: 3px !important;
+}
+
+/* Role switch styles */
+#role-switch-modal.modal-header {
+    color: black !important;
+}
+
+#role-switch-modal .modal-header button {
+    border: none;
+    background-color: white;
+}
+
+#role-switch-modal .modal-title, #role-switch-modal .modal-footer button {
+    margin: 0 auto;
+}

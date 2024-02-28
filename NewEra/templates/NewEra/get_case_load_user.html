@@ -1,0 +1,68 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Resource
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+
+            <!-- Display the nickname of the case load user if they have one -->
+            {% if case_load_user.nickname %}
+                <h1>{{ case_load_user.get_full_name }} ({{ case_load_user.nickname }})</h1>
+            {% else %}
+                <h1>{{ case_load_user.get_full_name }}</h1>
+            {% endif %}
+
+            <!-- Mark the case load user as active or inactive -->
+            {% if case_load_user.is_active %}
+                Status: <p class="text-success">Active</p>
+            {% else %}
+                Status: <p class="text-danger">Inactive</p>
+            {% endif %}
+
+            {% if request.user.is_superuser %}
+                <h3>SOW</h3>
+                <p>{{ case_load_user.user }}</p>
+            {% endif %}
+
+            <h3>Phone</h3>
+            <p><a href="tel:{{case_load_user.phone}}"><i class="material-icons">phone</i>{{ case_load_user.phone }}</a></p>
+
+            <h3>Email</h3>
+            <p><a href="mailto:{{case_load_user.email}}"><i class="material-icons">email</i>{{ case_load_user.email }}</a></p>
+
+            <h3>Neighborhood</h3>
+            <p>{{ case_load_user.neighborhood }}</p>
+
+            <h3>Case Label</h3>
+             <p>{{ case_load_user.case_label }}</p>
+
+            <h3>Notes</h3>
+            <a href="{% url 'Create Note' case_load_user.id %}" class="btn btn-primary"><i class="material-icons">add</i>Add Note</a><br>
+            <br>
+            {% for n in notes %}
+                <div class="card card-body">
+                    <span>{{ n.activity_type }}, {{ n.hours }} hours</span><br>
+                    <span>{{ n.notes }}</span><br>
+                    <span>{{ n.date }}</span><br>
+                    <a href="{% url 'Edit Note' n.id %}"><i>Edit</i></a>
+                    <a href="{% url 'Delete Note' n.id %}"><i>Delete</i></a><br>
+
+                    <br>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <br><hr><br>
+
+        <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+
+        <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

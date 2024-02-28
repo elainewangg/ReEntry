@@ -1,0 +1,44 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Response
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+
+            <!-- Display the nickname of the case load user if they have one -->
+            {% if response.user.nickname %}
+                <h1>{{ response.user.get_full_name }} ({{ response.user.nickname }})</h1>
+            {% else %}
+                <h1>{{ response.user.get_full_name }}</h1>
+            {% endif %}
+            {{response.date}} {{response.time}}
+            <br>
+            <br>
+
+            <h4>What is the current risk level in your community?</h4>
+            <p>{{ response.risk_level }}</p>
+
+            <h4>What actions need to be taken to reduce risk level?</h4>
+            <p>{{ response.actions }}</p>
+
+            <h4>In what neighborhood does this risk exist?</h4>
+            <p>{{ response.neighborhood }}</p>
+
+            <h4>Is there any additional information you would like to share about the risk level in your community?</h4>
+             <p>{{ response.notes }} </p>
+
+        </div>
+
+        <br><hr><br>
+
+        <a href="{% url 'Edit Risk Assessment Response' response.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+
+        <a href="{% url 'Delete Risk Assessment Response' response.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

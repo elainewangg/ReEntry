@@ -1,0 +1,104 @@
+{% extends "NewEra/base.html" %}
+
+{% block title %}{% block navtitle %}
+	Show Resource
+{% endblock %}{% endblock %}
+
+{% block content %}
+    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+        <div class="">
+            <h1>Referral Details</h1>
+
+            <h3>SOW</h3>
+            <p>{{ referral.user }}</p>
+            <p></p>
+
+            <!-- Display nickname on referral if it has a case load user and they have a nickname -->
+            {% if referral.caseUser %}
+                <h3>Case Load User</h3>
+                {% if referral.caseUser.nickname %}
+                    {{ referral.caseUser.get_full_name }} ({{ referral.caseUser.nickname }})
+                {% else %}
+                    {{ referral.caseUser.get_full_name }}
+                {% endif %}
+                </p>
+                <a class="read-link" href="{% url 'Show Case Load User' id=referral.caseUser.id %}"><b>Read More</b></a>
+                <br/><br/>
+            {% endif %}
+
+            <h3>Phone</h3>
+            <p>{{ referral.phone }}</p>
+
+            <h3>Email</h3>
+            <p>{{ referral.email }}</p>
+
+            <h3>Notes <a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning">Edit Notes</a></h3>
+            <p>{{ referral.notes }}</p>
+            
+            <h3>Date Created:</h3>
+            <p>{{ referral.referral_date }}</p>
+
+            <h3>Accessed:</h3>
+            {% if referral.date_accessed %}
+                <p>Yes, on {{ referral.date_accessed }}</p>
+            {% else %}
+                <p>No</p>
+            {% endif %}
+
+            <h3>Resources Referred</h3>
+            <div class="row">
+                {% for r in resources %}
+                    <a href="{% url 'Show Resource' id=r.id %}">
+                        <div class="col-sm-4">
+                            <div id="resource-{{ r.id }}" class="card resource-card" style="width: 18rem;">
+                                <!-- Display image if available -->
+                                {% if r.image %}
+                                    <img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
+                                {% endif %} 
+                                <div class="card-body">
+                                    <h4 class="card-title">{{ r.name }}</h4>
+                                    <!-- Display URL if available -->
+                                    {% if r.url %}
+                                        <p><a href="{{r.url}}"><i class="material-icons">link</i>{{ r.url }}</a></p>
+                                    {% else %}
+                                        <p>&nbsp;</p>
+                                    {% endif %}
+                                    <!-- Display phone if available -->
+                                    {% if r.phone %}
+                                        <p><a href="tel:{{r.phone}}"><i class="material-icons">phone</i>{{ r.phone }}</a></p>
+                                    {% else %}
+                                        <p>&nbsp;</p>
+                                    {% endif %}
+                                    <!-- Display email if available -->
+                                    {% if r.email %}
+                                        <p><a href="mailto:{{r.email}}"><i class="material-icons">email</i>{{ r.email }}</a></p>
+                                    {% else %}
+                                        <p>&nbsp;</p>
+                                    {% endif %}
+                                    <br/>
+                                    <div class="row">
+                                        <div class="col">
+                                            {% if perms.resource.edit_resource %}
+                                                <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+                                            {% endif %}
+                                        </div>
+                                        <div class="col">
+                                            {% if perms.resource.delete_resource %}
+                                                <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <br><hr></br>
+
+    </div>
+    <p>&nbsp;</p>
+
+{% endblock %}

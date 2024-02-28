@@ -1,0 +1,22 @@
+# ReEntry GitIgnore
+*.pyc
+db.sqlite3
+migrations
+.DS_Store
+staticfiles/*
+.vscode/
+.idea/
+newera_env/
+django_env/
+#.env # keep this for now because of how site is deployed.
+NewEra/user_uploads/*
+NewEra/__pycache__
+ReEntryApp/__pycache__
+NewEra/migrations/__pycache__
+newera_dev/
+ReEntry412.sock
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
