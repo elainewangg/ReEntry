@@ -36,7 +36,6 @@
 			{% if user.is_authenticated and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
 			<li class="nav-item dropdown">
 				{% url 'Referrals' as referrals_url %}
-				{% url 'Student Referrals' as student_referrals_url %}
 				<a class="nav-link dropdown-toggle {% if request.path == referrals_url %}active{% endif %}"
 					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
 					aria-expanded="false">
@@ -44,7 +43,6 @@
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 					<a class="dropdown-item" href="{% url 'Referrals' %}">General Referrals</a>
-					<a class="dropdown-item" href="{% url 'Student Referrals' %}">Student Referrals</a>
 				</div>
 			</li>
 			{% endif %}
@@ -69,36 +67,10 @@
 				</a>
 				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
 					<a class="dropdown-item" href="{% url 'Meeting Tracker' %}">Meetings Tracker</a>
-					<a class="dropdown-item" href="{% url 'Biweekly' %}">Bi-Weekly Tracker</a>
-					<a class="dropdown-item" href="{% url 'Risk Assessment' %}">Weekly Risk Assessment</a>
 				</div>
 			</li>
 			{% endif %}
 
-			<!-- Only show the school forms link if the user is logged in and user.is_safe_passage_coordinator or user.is_safe_passage_coordinator_supervisor -->
-			{% if request.session.role == 'is_safe_passage_coordinator' or request.session.role == 'is_safe_passage_coordinator_supervisor' or request.session.role == 'is_superuser' %}
-			<li class="nav-item dropdown">
-				<a class="nav-link dropdown-toggle {% if 'schools' in request.path %}active{% endif %}"
-					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-					aria-expanded="false">
-					School Forms
-				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="{% url 'Student Dashboard' %}">Dashboard</a>
-					<a class="dropdown-item" href="{% url 'Student' %}">Students</a>
-					<a class="dropdown-item" href="{% url 'Weekly Student Update' %}">Weekly Update</a>
-					<a class="dropdown-item" href="{% url 'Quarterly Student Update' %}">Quarterly Update</a>
-				</div>
-			</li>
-			{% endif %}
-
-			<!-- Only show the maps link if the user is logged in and an admin -->
-			{% if request.session.role == 'is_superuser' %}
-			<li class="nav-item">
-				{% url 'Maps' as maps_url %}
-				<a class="nav-link {% if request.path == maps_url %}active{% endif %}" href="{{ maps_url }}">Maps</a>
-			</li>
-			{% endif %}
 
 			<!-- Only show the dashboard link if the user is logged in and an admin -->
 			{% if request.session.role == 'is_superuser' %}
