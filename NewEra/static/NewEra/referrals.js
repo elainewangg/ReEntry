@@ -193,9 +193,9 @@ function commitReferrals() {
 }
 
 // Send the resources to the referral
-function commitStudentReferrals() {
-    stagedResources = window.localStorage.stagedResources
-    if (stagedResources === "[]") return;
+// function commitStudentReferrals() {
+//     stagedResources = window.localStorage.stagedResources
+//     if (stagedResources === "[]") return;
 
-    document.location.href = '/create_student_referral?resources=' + stagedResources;
-}
+//     document.location.href = '/create_student_referral?resources=' + stagedResources;
+// }

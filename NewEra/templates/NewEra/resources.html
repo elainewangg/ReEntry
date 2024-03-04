@@ -244,13 +244,9 @@
 	</div>
 
 	<!-- SOWs can make referrals through the 'Make Referrals' button -->
-    {% if user.is_staff and not user.is_safe_passage_coordinator and not user.is_safe_passage_coordinator_supervisor %}
     	<button id="make-referral" type="button" class="btn btn-light white-background">Make Referral</button>
     	<button id='commit-referral' onclick="commitReferrals()" class='btn btn-warning'></button>
-	{% elif user.is_safe_passage_coordinator or user.is_safe_passage_coordinator_supervisor %}
-		<button id="make-referral" type="button" class="btn btn-light white-background">Make Referral</button>
-		<button id='commit-referral' onclick="commitStudentReferrals()" class='btn btn-warning'></button>
-    {% endif %} 
+
 
     <p>&nbsp;</p>
 
