@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods
+from NewEra import case_labels, neighborhoods, educations, registrations
 # from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            StudentQuarterlyUpdate, StudentReferral,
@@ -47,7 +47,6 @@ COMMON NOTES:
 - Emails have a 254-digit maximum to reflect the IETF standard (https://stackoverflow.com/questions/386294/what-is-the-maximum-length-of-a-valid-email-address)
 - Phone numbers have an 11-digit maximum to match a 1 and 10 subsequent digits at maximum (methods check for a minimum of 10 digits)
 '''
-
 # Form used to create and edit a CaseLoadUser
 class CaseLoadUserForm(forms.ModelForm):
 	# Set up attributes
@@ -58,17 +57,22 @@ class CaseLoadUserForm(forms.ModelForm):
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(choices=neighborhoods.NEIGHBORHOOD_LIST))
 	case_label = forms.CharField(widget=forms.Select(choices=case_labels.CASE_LABEL_LIST))
+	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	education = forms.CharField(widget=forms.Select(choices=educations.EDUCATION_LIST), required=False)
+	is_vote_registered = forms.CharField(widget=forms.Select(choices=registrations.REGISTRATION_LIST), required=False)
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = CaseLoadUser
-		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user']
+		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
 		exclude = (
 			'user',
 		)
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)
+		self.fields['is_vote_registered'].label = "Voter Registration"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
 

@@ -1,5 +1,5 @@
 from datetime import timedelta
-
+from django.core.validators import RegexValidator
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.core import mail
@@ -152,6 +152,11 @@ class CaseLoadUser(models.Model):
     case_label = models.CharField(max_length=150, blank=False, null=False, default='')
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    age = models.CharField(max_length=3, blank=True, default='')
+    zip_code = models.CharField(max_length=5, blank=True, default='', 
+                                validators=[RegexValidator(regex=r'^\d{5}$', message=(u'Must be a 5-digit zipcode'))])
+    education = models.CharField(max_length=150, blank=True, null=False, default='')
+    is_vote_registered = models.CharField(max_length=20, blank=True, null=False, default='')
 
     # Methods
     # Basic string printing

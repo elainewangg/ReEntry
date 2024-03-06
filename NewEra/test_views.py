@@ -8,9 +8,10 @@ from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from NewEra.forms import StudentForm, StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm
-from NewEra.models import Organization, Student, StudentQuarterlyUpdate, StudentWeeklyUpdate, User
-from NewEra.views import get_student, student
+# from NewEra.forms import StudentForm, StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm
+# from NewEra.models import Organization, Student, StudentQuarterlyUpdate, StudentWeeklyUpdate, User
+from NewEra.models import Organization, User
+# from NewEra.views import get_student, student
 
 # region Dashboard tests
 
