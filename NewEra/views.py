@@ -128,9 +128,6 @@ def sendEmail(load_user):
 
 # function to sign up
 def sign_up(request):
-    if request.user.is_authenticated:
-        return redirect(reverse('Home'))
-
     context = {}
 
     if request.method == 'GET':
@@ -140,7 +137,6 @@ def sign_up(request):
         staff_user = User.objects.filter(is_superuser=True).first()
         load_user = CaseLoadUser(user=staff_user)
         form = CaseLoadUserForm(request.POST, instance=load_user)
-        
         if not form.is_valid():
             context['form'] = form 
             return render(request, 'NewEra/sign_up.html', context)

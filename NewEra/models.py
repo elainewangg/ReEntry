@@ -14,6 +14,7 @@ from encrypted_model_fields.fields import (EncryptedCharField,
 from twilio.rest import Client
 
 from NewEra import neighborhoods
+from django.contrib.postgres.fields import ArrayField
 
 '''
 COMMON NOTES:
