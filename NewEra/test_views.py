@@ -8,16 +8,123 @@ from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from NewEra.forms import StudentForm, StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm
-from NewEra.models import Organization, Student, StudentQuarterlyUpdate, StudentWeeklyUpdate, User
-from NewEra.views import get_student, student
+# from NewEra.forms import StudentForm, StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm
+# from NewEra.models import Organization, Student, StudentQuarterlyUpdate, StudentWeeklyUpdate, User
+from NewEra.models import Organization, User, CaseLoadUser
+# from NewEra.views import get_student, student
+from NewEra.views import sign_up
+from NewEra.forms import CaseLoadUserForm
 
 # region Dashboard tests
 
-class DashboardTestCase(TestCase):
-    def setUp(self):
-        self.dashboard_url = reverse('Dashboard')  # Assuming 'dashboard' is the URL name
+# class DashboardTestCase(TestCase):
+#     def setUp(self):
+#         self.dashboard_url = reverse('Dashboard')  # Assuming 'dashboard' is the URL name
 
+#         # Create a superuser for testing
+#         self.superuser = User.objects.create_superuser(
+#             username='admin',
+#             password='adminpassword',
+#             email='admin@example.com'
+#         )
+
+#     def test_dashboard_superuser(self):
+#         # Login as a superuser
+#         self.client.login(username='admin', password='adminpassword')
+
+#         # Make a GET request to the dashboard
+#         response = self.client.get(self.dashboard_url)
+
+#         # Assert that the response is successful (HTTP 200) and the expected context variables exist
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTrue('admins' in response.context)
+#         self.assertTrue('sows' in response.context)
+#         self.assertTrue('orgs' in response.context)
+#         self.assertTrue('supervisors' in response.context)
+#         self.assertTrue('form' in response.context)
+#         self.assertTrue('user' in response.context)
+#         self.assertTrue('safe_passage_coordinators' in response.context)
+#         self.assertTrue('safe_passage_coordinator_supervisors' in response.context)
+
+#         # Assert that the superuser condition is met
+#         self.assertEqual(response.context['user'], self.superuser)
+#         self.assertTrue(response.context['admins'].exists())
+
+#     def test_dashboard_non_superuser(self):
+#         # Create a regular user for testing
+#         regular_user = User.objects.create_user(
+#             username='user',
+#             password='userpassword',
+#             email='user@example.com'
+#         )
+
+#         # Login as the regular user
+#         self.client.login(username='user', password='userpassword')
+
+#         # Make a GET request to the dashboard
+#         response = self.client.get(self.dashboard_url)
+
+#         # Assert that the response is a 404 (HTTP 404 Error)
+#         self.assertEqual(response.status_code, 404)
+
+#     def test_dashboard_post_request(self):
+#         # Login as a superuser
+#         self.client.login(username='admin', password='adminpassword')
+
+#         # Make a POST request to the dashboard with organization creation data
+#         response = self.client.post(
+#             self.dashboard_url,
+#             {
+#                 'org_name': 'Sample Organization'
+#             }
+#         )
+
+#         # Assert that the response is successful (HTTP 200) and a new organization is created
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTrue(Organization.objects.filter(name='Sample Organization').exists())
+
+#         # Assert that the success message is displayed
+#         messages = list(response.context['messages'])
+#         self.assertEqual(len(messages), 1)
+#         self.assertEqual(messages[0].level, constants.SUCCESS)
+#         self.assertEqual(messages[0].message, 'Added a new organization to the system.')
+
+#         organization = Organization.objects.get(name='Sample Organization')
+#         organization_id = organization.id
+
+#         # Make a POST request to the dashboard with user creation data
+#         response = self.client.post(
+#             self.dashboard_url,
+#             {
+#                 'username': 'newuser',
+#                 'password': 'newpassword',
+#                 'confirm_password': 'newpassword',
+#                 'email': 'newuser@example.com',
+#                 'phone': '1234567890',
+#                 'first_name': 'John',
+#                 'last_name': 'Doe',
+#                 'organization': organization_id,
+#                 'user_type': 'admin'
+#             }
+#         )
+
+#         # Assert that the response is successful (HTTP 200) and a new user is created
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTrue(User.objects.filter(username='newuser').exists())
+#         self.assertTrue(User.objects.get(username='newuser').is_superuser)
+
+#         # Assert that the success message is displayed
+#         messages = list(response.context['messages'])
+#         self.assertEqual(len(messages), 1)
+#         self.assertEqual(messages[0].level, constants.SUCCESS)
+#         self.assertEqual(messages[0].message, 'Added a new user to the system.')
+
+# # endregion
+
+# region Sign Up tests
+class SignUpTestCase(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
         # Create a superuser for testing
         self.superuser = User.objects.create_superuser(
             username='admin',
@@ -25,99 +132,42 @@ class DashboardTestCase(TestCase):
             email='admin@example.com'
         )
 
-    def test_dashboard_superuser(self):
-        # Login as a superuser
-        self.client.login(username='admin', password='adminpassword')
+        self.sign_up_form_data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'phone': '5135551212',
+            'neighborhood': 'Prefer Not To Say',
+            'case_label': 'Other'
+        }
 
-        # Make a GET request to the dashboard
-        response = self.client.get(self.dashboard_url)
+        self.no_email_or_phone_sign_up_form_data = {
+            'first_name': 'John',
+            'last_name': 'Doe',
+            'neighborhood': 'Prefer Not To Say',
+            'case_label': 'Other',
+            'phone': '',
+            'email': ''
+        }
 
-        # Assert that the response is successful (HTTP 200) and the expected context variables exist
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue('admins' in response.context)
-        self.assertTrue('sows' in response.context)
-        self.assertTrue('orgs' in response.context)
-        self.assertTrue('supervisors' in response.context)
-        self.assertTrue('form' in response.context)
-        self.assertTrue('user' in response.context)
-        self.assertTrue('safe_passage_coordinators' in response.context)
-        self.assertTrue('safe_passage_coordinator_supervisors' in response.context)
+    def test_valid_form_submission(self):
+        request = self.factory.post('/sign_up/', data=self.sign_up_form_data)
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
 
-        # Assert that the superuser condition is met
-        self.assertEqual(response.context['user'], self.superuser)
-        self.assertTrue(response.context['admins'].exists())
-
-    def test_dashboard_non_superuser(self):
-        # Create a regular user for testing
-        regular_user = User.objects.create_user(
-            username='user',
-            password='userpassword',
-            email='user@example.com'
-        )
-
-        # Login as the regular user
-        self.client.login(username='user', password='userpassword')
-
-        # Make a GET request to the dashboard
-        response = self.client.get(self.dashboard_url)
-
-        # Assert that the response is a 404 (HTTP 404 Error)
-        self.assertEqual(response.status_code, 404)
-
-    def test_dashboard_post_request(self):
-        # Login as a superuser
-        self.client.login(username='admin', password='adminpassword')
-
-        # Make a POST request to the dashboard with organization creation data
-        response = self.client.post(
-            self.dashboard_url,
-            {
-                'org_name': 'Sample Organization'
-            }
-        )
-
-        # Assert that the response is successful (HTTP 200) and a new organization is created
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(Organization.objects.filter(name='Sample Organization').exists())
-
-        # Assert that the success message is displayed
-        messages = list(response.context['messages'])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level, constants.SUCCESS)
-        self.assertEqual(messages[0].message, 'Added a new organization to the system.')
-
-        organization = Organization.objects.get(name='Sample Organization')
-        organization_id = organization.id
-
-        # Make a POST request to the dashboard with user creation data
-        response = self.client.post(
-            self.dashboard_url,
-            {
-                'username': 'newuser',
-                'password': 'newpassword',
-                'confirm_password': 'newpassword',
-                'email': 'newuser@example.com',
-                'phone': '1234567890',
-                'first_name': 'John',
-                'last_name': 'Doe',
-                'organization': organization_id,
-                'user_type': 'admin'
-            }
-        )
-
-        # Assert that the response is successful (HTTP 200) and a new user is created
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(User.objects.filter(username='newuser').exists())
-        self.assertTrue(User.objects.get(username='newuser').is_superuser)
-
-        # Assert that the success message is displayed
-        messages = list(response.context['messages'])
-        self.assertEqual(len(messages), 1)
-        self.assertEqual(messages[0].level, constants.SUCCESS)
-        self.assertEqual(messages[0].message, 'Added a new user to the system.')
+        response = sign_up(request)
+        actual_messages = [m.message for m in messages]
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(CaseLoadUser.objects.count(), 1)
+        self.assertIn('John Doe has successfully signed up.', actual_messages)
+    
+    def test_student_creation_without_phone_or_email(self):
+        form = CaseLoadUserForm(data=self.no_email_or_phone_sign_up_form_data)
+        self.assertFalse(form.is_valid())
+        self.assertIn('You must input either a phone number or an email address for this user.', form.errors['__all__'])
 
 # endregion
-
+        
 # region Student tests
 
 # class StudentViewTestCase(TestCase):

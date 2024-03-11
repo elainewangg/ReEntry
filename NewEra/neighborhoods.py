@@ -1,4 +1,5 @@
 NEIGHBORHOOD_LIST = [
+  ("Prefer Not To Say","Prefer Not To Say"),
   ("Aleppo Township","Aleppo Township"),
   ("Allegheny Center","Allegheny Center"),
   ("Allegheny West","Allegheny West"),

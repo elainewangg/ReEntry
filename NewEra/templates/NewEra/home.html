@@ -12,13 +12,12 @@
 {% block content %}
 
 	<div class="parallax">
-		<span class="parallax-text"><h1 class="text-white parallax-text">NewEra412</h1></span>
+		<span class="parallax-text"><h1 class="text-white parallax-text">Realistic ReEntry</h1></span>
 		<p class="text-white parallax-text subtitle">
 			Using tech to deliver resources to our communities.
 		</p>
         <div class="inline-button">
-            <a href="{% url 'Resources' %}"><button id="resource-btn" type="button" class="btn btn-light">General Resources</button></a>&nbsp;&nbsp;
-            <a href="https://www.realisticreentry.com/"><button id="resource-btn" type="button" class="btn btn-light">For Returning Citizens</button></a>
+            <a href="{% url 'Resources' %}"><button id="resource-btn" type="button" class="btn btn-light">ReEntry Resources</button></a>&nbsp;&nbsp;
         </div>
     </div>
 
@@ -29,7 +28,12 @@
                 <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
             </div>
 
+
             <div class="col-sm-6 mb-3 ">
+
+        <div>
+            {% include "NewEra/sign_up_popup.html" %}
+        </div>
                 <p>Realistic ReEntry is Pittsburgh's first restorative practice based  interim management firm for social service orginizations, governemnt agencies, employers, and foundations. Our award winning experts assist organizations who are undergoing major change, trying to implement a critical strategy or are looking to plug a critical management gap. </p>
             </div>
         </div>

@@ -28,6 +28,10 @@ from openpyxl import Workbook
 from openpyxl.styles import Alignment, Font
 from openpyxl.utils import get_column_letter
 import pytz
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.conf import settings
+from django.core import mail
 
 # from NewEra.forms import (BiweeklyForm, CaseLoadUserForm, CreateNoteForm,
 #                           CreateResourceForm, EditOrganizationForm,
@@ -104,6 +108,44 @@ def login(request):
     else:
         return render(request, 'NewEra/login.html', context)
 
+    return redirect(reverse('Home'))
+
+# Sends an email to the staff_user
+def sendEmail(load_user):
+    # Create email contents
+    subject = 'Realistic ReEntry Sign Up from {}'.format(load_user.get_full_name())
+    html_message = render_to_string('NewEra/sign_up_mailer.html',
+                                    {'client': load_user})
+    plain_message = strip_tags(html_message)
+    from_email = settings.EMAIL_HOST_USER
+
+    # Set recipient
+    # to = settings.EMAIL_HOST_USER
+    to = "aeli@andrew.cmu.edu"
+
+    # Send the email
+    mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
+
+# function to sign up
+def sign_up(request):
+    context = {}
+
+    if request.method == 'GET':
+        context['form'] = CaseLoadUserForm()
+        return render(request, 'NewEra/sign_up.html', context)
+    if request.method == 'POST':
+        staff_user = User.objects.filter(is_superuser=True).first()
+        load_user = CaseLoadUser(user=staff_user)
+        form = CaseLoadUserForm(request.POST, instance=load_user)
+        if not form.is_valid():
+            context['form'] = form 
+            return render(request, 'NewEra/sign_up.html', context)
+        form.save()
+        load_user.save()
+        sendEmail(load_user)
+        messages.success(request, '{} {} has successfully signed up.'.format(request.POST.get("first_name", ""), request.POST.get("last_name", "")))
+
+    context['form'] = CaseLoadUserForm()
     return redirect(reverse('Home'))
 
 def switch_role(request):
@@ -585,7 +627,6 @@ def case_load(request):
             context['caseload_users'] = users
             context['modalStatus'] = 'show'
             return render(request, 'NewEra/case_load.html', context)
-
         form.save()
         load_user.save()
         messages.success(request, 'Successfully added {} {} to the CaseLoad.'.format(load_user.first_name, load_user.last_name))
