@@ -1,11 +1,12 @@
 {% block navbar %}
-<nav id="app-nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav id="app-nav" class="navbar navbar-expand-lg navbar-light bg-custom">
 	<!-- Render the logo -->
 	<a class="navbar-brand" href="{% url 'Home' %}">
 		{% load static %}
+		<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
 		<img src="{% static 'NewEra/reentry_logo.jpg' %}" width="35" height="33" class="d-inline-block align-top"
 			alt="ReEntry Logo">
-		<b>&nbsp;&nbsp;NewERA412&nbsp;&nbsp;</b>
+		<b>&nbsp;&nbsp;Realistic ReEntry&nbsp;&nbsp;</b>
 	</a>
 
 	<!-- Create the hamburger button -->
@@ -94,7 +95,7 @@
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
-				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Sign Up</a>
+				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Contact Us</a>
 			</li>
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">

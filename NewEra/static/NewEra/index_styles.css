@@ -6,6 +6,7 @@ div.heading-banner {
     background-color: lightgray;
 }
 
+
 div.heading-banner h1 {
     font-size: 2rem;
 }
@@ -35,6 +36,10 @@ div.secondary-content {
 
 .subtitle {
     font-size: 1.2em;
+}
+
+.bg-custom {
+    background-color: #F9F4EC;
 }
 
 .parallax-text {
