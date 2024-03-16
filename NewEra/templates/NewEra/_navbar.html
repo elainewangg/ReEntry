@@ -1,12 +1,12 @@
 {% block navbar %}
-<nav id="app-nav" class="navbar navbar-expand-lg navbar-light bg-custom">
+<nav id="app-nav" class="navbar navbar-expand-lg navbar-light beige">
 	<!-- Render the logo -->
 	<a class="navbar-brand" href="{% url 'Home' %}">
 		{% load static %}
 		<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
 		<img src="{% static 'NewEra/reentry_logo.jpg' %}" width="35" height="33" class="d-inline-block align-top"
 			alt="ReEntry Logo">
-		<b>&nbsp;&nbsp;Realistic ReEntry&nbsp;&nbsp;</b>
+		<!-- <b>&nbsp;&nbsp;Realistic ReEntry&nbsp;&nbsp;</b> -->
 	</a>
 
 	<!-- Create the hamburger button -->

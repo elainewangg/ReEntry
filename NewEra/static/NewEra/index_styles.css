@@ -22,11 +22,12 @@ div.secondary-content {
 .parallax {
     /* Credit: https://www.w3schools.com/howto/howto_css_parallax.asp */
     position: relative;
-    background-image: url("/static/NewEra/reentry_logo.jpg");
-    height: 300px;
-    padding-top: 12vh; 
+    background-image: url("/static/NewEra/homepage_bg.jpg");
+    height: 400px;
+    padding-top: 16vh; 
     padding-bottom: 7vh; 
-    text-align: center;
+    text-align: left;
+    padding-left: 30vh; 
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
@@ -38,7 +39,71 @@ div.secondary-content {
     font-size: 1.2em;
 }
 
-.bg-custom {
+.footer {
+    background-color: black;
+    color: white;
+    text-align: left;
+    padding: 40px 80px;
+}
+
+.footer p {
+    margin: 0;
+    padding: 0;
+}
+
+.footer p.contact-title {
+    font-size: 20px;
+}
+
+.footer p, .footer p.footer-rights {
+    font-size: 16px;
+}
+
+.footer p.footer-rights {
+    margin-top: 20px;
+}
+
+.decorative-box {
+    border: 2px solid black; 
+    padding: 50px 80px; 
+    margin: 0px -200px; 
+    /* border-radius: 10px;  */
+    background-color: white; /* Light blue background */
+    color: black;
+    position: relative; 
+}
+
+.decorative-box p {
+    font-size: 20px; /* Set paragraph text size to 30px */
+}
+
+.box-logo {
+    position: absolute; /* Position the logo absolutely within the decorative box */
+    bottom: 0; /* Align to the bottom of the box */
+    right: 0; /* Align to the left side of the box */
+    width: 60px; /* Make the logo very small */
+    height: auto; /* Maintain aspect ratio */
+    margin: -20px; /* Adjust if needed to overlap the corner as desired */
+}
+
+.orange-button {
+    background-color: #F0430D;
+    color: white;
+    border: 0px;
+    padding: 8px 15px;
+    border-radius: 12px;
+}
+
+.white-button {
+    background-color: white;
+    color: black;
+    border-radius: 12px;
+    border: 0px;
+    padding: 8px 15px;
+    border-radius: 12px;
+    /* You can add additional styling here if needed */
+}
+.beige {
     background-color: #F9F4EC;
 }
 
