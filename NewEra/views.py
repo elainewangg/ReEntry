@@ -474,7 +474,7 @@ def create_referral(request):
     
     if request.user.is_superuser: 
         recipients = CaseLoadUser.objects.filter(is_active=True).all()
-    elif request.user.is_staff: 
+    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         recipients = CaseLoadUser.objects.filter(is_active=True).filter(user=request.user)
 
     if request.method == 'GET' and resources:
@@ -551,7 +551,7 @@ def referrals(request):
         referrals = Referral.objects.all().order_by('-referral_date')
     elif (request.user.is_supervisor):
         referrals = Referral.objects.all().filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-referral_date')
-    elif (request.user.is_staff):
+    else:
         referrals = Referral.objects.all().filter(user=request.user).order_by('-referral_date')
 
     page = request.GET.get('page', 1)
@@ -612,7 +612,7 @@ def case_load(request):
         context['staff'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
     elif request.user.is_supervisor:
         users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
-    elif request.user.is_staff:
+    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
     else:  
         raise Http404
@@ -835,20 +835,22 @@ def dashboard(request):
         raise Http404
 
     admins = User.objects.filter(is_superuser=True)
-    sows = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator=False)
-    safe_passage_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator=True)
-    safe_passage_coordinator_supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_staff=True).filter(is_safe_passage_coordinator_supervisor=True)
+    reentry_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_reentry_coordinator=True)
+    community_outreach_workers = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_community_outreach_worker=True)
+    service_providers = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_service_provider=True)
+    resource_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_resource_coordinator=True)
     supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=True)
     orgs = Organization.objects.all().order_by('name')
     context = {
         'admins': admins, 
-        'sows': sows, 
+        'reentry_coordinators': reentry_coordinators, 
+        'community_outreach_workers': community_outreach_workers, 
+        'service_providers': service_providers, 
+        'resource_coordinators': resource_coordinators, 
         'orgs': orgs, 
         'supervisors': supervisors, 
         'form': RegistrationForm(), 
-        'user' : request.user,
-        'safe_passage_coordinators': safe_passage_coordinators,
-        'safe_passage_coordinator_supervisors': safe_passage_coordinator_supervisors
+        'user' : request.user
     }
 
     if request.method == 'POST':
@@ -860,25 +862,25 @@ def dashboard(request):
                 context['modalStatus'] = 'show'
                 return render(request, 'NewEra/dashboard.html', context)
 
-            user = User.objects.create_user(username=form.cleaned_data['username'], 
+            user = User.objects.create_user(username=form.cleaned_data['username'],
                                             password=form.cleaned_data['password'],
                                             email=form.cleaned_data['email'],
                                             phone=form.cleaned_data['phone'],
                                             first_name=form.cleaned_data['first_name'],
                                             last_name=form.cleaned_data['last_name'],
                                             organization=form.cleaned_data['organization'])
-            user.is_staff = True 
             user.is_superuser = False
             user.is_supervisor = False
 
             # User role checkboxes
             if 'user_type' in request.POST:
                 roles = request.POST.getlist('user_type')
-
                 user.is_superuser = 'admin' in roles
                 user.is_supervisor = 'supervisor' in roles
-                user.is_safe_passage_coordinator = 'safe_passage_coordinator' in roles
-                user.is_safe_passage_coordinator_supervisor = 'safe_passage_coordinator_supervisor' in roles
+                user.is_reentry_coordinator = 'reentry_coordinator' in roles
+                user.is_community_outreach_worker = 'community_outreach_worker' in roles
+                user.is_service_provider = 'service_provider' in roles
+                user.is_resource_coordinator = 'resource_coordinator' in roles
             else:
                 form.clean_roles()
             
@@ -899,10 +901,18 @@ def supervisor_dashboard(request):
         raise Http404
 
     admins = User.objects.filter(is_superuser=True)
-    sows = User.objects.filter(is_superuser=False).filter(is_staff=True).filter(is_supervisor=False)
+    reentry_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_reentry_coordinator=True)
+    community_outreach_workers = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_community_outreach_worker=True)
+    service_providers = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_service_provider=True)
+    resource_coordinators = User.objects.filter(is_superuser=False).filter(is_supervisor=False).filter(is_resource_coordinator=True)
     supervisors = User.objects.filter(is_superuser=False).filter(is_supervisor=True)
     orgs = Organization.objects.all().order_by('name')
-    context = {'admins':admins, 'sows':sows, 'orgs':orgs, 'supervisors':supervisors, 'form': RegistrationForm(), 'user' : request.user}
+    context = { 'admins':admins, 
+                'reentry_coordinators': reentry_coordinators, 
+                'community_outreach_workers': community_outreach_workers, 
+                'service_providers': service_providers, 
+                'resource_coordinators': resource_coordinators, 
+                'orgs':orgs, 'supervisors':supervisors, 'form': RegistrationForm(), 'user' : request.user}
 
     context['form'] = RegistrationForm()
     return render(request, 'NewEra/supervisor_dashboard.html', context)
@@ -927,8 +937,10 @@ def edit_user(request, id):
 
                 user.is_superuser = 'admin' in roles
                 user.is_supervisor = 'supervisor' in roles
-                user.is_safe_passage_coordinator = 'safe_passage_coordinator' in roles
-                user.is_safe_passage_coordinator_supervisor = 'safe_passage_coordinator_supervisor' in roles
+                user.is_reentry_coordinator = 'reentry_coordinator' in roles
+                user.is_community_outreach_worker = 'community_outreach_worker' in roles
+                user.is_service_provider = 'service_provider' in roles
+                user.is_resource_coordinator = 'resource_coordinator' in roles
 
     
         if form.is_valid():
@@ -1019,7 +1031,7 @@ def meeting_tracker(request):
         context['responses'] = MeetingTracker.objects.all().order_by('-date')
     elif request.user.is_supervisor:
         context['responses'] = MeetingTracker.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
-    elif request.user.is_staff:
+    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         context['responses'] = MeetingTracker.objects.filter(user=request.user).order_by('-date')
     else:  
         raise Http404
@@ -1108,7 +1120,7 @@ def delete_meeting_tracker_response(request, id):
 #         context['responses'] = RiskAssessment.objects.all().order_by('-date')
 #     elif request.user.is_supervisor:
 #         context['responses'] = RiskAssessment.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
-#     elif request.user.is_staff:
+#    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
 #         context['responses'] = RiskAssessment.objects.filter(user=request.user).order_by('-date')
 #     else:  
 #         raise Http404
@@ -1199,7 +1211,7 @@ def delete_meeting_tracker_response(request, id):
 #         context['responses'] = Biweekly.objects.all().order_by('-date')
 #     elif request.user.is_supervisor:
 #         context['responses'] = Biweekly.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
-#     elif request.user.is_staff:
+#    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
 #         context['responses'] = Biweekly.objects.filter(user=request.user).order_by('-date')
 #     else:  
 #         raise Http404

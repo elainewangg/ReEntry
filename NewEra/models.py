@@ -51,7 +51,7 @@ class User(AbstractUser):
     - first_name
     - last_name
 
-    Within this model, is_staff represents an SOW; is_superuser represents an admin
+    Within this model, is_superuser represents an admin
     '''
 
     # Phone number is not provided in AbstractUser
@@ -66,11 +66,17 @@ class User(AbstractUser):
     # is_supervisor is a boolean that tells whether the user is a supervisor
     is_supervisor = models.BooleanField(blank=False, null=False, default=False)
 
-    # is_safe_passage_coordinator field
-    is_safe_passage_coordinator = models.BooleanField(default=False)
+    # is_reentry_coordinator field
+    is_reentry_coordinator = models.BooleanField(default=False)
 
-    # is_safe_passage_coordinator_supervisor field
-    is_safe_passage_coordinator_supervisor = models.BooleanField(default=False)
+    # is_community_outreach_worker field
+    is_community_outreach_worker = models.BooleanField(default=False)
+    
+    # is_service_provider field
+    is_service_provider = models.BooleanField(default=False)
+    
+    # is_resource_coordinator field
+    is_resource_coordinator = models.BooleanField(default=False)
 
     # Methods
     # Basic string printing
@@ -79,7 +85,7 @@ class User(AbstractUser):
 
     # Returns if the user is an active staff member (an SOW or an admin)
     def is_active_staff(self):
-        return self.is_active and self.is_staff
+        return self.is_active and self.is_staff()
 
     # Returns the case load of the user
     def get_case_load(self):
@@ -96,11 +102,12 @@ class User(AbstractUser):
     # Returns an array of the user types the user is assigned to
     def get_user_types(self):
         user_type_fields = {
-            'is_safe_passage_coordinator': 'safe_passage_coordinator',
-            'is_safe_passage_coordinator_supervisor': 'safe_passage_coordinator_supervisor',
             'is_supervisor': 'supervisor',
             'is_superuser': 'admin',
-            'is_staff': 'sow'
+            'is_reentry_coordinator': 'reentry_coordinator',
+            'is_community_outreach_worker': 'community_outreach_worker',
+            'is_service_provider': 'service_provider',
+            'is_resource_coordinator': 'resource_coordinator',
         }
         keys = list(user_type_fields.keys())
         # Get only the user type fields that are flagged true
@@ -115,11 +122,12 @@ class User(AbstractUser):
 
     def get_user_type_buttons(self):
         user_type_fields = {
-            'is_safe_passage_coordinator': 'SPC (Safe Passage Coordinator)',
-            'is_safe_passage_coordinator_supervisor': 'SPC Supervisor',
             'is_supervisor': 'Supervisor',
             'is_superuser': 'Admin',
-            'is_staff': 'SOW'
+            'is_reentry_coordinator': 'Reentry Coordinator',
+            'is_community_outreach_worker': 'Community Outreach Worker',
+            'is_service_provider': 'Service Provider',
+            'is_resource_coordinator': 'Resource Coordinator',
         }
         keys = list(user_type_fields.keys())
         # Get only the user type fields that are flagged true
@@ -131,14 +139,17 @@ class User(AbstractUser):
             types[property_name] = user_type_fields[property_name]
 
         return types
-
+    
+    # def is_staff(self):
+    #     return self.is_superuser or self.is_reentry_coordinator or self.is_community_outreach_worker or self.is_service_provider or self.is_resource_coordinator
+    
     def has_more_than_one_role(self):
         roles = self.get_user_types()
         return len(roles) > 1
 
     # Sets ordering parameters and their ordering priority
     class Meta:
-        ordering = ['-is_active', 'is_superuser', 'is_staff', 'username', 'first_name', 'last_name', 'team']
+        ordering = ['-is_active', 'is_superuser', 'username', 'first_name', 'last_name', 'team']
 
 
 # Model for individuals on the case load

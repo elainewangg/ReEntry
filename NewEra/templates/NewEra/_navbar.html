@@ -32,62 +32,56 @@
 			</li>
 			{% endif %}
 
-			<!-- Only show the referrals link if the user is logged in and not safe_passage_coordinator -->
-			{% if user.is_authenticated and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
-			<li class="nav-item dropdown">
-				{% url 'Referrals' as referrals_url %}
-				<a class="nav-link dropdown-toggle {% if request.path == referrals_url %}active{% endif %}"
-					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-					aria-expanded="false">
-					Referrals
-				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="{% url 'Referrals' %}">General Referrals</a>
-				</div>
-			</li>
-			{% endif %}
+			<!-- Only show the referrals link if the user is logged in -->
+			{% if user.is_authenticated %}
+				<li class="nav-item dropdown">
+					{% url 'Referrals' as referrals_url %}
+					<a class="nav-link dropdown-toggle {% if request.path == referrals_url %}active{% endif %}"
+						href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false">
+						Referrals
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						<a class="dropdown-item" href="{% url 'Referrals' %}">General Referrals</a>
+					</div>
+				</li>
 
-			<!-- Only show the case load link if the user is logged in and not safe_passage_coordinator -->
-			{% if request.session.role == 'is_staff' and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
-			<li class="nav-item">
-				{% url 'Case Load' as case_load_url %}
-				<a class="nav-link {% if request.path == case_load_url %}active{% endif %}"
-					href="{{ case_load_url }}">Case Load</a>
-			</li>
-			{% endif %}
+				<li class="nav-item">
+					{% url 'Case Load' as case_load_url %}
+					<a class="nav-link {% if request.path == case_load_url %}active{% endif %}"
+						href="{{ case_load_url }}">Case Load</a>
+				</li>
 
-			<!-- Only show the forms link if the user is logged in and not user.is_safe_passage_coordinator -->
-			{% if request.session.role == 'is_staff' and request.session.role != 'is_safe_passage_coordinator' and request.session.role != 'is_safe_passage_coordinator_supervisor' %}
-			<li class="nav-item dropdown">
-				{% url 'Meeting Tracker' as meeting_tracker_url %}
-				<a class="nav-link dropdown-toggle {% if request.path == meeting_tracker_url %}active{% endif %}"
-					href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
-					aria-expanded="false">
-					Forms
-				</a>
-				<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-					<a class="dropdown-item" href="{% url 'Meeting Tracker' %}">Meetings Tracker</a>
-				</div>
-			</li>
-			{% endif %}
+				<li class="nav-item dropdown">
+					{% url 'Meeting Tracker' as meeting_tracker_url %}
+					<a class="nav-link dropdown-toggle {% if request.path == meeting_tracker_url %}active{% endif %}"
+						href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true"
+						aria-expanded="false">
+						Forms
+					</a>
+					<div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+						<a class="dropdown-item" href="{% url 'Meeting Tracker' %}">Meetings Tracker</a>
+					</div>
+				</li>
 
 
-			<!-- Only show the dashboard link if the user is logged in and an admin -->
-			{% if request.session.role == 'is_superuser' %}
-			<li class="nav-item">
-				{% url 'Dashboard' as dashboard_url %}
-				<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
-					href="{{ dashboard_url }}">Dashboard</a>
-			</li>
-			{% endif %}
+				<!-- Only show the dashboard link if the user is logged in and an admin -->
+				{% if request.session.role == 'is_superuser' %}
+				<li class="nav-item">
+					{% url 'Dashboard' as dashboard_url %}
+					<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
+						href="{{ dashboard_url }}">Dashboard</a>
+				</li>
+				{% endif %}
 
-			<!-- Only show the dashboard link if the user is logged in and a supervisor -->
-			{% if request.session.role == 'is_supervisor' %}
-			<li class="nav-item">
-				{% url 'Supervisor Dashboard' as supervisor_dashboard_url %}
-				<a class="nav-link {% if request.path == supervisor_dashboard_url %}active{% endif %}"
-					href="{{ supervisor_dashboard_url }}">Dashboard</a>
-			</li>
+				<!-- Only show the dashboard link if the user is logged in and a supervisor -->
+				{% if request.session.role == 'is_supervisor' %}
+				<li class="nav-item">
+					{% url 'Supervisor Dashboard' as supervisor_dashboard_url %}
+					<a class="nav-link {% if request.path == supervisor_dashboard_url %}active{% endif %}"
+						href="{{ supervisor_dashboard_url }}">Dashboard</a>
+				</li>
+				{% endif %}
 			{% endif %}
 
 			{% if not user.is_authenticated %}
@@ -120,16 +114,18 @@
 					aria-haspopup="true" 
 					aria-expanded="false">
 					<i class="material-icons" style="font-size: 20px;">account_circle</i>
-					{% if request.session.role == 'is_safe_passage_coordinator' %}
-                        SPC
+					{% if request.session.role == 'is_reentry_coordinator' %}
+						Reentry Coordinator
 					{% elif request.session.role == 'is_supervisor' %}
                         Supervisor
 					{% elif request.session.role == 'is_superuser' %}
                         Admin
-					{% elif request.session.role == 'is_safe_passage_coordinator_supervisor' %}
-                        SPC Supervisor
-                    {% elif request.session.role == 'is_staff' %}
-                        SOW
+					{% elif request.session.role == 'is_community_outreach_worker' %}
+						Community Outreach Worker
+					{% elif request.session.role == 'is_community_outreach_worker' %}
+						Service Provider
+					{% elif request.session.role == 'is_community_outreach_worker' %}
+						Resource Coordinator
                     {% endif %}
 				</a>
 				<div class="dropdown-menu"

@@ -254,7 +254,7 @@
 
 {% block page_specific_scripts %}
 
-{% if user.is_staff %}{%load static %}
+{% if user.is_reentry_coordinator or user.is_community_outreach_worker or user.is_service_provider or user.is_resource_coordinator %}{%load static %}
 	<script src="{% static 'NewEra/referrals.js' %}" type="text/javascript"></script>
 {% endif %}
 

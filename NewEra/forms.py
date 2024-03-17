@@ -31,11 +31,12 @@ MAX_IMAGE_UPLOAD_SIZE = 2500000 #2.5mb
 MAX_ATTACHMENT_UPLOAD_SIZE = 20000000 #20mb
 
 USER_TYPE_CHOICES = [
-	('sow', 'SOW'),
-	('safe_passage_coordinator', 'Safe Passage Coordinator'),
+	('admin', 'Admin'),
 	('supervisor', 'Supervisor'),
-	('safe_passage_coordinator_supervisor', 'Safe Passage Coordinator Supervisor'),
-	('admin', 'Admin')
+	('reentry_coordinator', 'Reentry Coordinator'),
+	('community_outreach_worker', 'Community Outreach Worker'),
+	('service_provider', 'Service Provider'),
+	('resource_coordinator', 'Resource Coordinator')
 ]
 
 # Model Forms
@@ -471,10 +472,12 @@ class LoginForm(forms.Form):
 # Form for a user to switch roles
 class RoleSwitchForm(forms.Form):
 	role_choices = {
-		'is_safe_passage_coordinator': 'SPC (Safe Passage Coordinator)',
-		'is_safe_passage_coordinator_supervisor': 'SPC Supervisor',
 		'is_supervisor': 'Supervisor',
-		'is_superuser': 'Admin'
+		'is_superuser': 'Admin',
+		'is_reentry_coordinator': 'Reentry Coordinator',
+		'is_community_outreach_worker': 'Community Outreach Worker',
+		'is_service_provider': 'Service Provider',
+		'is_resource_coordinator': 'Resource Coordinator',
 	}
 	role = forms.ChoiceField(widget=forms.RadioSelect(choices=role_choices))
 
