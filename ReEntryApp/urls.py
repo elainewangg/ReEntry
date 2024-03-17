@@ -31,7 +31,8 @@ urlpatterns = [
     path('login/', views.login, name='Login'),  # Visitors (anyone not logged in) only
     path('sign_up/', views.sign_up, name='Sign Up'),  # Visitors (anyone not logged in) only
     path('logout/', views.logout, name='Logout'),   # Staff (SOWs) and superuser (admin) only
-    path('about/', views.about, name='About'),  # All users
+    path('about_us/', views.about_us, name='About Us'),  # All users
+    path('programs/', views.programs, name="Programs"),
     path('switch_role/', views.switch_role, name='Switch Role'), # All users
 
     # Dashboard (previously Manage Users)
