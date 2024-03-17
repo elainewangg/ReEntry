@@ -1,0 +1,42 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}{% block navtitle %}
+	Programs
+{% endblock %}{% endblock %}
+
+
+{% block content %}
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Programs</h1>
+    </div>
+
+    <div class="container mt-5" > 
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="200" height="auto" class="" alt="ReEntry Logo">
+            </div>
+        
+            <div class="col-md-7">
+                <h2>YARP</h2>
+                <br/> 
+                <p>A partnership between Partner4Work (P4W), Operation Better Block, the Allegheny County Jail Collaborative and local programs with long history of serving young adults (age 18-24) with justice system involvement will work to provide 40 young adults with justice system involvement opportunities with targeted workforce training programs that are tied directly to employers.
+                </p>
+                <p>Participants will be recruited based upon their interest in several in-demand industries in Allegheny County and the City of Pittsburgh, including healthcare, construction, financial services, transportation and logistics, and other high growth sectors, with employers assisting in developing a screening process to ensure participants are entering fields in which they have long-term interest and meet some initial criteria for employers. This program will build upon existing programming, especially that of Operation Better Block, and create targeted career pathway opportunities for participants, while providing them necessary support to complete any trainings or on-the-job work experiences.
+                </p>
+
+            </div>
+            
+        </div>
+        <br/><br/><br/><br/>
+        
+    </div>
+{% endblock %}
+
+

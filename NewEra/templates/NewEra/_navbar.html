@@ -93,18 +93,25 @@
 
 			{% if not user.is_authenticated %}
 
-			<!-- Only show the programs link if the user is logged out -->
-			<li class="nav-item">
-				{% url 'Programs' as programs_url %}
-				<a class="nav-link {% if request.path == programs_url %}active{% endif %}" href="{{ programs_url }}">Programs</a>
-			</li>
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+					Programs
+				</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <li><a class="dropdown-item" href="{% url 'yarp' %}">Young Adults ReEntry Program</a></li>
+                    <li><a class="dropdown-item" href="{% url 'obb' %}">Operation Better Block</a></li>
+                    <li><a class="dropdown-item" href="{% url 'partners' %}">Our Partners</a></li>
+                </ul>
+            </li>
+			
 
 			<!-- Only show the about link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'About Us' as about_us_url %}
 				<a class="nav-link {% if request.path == about_us_url %}active{% endif %}" href="{{ about_us_url }}">About Us</a>
 			</li>
-			
+
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
