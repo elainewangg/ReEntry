@@ -8,9 +8,9 @@
 
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
-	<h1 style="margin: auto; margin-top: 50px; text-align: center;">
-		Resources
-	</h1>
+	<div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Resources</h1>
+    </div>
 
 	<!-- Display referral information -->
 	{% if request.user.is_authenticated %}
@@ -26,10 +26,10 @@
 			<form method="GET" action="">
 				<!-- Text search bar -->
 				<input id="searchBar" name="query" value="{{ request.GET.query }}" class="form-control" type="search" placeholder="Search for a Resource" aria-label="Search">
-				<button id="searchBarButton" class="btn btn-primary" type="submit">Search</button>
+				<button id="searchBarButton" class="orange-button" type="submit">Search</button>
 
 				<!-- Search Filter  -->
-				<a id="searchFilter" class="btn btn-primary dropdown-toggle"  data-toggle="collapse" href="#filterDropdown" role="button" aria-expanded="false" aria-controls="filterDropdown">Filter Resources</a>
+				<a id="searchFilter" class="orange-button dropdown-toggle"  data-toggle="collapse" href="#filterDropdown" role="button" aria-expanded="false" aria-controls="filterDropdown">Filter Resources</a>
 			</form>
 		</div>
 
@@ -51,8 +51,8 @@
 
 					<hr style="margin-top: 0;">
 
-					<button class="btn btn-primary" type="submit"><i class="material-icons">filter_list</i>Filter</button>
-					<button class="btn btn-primary" onclick="uncheckAll(event);">Clear Selection</button>
+					<button class="orange-button" type="submit"><i class="material-icons">filter_list</i>Filter</button>
+					<button class="orange-button" onclick="uncheckAll(event);">Clear Selection</button>
 				</form>
 			</div>
 		</div>
@@ -64,7 +64,7 @@
 		{% if active_resources.paginator.count > 0 or inactive_resources.count > 0 %}
 			{% if perms.resource.edit_resource %}
 				<h3>Active Resources</h3>
-				<a href="{% url 'Create Resource' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Resource</a>
+				<a href="{% url 'Create Resource' %}" class="orange button"><i class="material-icons">add</i>Add Resource</a>
 				<br><br>
 			{% endif %}
 
@@ -153,7 +153,7 @@
 				<hr>
 				{% if inactive_resources.paginator.count > 0 %}
 					<h3>Inactive Resources</h3>
-					<a href="{% url 'Create Resource' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Resource</a>
+					<a href="{% url 'Create Resource' %}" class="orange-button"><i class="material-icons">add</i>Add Resource</a>
 					<br>
 					<br>
 					<div class="row">
@@ -236,7 +236,7 @@
 			{% endif %}
 
 		{% else %}
-			<a href="{% url 'Create Resource' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Resource</a>
+			<a href="{% url 'Create Resource' %}" class="orange-button"><i class="material-icons">add</i>Add Resource</a>
 			<br>
 			<p style="margin: auto; margin-top: 50px; text-align: center;"><em>No resources were found.</em></p>
 		{% endif %}
@@ -244,7 +244,7 @@
 	</div>
 
 	<!-- SOWs can make referrals through the 'Make Referrals' button -->
-    	<button id="make-referral" type="button" class="btn btn-light white-background">Make Referral</button>
+    	<button id="make-referral" type="button" class="white-button">Make Referral</button>
     	<button id='commit-referral' onclick="commitReferrals()" class='btn btn-warning'></button>
 
 

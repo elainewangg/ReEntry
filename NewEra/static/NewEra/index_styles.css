@@ -23,6 +23,11 @@ div.secondary-content {
     padding-top: 5vh;
 }
 
+.navbar-nav > .nav-item > .nav-link {
+    padding-left: 2rem; 
+    padding-right: 1rem; 
+}
+
 .parallax-subpage{
     position: relative;
     background-image: url("/static/NewEra/homepage_bg.jpg");

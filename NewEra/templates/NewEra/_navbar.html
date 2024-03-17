@@ -99,17 +99,18 @@
 				<a class="nav-link {% if request.path == programs_url %}active{% endif %}" href="{{ programs_url }}">Programs</a>
 			</li>
 
+			<!-- Only show the about link if the user is logged out -->
+			<li class="nav-item">
+				{% url 'About Us' as about_us_url %}
+				<a class="nav-link {% if request.path == about_us_url %}active{% endif %}" href="{{ about_us_url }}">About Us</a>
+			</li>
+			
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
 				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Contact Us</a>
 			</li>
 
-			<!-- Only show the about link if the user is logged out -->
-			<li class="nav-item">
-				{% url 'About Us' as about_us_url %}
-				<a class="nav-link {% if request.path == about_us_url %}active{% endif %}" href="{{ about_us_url }}">About Us</a>
-			</li>
 
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">

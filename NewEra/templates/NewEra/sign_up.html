@@ -11,16 +11,22 @@
     </div>
 
     <div style="margin: auto; margin-top: 4%; width: 80%;">
-        <hr/>
         <form id='sign-up-form' method="POST" action="{% url 'Sign Up' %}" class="sign-up">
             <table>
                 {{ form }}
             </table>
             {% csrf_token %}
-            <hr/>
-            <button id="id_sign_up_button" class="btn btn-primary" type="submit" data-target="#role-switch-modal">Sign Up
+
+            <br/>
+            <br/>
+
+            <button id="id_sign_up_button" class="orange-button" type="submit" data-target="#role-switch-modal">Sign Up
             </button>
         </form>
         <br/>
     </div>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 {% endblock %}
