@@ -80,20 +80,15 @@ h1.parallax-text {
 }
 
 .footer p {
-    margin: 0;
-    padding: 0;
+    text-align: left;
+    margin: 5px;
+    padding: 3px;
 }
 
-.footer p.contact-title {
-    font-size: 20px;
-}
-
-.footer p, .footer p.footer-rights {
-    font-size: 16px;
-}
 
 .footer p.footer-rights {
     margin-top: 20px;
+    margin-bottom: -10px;
 }
 
 .home-founder {

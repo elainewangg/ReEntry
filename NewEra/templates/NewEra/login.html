@@ -18,11 +18,12 @@
             </table>
             {% csrf_token %}
             <br/>
-            <button id="id_login_button" class="btn btn-primary" type="submit" data-target="#role-switch-modal">Log In
-            </button>
+            <div class="d-flex align-items-center" style="gap: 20px;">
+                <button id="id_login_button" class="orange-button" type="submit" data-target="#role-switch-modal">Log In</button>
+                <div><a href="{% url 'reset_password' %}"><u>Forgot password?</u></a></div>
+            </div>
         </form>
-        <br/>
-        <p><a href="{% url 'reset_password' %}"><u>Forgot your password?</u></a></p>
+        <br/><br/><br/><br/>
     </div>
 {% endblock %}
 
