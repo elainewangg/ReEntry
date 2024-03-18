@@ -1341,6 +1341,7 @@ def create_tag(request):
         form = TagForm(request.POST, instance=tag)
         
         if form.is_valid():
+            tag.tag_type=form.cleaned_data['tag_type']
             form.save()
             tag.save()
 

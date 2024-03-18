@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods, educations, registrations
+from NewEra import case_labels, neighborhoods, educations, registrations, tags
 # from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            StudentQuarterlyUpdate, StudentReferral,
@@ -383,13 +383,13 @@ class SelectDataTimeframe(forms.Form):
 
 # Form to create or edit tags
 class TagForm(forms.ModelForm):
-	# Name is the only attribute
 	name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	tag_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=tags.TAG_TYPES_LIST))
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = Tag
-		fields = ('name',)
+		fields = ('name', 'tag_type')
 
 # Filter function for the resources; needs instantiation as a form
 class ResourceFilter(django_filters.FilterSet):
