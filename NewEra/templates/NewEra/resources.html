@@ -12,24 +12,30 @@
         <h1 class="text-black parallax-text">Resources</h1>
     </div>
 
-	<!-- Display referral information -->
+	<!-- Display referral information
 	{% if request.user.is_authenticated %}
-    	<p id="referral-ins" class="px-1" style="margin: auto; text-align: center;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
+    	<p id="referral-ins" class="px-1" style="margin: auto; text-align: left;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
     {% else %}
     	<p></p>
-    {% endif %}
+    {% endif %} -->
 
 	<div class="container">
-		<hr>
-
+		<!-- <hr> -->
+		<!-- Display referral information -->
+		<br/>
+		{% if request.user.is_authenticated %}
+			<p id="referral-ins" class="px-1" style="margin: auto; text-align: left;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
+		{% else %}
+			<p></p>
+		{% endif %}
 		<div aria-label="Filter Controls">
 			<form method="GET" action="">
-				<!-- Text search bar -->
-				<input id="searchBar" name="query" value="{{ request.GET.query }}" class="form-control" type="search" placeholder="Search for a Resource" aria-label="Search">
-				<button id="searchBarButton" class="orange-button" type="submit">Search</button>
-
 				<!-- Search Filter  -->
-				<a id="searchFilter" class="orange-button dropdown-toggle"  data-toggle="collapse" href="#filterDropdown" role="button" aria-expanded="false" aria-controls="filterDropdown">Filter Resources</a>
+				<a id="searchFilter" class="orange-button dropdown-toggle"  data-toggle="collapse" href="#filterDropdown" role="button" aria-expanded="false" aria-controls="filterDropdown">Filter</a>
+				<!-- Text search bar -->
+				<input id="searchBar" name="query" value="{{ request.GET.query }}" class="form-control" type="search" placeholder="search resources" aria-label="Search">
+				<!-- <button id="searchBarButton" class="orange-button" type="submit">Search</button> -->
+			
 			</form>
 		</div>
 
@@ -38,17 +44,17 @@
 			<div id="filter-card" class="card card-body">
 				<!-- Tag filter actions -->
 				<form action="" method="GET" class="tag-form">
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<input id="filter-search" class="form-control" placeholder="Search for a tag" aria-label="Search" onkeyup="searchFilters(event);">
-					</div>
+					</div> -->
 
-					<hr style="margin-bottom: 0;">
-
+					<!-- <hr style="margin-bottom: 0;"> -->
+					<br/>
 					<!-- DEPENDENCY ON THIS SECTION STRUCTURE: in resourceScripts.js -->
 					<div class="scroll-section">
 						{{ filter.form.as_table }}
 					</div>
-
+		
 					<hr style="margin-top: 0;">
 
 					<button class="orange-button" type="submit"><i class="material-icons">filter_list</i>Filter</button>
@@ -79,13 +85,14 @@
 	                            {% endif %} 
 	                            <div class="card-body">
 	                                <h4 class="card-title">{{ r.name }}</h4>
-	                                <p class="card-text">{{r.description|truncatewords:35}}</p>
+									{% for t in r.tags.all %}
+										<div class="tag-capsule"> {{ t.name }} </div>
+									{% endfor %}
+	                                <p class="card-text">{{r.description|truncatewords:20}}</p>
+									<a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>read more</b></a>
 	                                {% if perms.resource.create_resource %}
 	                                    <p>Views: {{ r.clicks }}</p>
 	                                {% endif %}
-	                                <br>
-	                                <a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>Read More</b></a>
-	                                <br><br>
 	                                <div class="row">
 	                                    <div class="col">
 	                                        {% if perms.resource.edit_resource %}

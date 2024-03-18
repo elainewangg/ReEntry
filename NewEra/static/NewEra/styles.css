@@ -56,7 +56,10 @@ a:hover {
 
 #searchBar {
     display: inline-block;
-    width: calc(100% - 320px);
+    width: calc(100% - 200px);
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 15px;
 }
 
 #searchBarButton {
@@ -67,8 +70,11 @@ a:hover {
 
 #searchFilter {
     display: inline-block;
-    width: 200px;
-    font-size: 1.2em;
+    width: 150px;
+    font-size: 1.1em;
+    text-align: center;
+    margin-right: 30px;
+    border-radius: 15px;
 }
 
 /* Filter */
@@ -109,22 +115,48 @@ a:hover {
     width: 100%;
 }
 */
+.card-title {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.card-text{
+    font-size: 17px;
+    margin-bottom: 5px;
+}
+
+.tag-capsule {
+    font-size: 14px;
+    background-color: #F0430D;
+    border: none;
+    padding: 1px 7px;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    margin-right: 2px;
+    margin-bottom: 5px;
+    border-radius: 14px;
+}
+
 .white-background {
     background-color: white;
+    border-radius: 20px;
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 3px 10px 0 rgba(0, 0, 0, 0.10);
 }
 
 .shadow {
+    border-radius: 20px;
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 3px 10px 0 rgba(0, 0, 0, 0.10);
 }
 
 .read-link {
-    text-decoration: none;
-    color: #089000;
+    text-decoration: #636363;
+    color: grey;
+    margin: 0px
 }
 
 .read-link:hover {
-    color: #0a5d00; 
+    color: #8b8b8b; 
     text-decoration: none; 
     cursor: pointer;  
 }

@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from dateutil.parser import isoparse
 from decimal import Decimal
 from pathlib import Path
+from itertools import chain
 
 import openpyxl
 from django.contrib import messages
@@ -241,6 +242,10 @@ def isUniqueVisit(request, response, id):
 def resources(request):
     all_resources = Resource.objects.all()
     context = { 'filter': ResourceFilter(request.GET, queryset=all_resources) }
+    # context['employment_filter'] =  ResourceEmploymentFilter(request.GET, queryset=all_resources)
+    # context = { 'employment_filter': ResourceEmploymentFilter(request.GET, queryset=all_resources) }
+    # context['housing_filter'] = ResourceHousingFilter(request.GET, queryset=all_resources)
+    # context['support_filter'] = ResourceSupportFilter(request.GET, queryset=all_resources)
 
     if request.method == 'GET':
         # SEARCH QUERY
