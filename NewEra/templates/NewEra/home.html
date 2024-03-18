@@ -12,43 +12,45 @@
 {% block content %}
 
 	<div class="parallax">
-		<span class="parallax-text"><h1 class="text-white parallax-text">Realistic ReEntry</h1></span>
-		<p class="text-white parallax-text subtitle">
-			Using tech to deliver resources to our communities.
+		<span class="parallax-text"><h1 class="text-black parallax-text">Realistic ReEntry</h1></span>
+		<p class="text-black parallax-text subtitle">
+			Supporting returning citizens in Allegheny County with vital resources for housing, employment, and more.
 		</p>
         <div class="inline-button">
-            <a href="{% url 'Resources' %}"><button id="resource-btn" type="button" class="btn btn-light">ReEntry Resources</button></a>&nbsp;&nbsp;
+            <a href="{% url 'Resources' %}"><button id="resource-btn" type="button" class="orange-button">FIND RESOURCES  <i class="material-icons">forward</i></button></a>&nbsp;&nbsp;
+            <a href="{% url 'Sign Up' %}"><button id="signup-btn" type="button" class="white-button">CONTACT US</button></a>&nbsp;&nbsp;
         </div>
+        
     </div>
 
     <div class="container" style="padding-top: 7.5vh;">
-        <div class="row">
-            <div class="col-sm-6 mb-3">
+        <div class="row justify-content-center">
+            <!-- <div class="col-sm-6 mb-3">
                 {% load static %}
                 <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
-            </div>
+            </div> -->
+            <div class="col-sm-6 mb-6">
+                 <div>
+                {% include "NewEra/sign_up_popup.html" %}
+                </div>
 
-
-            <div class="col-sm-6 mb-3 ">
-
-        <div>
-            {% include "NewEra/sign_up_popup.html" %}
-        </div>
-                <p>Realistic ReEntry is Pittsburgh's first restorative practice based  interim management firm for social service orginizations, governemnt agencies, employers, and foundations. Our award winning experts assist organizations who are undergoing major change, trying to implement a critical strategy or are looking to plug a critical management gap. </p>
-            </div>
-        </div>
-
-        <div class="row align-items-center" style="padding-top: 5vh;">
-            <div class="col-sm-6 mb-3">
-                <p>Our mission is to reduce the dissonance among social service efforts and that serve communities, while presenting the opportunity to truly diversify the human capital of social service organizations, government agencies, employers, and foundations. Realistic ReEntry emphasizes the historical context of relationships among society and those who offend in our project planning and design. We provide a restorative approach to promote solidarity and stability among organizations on the micro, mezzo, and macro systems level.</p>
-            </div>
-
-            <div class="col-sm-6 mb-3 text-right">
-                {% load static %}
-                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
+                <div class="decorative-box">
+                    <img src="{% static 'NewEra/reentry_logo.jpg' %}"  alt="Logo" class="box-logo">
+                    <p>Realistic ReEntry, an electronic platform developed as part of the reentry services offered by Operation Better Block within the Department of Violence Prevention, aims to leverage technology to facilitate connections between returning citizens and the wide array of resources available throughout Pittsburgh, Allegheny County, and the state of Pennsylvania.</p>
+                    <p>The platform serves as a vital link in the ecosystem of resources for formerly incarcerated individuals, collaborating with entities such as ACAR (Allegheny County Reentry Coalition), HOL (House of Life Pittsburgh), and PARC (Pennsylvania Reentry Council). By effectively linking individuals with legitimate resources and opportunities, Realistic Reentry directly contributes to reducing violence within the community.</p>
+                </div>
+            
                 
+            </div> 
+
+
+            <div class="home-founder">
+                <h2>Our Founder</h2>
+                <p>Taili A. Thompson is a celebrated leader and activist in Allegheny County, dedicated to violence prevention and community empowerment since 1999. </p>
+            
+                <p>With a career spanning over two decades, he has led significant initiatives, including his role as manager for the Office of Violence Prevention at the Allegheny County Health Department (2016-2020) and his decade-long service at One Vision One Life. In 2012, Thompson founded Youth Opportunities Development (Y.O.D.) to mentor and empower at-risk youth. A graduate of Perry Traditional Academy and Point Park University, he now serves as the Director of Violence Prevention at Operation Better Block Inc., driving impactful community change.</p>
+                <p>He founded Realistic ReEntry ... </p>
             </div>
-        </div>
     </div>
 
 {% endblock %}

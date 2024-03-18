@@ -1,22 +1,32 @@
 {% extends "NewEra/base.html" %}
 
 {% block title %}{% block navtitle %}
-    Log In
+    Contact Us
 {% endblock %}{% endblock %}
 
 {% block content %}
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Sign Up For ReEntry Services</h1>
+    </div>
+
     <div style="margin: auto; margin-top: 4%; width: 80%;">
-        <h3>Sign Up For Operation Better Block ReEntry Services</h3>
-        <hr/>
         <form id='sign-up-form' method="POST" action="{% url 'Sign Up' %}" class="sign-up">
             <table>
                 {{ form }}
             </table>
             {% csrf_token %}
-            <hr/>
-            <button id="id_sign_up_button" class="btn btn-primary" type="submit" data-target="#role-switch-modal">Sign Up
+
+            <br/>
+            <br/>
+
+            <button id="id_sign_up_button" class="orange-button" type="submit" data-target="#role-switch-modal">Sign Up
             </button>
         </form>
         <br/>
     </div>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
 {% endblock %}

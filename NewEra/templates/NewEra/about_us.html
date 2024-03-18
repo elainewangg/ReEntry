@@ -1,0 +1,61 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}{% block navtitle %}
+	About Us
+{% endblock %}{% endblock %}
+
+
+{% block content %}
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">About Us</h1>
+    </div>
+
+    <div class="container mt-5" > 
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="200" height="auto" class="" alt="ReEntry Logo">
+            </div>
+        
+            <div class="col-md-7">
+                <h2>Taili Thompson- Director</h2>
+                <br />
+                <p>Taili A. Thompson is a distinguished leader and committed activist within the Allegheny County region, renowned for his unwavering dedication to violence prevention and community empowerment. With his career inception in the field dating back to 2003, alongside engaging in community-based initiatives since 1999, Thompson has cultivated a deep-rooted passion for fostering safer environments and nurturing positive community relations.
+                </p>
+                <p>Throughout his illustrious career, Thompson has amassed a remarkable track record in collaborating with various violence prevention organizations across the region. His tenure as the manager for the Office of Violence Prevention at the Allegheny County Health Department from 2016 to 2020 is particularly notable, where he spearheaded initiatives aimed at curbing community violence through innovative strategies and programs. His extensive experience also encompasses a decade-long service at One Vision One Life, a pivotal violence prevention entity, and a three-year role as the program manager for the Pittsburgh Initiative to Reduce Crime (PIRC), further underscoring his dedication to creating impactful change.
+                </p>
+                <p>In 2012, Thompson took his commitment a step further by founding Youth Opportunities Development (Y.O.D.), a nonprofit organization dedicated to the cultivation of young leaders in communities plagued by the epidemic of violence. Under his guidance, Y.O.D. has been instrumental in mentoring, educating, and empowering youth, providing them with the tools to thrive and contribute positively to their communities.
+                </p> 
+                <p>Thompson's academic achievements include graduating from Perry Traditional Academy in 1991, earning a bachelor's degree in legal studies from Point Park University, and securing an associate degree as a Paralegal from Community College of Allegheny County. Currently serving as the Director of Violence Prevention at Operation Better Block Inc., Thompson continues to leverage his expertise, leadership, and passion to drive meaningful advancements in violence prevention and community development, leaving an indelible mark on the communities he serves.
+                </p>
+            </div>
+
+            <div class="col-md-3">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="200" height="auto" class="" alt="ReEntry Logo">
+            </div>
+        
+            <div class="col-md-7">
+                <h2>Khalil Johnson- ReEntry Coordinator</h2>
+                <br />
+                <p>bio ... </p>
+                
+            </div>
+
+            
+        </div>
+        <br />
+        <br />
+            <br />
+            <br />
+        
+    </div>
+{% endblock %}
+
+

@@ -31,9 +31,15 @@ urlpatterns = [
     path('login/', views.login, name='Login'),  # Visitors (anyone not logged in) only
     path('sign_up/', views.sign_up, name='Sign Up'),  # Visitors (anyone not logged in) only
     path('logout/', views.logout, name='Logout'),   # Staff (SOWs) and superuser (admin) only
-    path('about/', views.about, name='About'),  # All users
+    path('about_us/', views.about_us, name='About Us'),  # All users
     path('switch_role/', views.switch_role, name='Switch Role'), # All users
 
+    # Programs
+    path('programs/', views.programs, name="Programs"),
+    path('programs/yarp', views.yarp, name='yarp'),
+    path('programs/operation_better_block', views.obb, name='obb'),
+    path('programs/partners', views.partners, name='partners'),
+    
     # Dashboard (previously Manage Users)
     path('dashboard/', views.dashboard, name='Dashboard'), # Superuser only
     path('dashboard/select_data', views.select_data, name='Select Meeting and Risk Data'),
