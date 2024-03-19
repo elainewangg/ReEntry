@@ -80,9 +80,9 @@
                     {% for r in active_resources %}
 	                    <div class="col-lg-4 mb-3">
 	                        <div id="resource-{{ r.id }}" class="card resource-card border-0 shadow">
-	                            {% if r.image %}
+	                            <!-- {% if r.image %}
 	                            	<img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
-	                            {% endif %} 
+	                            {% endif %}  -->
 	                            <div class="card-body">
 	                                <h4 class="card-title">{{ r.name }}</h4>
 									{% for t in r.tags.all %}

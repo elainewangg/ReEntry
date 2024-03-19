@@ -138,6 +138,20 @@ a:hover {
     border-radius: 14px;
 }
 
+.resource-tag {
+    font-size: 14px;
+    background-color: #F0430D;
+    border: none;
+    padding: 1px 7px;
+    color: white;
+    text-align: center;
+    display: inline-block;
+    margin-right: 6px;
+    margin-bottom: 15px;
+    border-radius: 14px;
+    width: 100px;
+}
+
 .white-background {
     background-color: white;
     border-radius: 20px;
@@ -147,6 +161,14 @@ a:hover {
 .shadow {
     border-radius: 20px;
     box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.10), 0 3px 10px 0 rgba(0, 0, 0, 0.10);
+}
+
+.side-by-side{
+    display: flex;
+}
+
+.contact-info {
+    background-color: rgba(217, 208, 198, .3) ;
 }
 
 .read-link {
@@ -230,7 +252,7 @@ a:hover {
 
 .resource-img {
     max-width: 100%;
-
+    max-height: 400px;
     background-size:cover;
     background-position:50% 50%;
 }
