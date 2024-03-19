@@ -88,7 +88,7 @@
 									{% for t in r.tags.all %}
 										<div class="tag-capsule"> {{ t.name }} </div>
 									{% endfor %}
-	                                <p class="card-text">{{r.description|truncatewords:20}}</p>
+	                                <p class="card-text">{{r.description|truncatewords:30}}</p>
 									<a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>read more</b></a>
 	                                {% if perms.resource.create_resource %}
 	                                    <p>Views: {{ r.clicks }}</p>
