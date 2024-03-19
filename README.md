@@ -93,7 +93,6 @@ The following will set up a python environment for the cloned project. This allo
 ###### Populate (DEPRECATED)
 
 * `python manage.py populate`
-* Creates an sow user (**is_staff**): User(username='sow', password='sow')
 * And an admin (**is_superuser**): User(username='admin', password='admin')
 
 ###### Drop (DEPRECATED)

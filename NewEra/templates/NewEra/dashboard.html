@@ -80,96 +80,6 @@ Dashboard
         <br>
         <hr><br>
 
-        <!-- SOW table display -->
-        <h2>SOWs:</h2>
-        {% if sows.count > 0 %}
-        <div style="overflow-x: auto;">
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Organization</th>
-                    <th>Active?</th>
-                </tr>
-                {% for sow in sows %}
-                <tr>
-                    <td>{{ sow.username }}</td>
-                    <td>{{ sow.first_name }}</td>
-                    <td>{{ sow.last_name }}</td>
-                    <td>{{ sow.email }}</td>
-                    <td>{{ sow.phone }}</td>
-                    <td>{{ sow.organization.name }}</td>
-                    {% if sow.is_active %}
-                    <td>&#10004;</td>
-                    {% else %}
-                    <td>&#10060;</td>
-                    {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id=sow.id %}" class="btn btn-warning"><i
-                                class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete User' id=sow.id %}" class="btn btn-danger"><i
-                                class="material-icons">delete</i>Delete</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        {% else %}
-        <em>
-            <p style="margin: auto;">There are no SOWs in the system.</p>
-        </em>
-        {% endif %}
-
-        <br>
-        <hr><br>
-
-        <!-- Safe Passage Coordinator table display -->
-        <h2>Safe Passage Coordinators:</h2>
-        {% if safe_passage_coordinators.count > 0 %}
-        <div style="overflow-x: auto;">
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>First Name</th>
-                    <th>Last Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Organization</th>
-                    <th>Active?</th>
-                </tr>
-                {% for safe_passage_coordinator in safe_passage_coordinators %}
-                <tr>
-                    <td>{{ safe_passage_coordinator.username }}</td>
-                    <td>{{ safe_passage_coordinator.first_name }}</td>
-                    <td>{{ safe_passage_coordinator.last_name }}</td>
-                    <td>{{ safe_passage_coordinator.email }}</td>
-                    <td>{{ safe_passage_coordinator.phone }}</td>
-                    <td>{{ safe_passage_coordinator.organization.name }}</td>
-                    {% if safe_passage_coordinator.is_active %}
-                    <td>&#10004;</td>
-                    {% else %}
-                    <td>&#10060;</td>
-                    {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id=safe_passage_coordinator.id %}"
-                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete User' id=safe_passage_coordinator.id %}"
-                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
-                </tr>
-                {% endfor %}
-            </table>
-        </div>
-
-        {% else %}
-        <em>
-            <p style="margin: auto;">There are no Safe Passage Coordinators in the system.</p>
-        </em>
-        {% endif %}
-
-        <br>
-        <hr><br>
-
         <!-- Supervisor table display -->
         <h2>Supervisors:</h2>
         {% if supervisors.count > 0 %}
@@ -215,9 +125,9 @@ Dashboard
         <br>
         <hr><br>
 
-        <!-- Safe Passage Coordinators Supervisor table display -->
-        <h2>Safe Passage Coordinators Supervisors:</h2>
-        {% if safe_passage_coordinator_supervisors.count > 0 %}
+        <!-- Reentry Coordinator table display -->
+        <h2>Reentry Coordinators:</h2>
+        {% if reentry_coordinators.count > 0 %}
         <div style="overflow-x: auto;">
             <table>
                 <tr>
@@ -229,22 +139,22 @@ Dashboard
                     <th>Organization</th>
                     <th>Active?</th>
                 </tr>
-                {% for safe_passage_coordinator_supervisor in safe_passage_coordinator_supervisors %}
+                {% for reentry_coordinator in reentry_coordinators %}
                 <tr>
-                    <td>{{ safe_passage_coordinator_supervisor.username }}</td>
-                    <td>{{ safe_passage_coordinator_supervisor.first_name }}</td>
-                    <td>{{ safe_passage_coordinator_supervisor.last_name }}</td>
-                    <td>{{ safe_passage_coordinator_supervisor.email }}</td>
-                    <td>{{ safe_passage_coordinator_supervisor.phone }}</td>
-                    <td>{{ safe_passage_coordinator_supervisor.organization.name }}</td>
-                    {% if safe_passage_coordinator_supervisor.is_active %}
+                    <td>{{ reentry_coordinator.username }}</td>
+                    <td>{{ reentry_coordinator.first_name }}</td>
+                    <td>{{ reentry_coordinator.last_name }}</td>
+                    <td>{{ reentry_coordinator.email }}</td>
+                    <td>{{ reentry_coordinator.phone }}</td>
+                    <td>{{ reentry_coordinator.organization.name }}</td>
+                    {% if reentry_coordinator.is_active %}
                     <td>&#10004;</td>
                     {% else %}
                     <td>&#10060;</td>
                     {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id=safe_passage_coordinator_supervisor.id %}"
+                    <td class="button-cell"><a href="{% url 'Edit User' id=reentry_coordinator.id %}"
                             class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete User' id=safe_passage_coordinator_supervisor.id %}"
+                    <td class="button-cell"><a href="{% url 'Delete User' id=reentry_coordinator.id %}"
                             class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
@@ -253,7 +163,142 @@ Dashboard
 
         {% else %}
         <em>
-            <p style="margin: auto;">There are no Safe Passage Coordinators Supervisors in the system.</p>
+            <p style="margin: auto;">There are no Reentry Coordinators in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Community Outreach Worker table display -->
+        <h2>Community Outreach Workers:</h2>
+        {% if community_outreach_workers.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for community_outreach_worker in community_outreach_workers %}
+                <tr>
+                    <td>{{ community_outreach_worker.username }}</td>
+                    <td>{{ community_outreach_worker.first_name }}</td>
+                    <td>{{ community_outreach_worker.last_name }}</td>
+                    <td>{{ community_outreach_worker.email }}</td>
+                    <td>{{ community_outreach_worker.phone }}</td>
+                    <td>{{ community_outreach_worker.organization.name }}</td>
+                    {% if community_outreach_worker.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=community_outreach_worker.id %}"
+                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=community_outreach_worker.id %}"
+                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Community Outreach Workers in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Service Provider table display -->
+        <h2>Service Providers:</h2>
+        {% if service_providers.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for service_provider in service_providers %}
+                <tr>
+                    <td>{{ service_provider.username }}</td>
+                    <td>{{ service_provider.first_name }}</td>
+                    <td>{{ service_provider.last_name }}</td>
+                    <td>{{ service_provider.email }}</td>
+                    <td>{{ service_provider.phone }}</td>
+                    <td>{{ service_provider.organization.name }}</td>
+                    {% if service_provider.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id=service_provider.id %}"
+                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id=service_provider.id %}"
+                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Service Providers in the system.</p>
+        </em>
+        {% endif %}
+
+        <br>
+        <hr><br>
+
+        <!-- Resource Coordinator table display -->
+        <h2>Resource Coordinators:</h2>
+        {% if resource_coordinators.count > 0 %}
+        <div style="overflow-x: auto;">
+            <table>
+                <tr>
+                    <th>Username</th>
+                    <th>First Name</th>
+                    <th>Last Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Organization</th>
+                    <th>Active?</th>
+                </tr>
+                {% for resource_coordinator in resource_coordinators %}
+                <tr>
+                    <td>{{ resource_coordinator.username }}</td>
+                    <td>{{ resource_coordinator.first_name }}</td>
+                    <td>{{ resource_coordinator.last_name }}</td>
+                    <td>{{ resource_coordinator.email }}</td>
+                    <td>{{ resource_coordinator.phone }}</td>
+                    <td>{{ resource_coordinator.organization.name }}</td>
+                    {% if resource_coordinator.is_active %}
+                    <td>&#10004;</td>
+                    {% else %}
+                    <td>&#10060;</td>
+                    {% endif %}
+                    <td class="button-cell"><a href="{% url 'Edit User' id resource_coordinator.id %}"
+                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                    <td class="button-cell"><a href="{% url 'Delete User' id resource_coordinator.id %}"
+                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        {% else %}
+        <em>
+            <p style="margin: auto;">There are no Resource Coordinators in the system.</p>
         </em>
         {% endif %}
 
