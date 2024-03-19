@@ -99,6 +99,30 @@ class User(AbstractUser):
     # def get_student_referrals(self):
     #     return StudentReferral.objects.filter(user=self)
 
+    # Returns user role
+    def get_role(self):
+        user_type_fields = {
+            'is_superuser': 'admin',
+            'is_supervisor': 'supervisor',
+            'is_reentry_coordinator': 'reentry_coordinator',
+            'is_community_outreach_worker': 'community_outreach_worker',
+            'is_service_provider': 'service_provider',
+            'is_resource_coordinator': 'resource_coordinator',
+        }
+
+        keys = list(user_type_fields.keys())
+        # Get only the user type fields that are flagged true
+        filtered_properties = [x for x in vars(self).items() if x[1] is True and x[0] in keys]
+
+        role = []
+
+        for property_name, property_value in filtered_properties:
+            role.append(property_name)
+        if len(role) > 0:
+            return role[0]
+        else:
+            return None
+
     # Returns an array of the user types the user is assigned to
     def get_user_types(self):
         user_type_fields = {

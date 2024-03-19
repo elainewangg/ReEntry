@@ -102,14 +102,11 @@ def login(request):
     auth_login(request, user)
 
     messages.success(request, 'Logged in as {} {}.'.format(user.first_name, user.last_name))
-    print("User", user)
-    if not user.has_more_than_one_role():
-        request.session['role'] = user.get_user_types()[0]
-        print("request.session['role']", request.session['role'])
-        print("login ROLE: ", user.get_user_types())
-    else:
+    role = user.get_role()
+    if not role:
         return render(request, 'NewEra/login.html', context)
-
+    else:
+        request.session['role'] = role
     return redirect(reverse('Home'))
 
 # Sends an email to the staff_user
@@ -158,7 +155,6 @@ def switch_role(request):
         request.session['role'] = role
 
         request.session.modified = True
-        print("swithc ROLE: ", role)
     else:
         form = RoleSwitchForm()
 
