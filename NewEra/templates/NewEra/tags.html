@@ -24,7 +24,8 @@
 					<div class="col-sm-4 mb-3">
 						<div class="card border-0 shadow">
 			                <div class="card-body">
-								<p style="display: inline;" class="card-title">{{ t.name }}</p>
+								<p style="display: inline;" class="card-title">{{ t.name }}</p> <br />
+								<p style="display: inline;" class="card-text">{{ t.tag_type }}</p>
 								<span style="float: right; display: inline;">
 									{% if perms.tag.edit_tag %}
 										<a href="{% url 'Edit Tag' t.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i></a>

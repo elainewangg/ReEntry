@@ -277,8 +277,8 @@ class TagTests(TestCase):
 
 	def test_printing(self):
 		# Set up tags
-		tag1 = Tag.objects.create(name="Housing")
-		tag2 = Tag.objects.create(name="Employment")
+		tag1 = Tag.objects.create(name="Housing", tag_type="Housing and Needs")
+		tag2 = Tag.objects.create(name="Employment", tag_type="Employment")
 
 		self.assertEqual(str(tag1), "Housing")
 		self.assertEqual(str(tag2), "Employment")
@@ -307,8 +307,8 @@ class ResourceTests(TestCase):
 		res2 = Resource.objects.create(name="Second Test Resource", email="testresource2@res.test")
 
 		# Set up tags
-		tag1 = Tag.objects.create(name="Housing")
-		tag2 = Tag.objects.create(name="Employment")
+		tag1 = Tag.objects.create(name="Housing", tag_type="Housing and Needs")
+		tag2 = Tag.objects.create(name="Employment", tag_type="Employment")
 
 		# Set up many-to-many fields
 		res1.tags.add(tag1)
@@ -361,8 +361,8 @@ class ResourceTests(TestCase):
 		res2 = Resource.objects.create(name="Second Test Resource", email="testresource2@res.test")
 
 		# Set up tags
-		tag1 = Tag.objects.create(name="Housing")
-		tag2 = Tag.objects.create(name="Employment")
+		tag1 = Tag.objects.create(name="Housing", tag_type="Housing and Needs")
+		tag2 = Tag.objects.create(name="Employment", tag_type="Employment")
 
 		self.assertEqual(res1.tags.count(), 0)
 		self.assertEqual(res2.tags.count(), 0)

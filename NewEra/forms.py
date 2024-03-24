@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods, educations, registrations
+from NewEra import case_labels, neighborhoods, educations, registrations, tags
 # from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            StudentQuarterlyUpdate, StudentReferral,
@@ -384,14 +384,13 @@ class SelectDataTimeframe(forms.Form):
 
 # Form to create or edit tags
 class TagForm(forms.ModelForm):
-	# Name is the only attribute
 	name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	tag_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=tags.TAG_TYPES_LIST))
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = Tag
-		fields = ('name',)
-
+		fields = ('name', 'tag_type')
 # Filter function for the resources; needs instantiation as a form
 class ResourceFilter(django_filters.FilterSet):
 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
@@ -401,6 +400,36 @@ class ResourceFilter(django_filters.FilterSet):
 	class Meta:
 		model = Resource
 		fields = ('tags',)
+
+# Filter function for the resources; needs instantiation as a form
+# class ResourceEmploymentFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Employment"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
+
+# # Filter function for the resources; needs instantiation as a form
+# class ResourceHousingFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Housing and Needs"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
+
+# # Filter function for the resources; needs instantiation as a form
+# class ResourceSupportFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Support and Services"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
 
 # Meeting Tracker Form
 class MeetingTrackerForm(forms.ModelForm):

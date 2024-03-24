@@ -401,9 +401,10 @@ class Referral(models.Model):
 
 # Model representing a tag
 class Tag(models.Model):
+
     # Attributes
     name = models.CharField(max_length=30)
-
+    tag_type = models.CharField(max_length=150, blank=False, null=False, default='')
     # Methods
     # Basic string printing
     def __str__(self):
