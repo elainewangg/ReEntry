@@ -18,7 +18,8 @@ from NewEra.models import (CaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource, Tag,
                            User)
 
-INPUT_ATTRIBUTES = {'class' : 'form-control organization'}
+INPUT_ATTRIBUTES = {
+	'class' : 'form-control organization', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'	}
 COMMON_ATTRIBUTES = {'class' : 'form-control common'}
 EVENT_ATTRIBUTES = {'class' : 'form-control common', 'placeholder': 'Event or Deadline'}
 ATTACHMENT_ATTRIBUTES = {'class' : 'form-control attachment'}
@@ -56,12 +57,12 @@ class CaseLoadUserForm(forms.ModelForm):
 	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	email = forms.EmailField(max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	neighborhood = forms.CharField(widget=forms.Select(choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.CharField(widget=forms.Select(choices=case_labels.CASE_LABEL_LIST))
+	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
+	case_label = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=case_labels.CASE_LABEL_LIST))
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	education = forms.CharField(widget=forms.Select(choices=educations.EDUCATION_LIST), required=False)
-	is_vote_registered = forms.CharField(widget=forms.Select(choices=registrations.REGISTRATION_LIST), required=False)
+	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
+	is_vote_registered = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=registrations.REGISTRATION_LIST), required=False)
 
 	# Define the model and fields to include/exclude
 	class Meta:

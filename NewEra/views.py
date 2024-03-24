@@ -168,8 +168,20 @@ def logout(request):
     return redirect(reverse('Login'))
 
 # function to display about page
-def about(request):
-    return render(request, 'NewEra/about.html')
+def about_us(request):
+    return render(request, 'NewEra/about_us.html')
+
+def programs(request):
+    return render(request, 'NewEra/yarp.html')
+
+def yarp(request):
+    return render(request, 'NewEra/yarp.html')
+
+def obb(request):
+    return render(request, 'NewEra/obb.html')
+
+def partners(request):
+    return render(request, 'NewEra/partners.html')
 
 # Function to update the referral given a GET request (to a resource) with a querystring timestamp
 def markReferralAsSeen(request):

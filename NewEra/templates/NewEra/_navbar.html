@@ -1,11 +1,12 @@
 {% block navbar %}
-<nav id="app-nav" class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav id="app-nav" class="navbar navbar-expand-lg navbar-light beige">
 	<!-- Render the logo -->
 	<a class="navbar-brand" href="{% url 'Home' %}">
 		{% load static %}
+		<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
 		<img src="{% static 'NewEra/reentry_logo.jpg' %}" width="35" height="33" class="d-inline-block align-top"
 			alt="ReEntry Logo">
-		<b>&nbsp;&nbsp;NewERA412&nbsp;&nbsp;</b>
+		<!-- <b>&nbsp;&nbsp;Realistic ReEntry&nbsp;&nbsp;</b> -->
 	</a>
 
 	<!-- Create the hamburger button -->
@@ -85,22 +86,38 @@
 			{% endif %}
 
 			{% if not user.is_authenticated %}
+
+
+			<li class="nav-item dropdown">
+				<a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-expanded="false">
+					Programs
+				</a>
+                <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                    <li><a class="dropdown-item" href="{% url 'yarp' %}">Young Adults ReEntry Program</a></li>
+                    <li><a class="dropdown-item" href="{% url 'obb' %}">Operation Better Block</a></li>
+                    <li><a class="dropdown-item" href="{% url 'partners' %}">Our Partners</a></li>
+                </ul>
+            </li>
+			
+
+			<!-- Only show the about link if the user is logged out -->
+			<li class="nav-item">
+				{% url 'About Us' as about_us_url %}
+				<a class="nav-link {% if request.path == about_us_url %}active{% endif %}" href="{{ about_us_url }}">About Us</a>
+			</li>
+
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
-				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Sign Up</a>
+				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Contact Us</a>
 			</li>
+
+
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Login' as login_url %}
 				<a class="nav-link {% if request.path == login_url %}active{% endif %}" href="{{ login_url }}">Log
 					In</a>
-			</li>
-
-			<!-- Only show the about link if the user is logged out -->
-			<li class="nav-item">
-				{% url 'About' as about_url %}
-				<a class="nav-link {% if request.path == about_url %}active{% endif %}" href="{{ about_url }}">About</a>
 			</li>
 			{% endif %}
 

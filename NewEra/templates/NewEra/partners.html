@@ -1,0 +1,47 @@
+{% extends "NewEra/base.html" %}
+
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block title %}{% block navtitle %}
+	Programs
+{% endblock %}{% endblock %}
+
+
+{% block content %}
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Our Partners</h1>
+    </div>
+
+    <div class="container mt-5" > 
+        <div class="row justify-content-center">
+            <div class="col-md-3">
+                {% load static %}
+                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="200" height="auto" class="" alt="ReEntry Logo">
+            </div>
+        
+            <div class="col-md-7">
+                <h2>Allegheny County Anchored Reentry</h2>
+                <br /> 
+                <p>The Allegheny County Anchored Reentry (ACAR) Coalition was launched to spark dialogue on how to collaborate in supporting reentry by aligning resources addressing unmet needs in our community by adequately serving previously incarcerated citizens.
+                </p>
+
+                <br /> <br /> <br /> 
+                <h2>House of Life</h2>
+                <br /> 
+                <p>Meet House of Life Pittsburgh, a group doing just that with their innovative prisoner reentry program. Central to their mission, the organization is led by a group of passionate returning citizens, which allows them to capitalize on the strengths of those that have already achieved success upon reentering society.
+                </p>
+
+            </div>
+            
+        </div>
+        
+        <br/><br/><br/><br/>
+        
+    </div>
+{% endblock %}
+
+

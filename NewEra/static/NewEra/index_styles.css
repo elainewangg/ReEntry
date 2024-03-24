@@ -1,3 +1,7 @@
+body {
+    background-color: #F6F6F6; /* Light gray background */
+  }
+
 div.heading-banner {
     margin: auto; 
     padding-top: 12vh; 
@@ -5,6 +9,7 @@ div.heading-banner {
     text-align: center;
     background-color: lightgray;
 }
+
 
 div.heading-banner h1 {
     font-size: 2rem;
@@ -18,14 +23,19 @@ div.secondary-content {
     padding-top: 5vh;
 }
 
-.parallax {
-    /* Credit: https://www.w3schools.com/howto/howto_css_parallax.asp */
+.navbar-nav > .nav-item > .nav-link {
+    padding-left: 2rem; 
+    padding-right: 1rem; 
+}
+
+.parallax-subpage{
     position: relative;
-    background-image: url("/static/NewEra/night_pgh.jpg");
-    height: 300px;
-    padding-top: 12vh; 
-    padding-bottom: 7vh; 
-    text-align: center;
+    background-image: url("/static/NewEra/homepage_bg.jpg");
+    height: 100px;
+    padding-top: 6vh; 
+    padding-bottom: 10vh; 
+    text-align: left;
+    padding-left: 12vh; 
     background-attachment: fixed;
     background-position: center;
     background-repeat: no-repeat;
@@ -33,16 +43,106 @@ div.secondary-content {
     background-position: 0 -25px;
 }
 
-.subtitle {
-    font-size: 1.2em;
+.parallax{
+    /* Credit: https://www.w3schools.com/howto/howto_css_parallax.asp */
+    position: relative;
+    background-image: url("/static/NewEra/homepage_bg.jpg");
+    height: 400px;
+    padding-top: 16vh; 
+    padding-bottom: 7vh; 
+    text-align: left;
+    padding-left: 20vh; 
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: 0 -25px;
 }
 
+
 .parallax-text {
-    text-shadow: 3px 3px 5px black; 
+    text-shadow: 0px 0px 0px black; 
 }
 
 h1.parallax-text {
     letter-spacing: 1px;
+}
+
+.subtitle {
+    font-size: 1.2em;
+}
+
+.footer {
+    background-color: black;
+    color: white;
+    text-align: left;
+    padding: 40px 80px;
+}
+
+.footer p {
+    text-align: left;
+    margin: 5px;
+    padding: 3px;
+}
+
+
+.footer p.footer-rights {
+    margin-top: 20px;
+    margin-bottom: -10px;
+}
+
+.home-founder {
+    /* border: 2px solid b lack;  */
+    padding: 50px 30px; 
+    margin: 0px 50px;  
+    color: black;
+    position: relative; 
+}
+
+.home-founder p {
+    font-size: 20px; 
+}
+.decorative-box {
+    border: 2px solid black; 
+    padding: 50px 80px; 
+    margin: 30px -200px;  
+    background-color: white; 
+    color: black;
+    position: relative; 
+}
+
+.decorative-box p {
+    font-size: 20px; /* Set paragraph text size to 30px */
+}
+
+.box-logo {
+    position: absolute; /* Position the logo absolutely within the decorative box */
+    bottom: 0; /* Align to the bottom of the box */
+    right: 0; /* Align to the left side of the box */
+    width: 60px; /* Make the logo very small */
+    height: auto; /* Maintain aspect ratio */
+    margin: -20px; /* Adjust if needed to overlap the corner as desired */
+}
+
+.orange-button {
+    background-color: #F0430D;
+    color: white;
+    border: 0px;
+    padding: 5px 15px;
+    border-radius: 12px;
+}
+
+.white-button {
+    background-color: white;
+    color: black;
+    border-radius: 12px;
+    border: 0px;
+    padding: 5px 15px;
+    border-radius: 12px;
+}
+
+.beige {
+    background-color: #F9F4EC;
 }
 
 #resource-btn {
