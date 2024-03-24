@@ -25,13 +25,11 @@
 
     <div class="container" style="padding-top: 7.5vh;">
         <div class="row justify-content-center">
-            <!-- <div class="col-sm-6 mb-3">
-                {% load static %}
-                <img src="{% static 'NewEra/reentry_logo.jpg' %}" width="280" height="264" class="" alt="ReEntry Logo">
-            </div> -->
             <div class="col-sm-6 mb-6">
                  <div>
-                {% include "NewEra/sign_up_popup.html" %}
+                {% if not request.user.is_authenticated %}
+                    {% include "NewEra/sign_up_popup.html" %}
+                {% endif %}
                 </div>
 
                 <div class="decorative-box">
