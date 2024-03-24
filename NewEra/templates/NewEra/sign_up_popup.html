@@ -1,19 +1,14 @@
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 <script>
-    // Show per session
-    $(window).on('load',function(){
-    if (!sessionStorage.getItem('shown-modal')){
-        $('#myModal').modal('show');
-        sessionStorage.setItem('shown-modal', 'true');
-    }
+    $(function() {
+        var visited = sessionStorage['visited'] || false;
+        if (visited) {
+            $('#myModal').modal('hide');
+        } else {
+            $("#myModal").modal('show');
+            sessionStorage['visited'] = true;
+        }
     });
-
-    // Show per page load
-    // $(document).ready(function(){
-	// 	$("#myModal").modal('show');
-	// });
 </script>
 <div id="myModal" class="modal">
     <div class="modal-dialog">
