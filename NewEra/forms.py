@@ -18,8 +18,7 @@ from NewEra.models import (CaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource, Tag,
                            User)
 
-INPUT_ATTRIBUTES = {
-	'class' : 'form-control organization', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'	}
+INPUT_ATTRIBUTES = {'class' : 'form-control organization', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'	}
 COMMON_ATTRIBUTES = {'class' : 'form-control common'}
 EVENT_ATTRIBUTES = {'class' : 'form-control common', 'placeholder': 'Event or Deadline'}
 ATTACHMENT_ATTRIBUTES = {'class' : 'form-control attachment'}
@@ -27,6 +26,7 @@ EMBEDDED_ATTRIBUTES = {'class' : 'form-control embed', 'placeholder': 'Paste <if
 HIDDEN_ATTRIBUTES = {'class' : 'form-control hidden'}
 
 TEXTAREA_ATTRIBUTES = { 'class': 'form-control', 'style': 'height: 200px; overflow-y: scroll;', 'cols': 40, 'rows': 40}
+MULTIPLE_CHOICE_ATTRIBUTES = {'class': 'form-control list-unstyled','style': 'padding: 50px; margin-top: 20px;'}
 
 MAX_IMAGE_UPLOAD_SIZE = 2500000 #2.5mb
 MAX_ATTACHMENT_UPLOAD_SIZE = 20000000 #20mb
@@ -134,13 +134,12 @@ class EditUserForm(forms.ModelForm):
 	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	organization = forms.ModelChoiceField(queryset=Organization.objects.all())
+	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
 	is_active = forms.BooleanField(required=False)
 	user_type = forms.MultipleChoiceField(choices=USER_TYPE_CHOICES,
-										  label='User Type',
-										  widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled'}),
-										  )
-
+									   label='User Type',
+									   widget=forms.CheckboxSelectMultiple(attrs=MULTIPLE_CHOICE_ATTRIBUTES),
+									   )
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = User

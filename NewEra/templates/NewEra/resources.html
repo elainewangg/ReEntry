@@ -12,14 +12,15 @@
         <h1 class="text-black parallax-text">Resources</h1>
     </div>
 
-	<!-- Display referral information -->
-	{% if request.user.is_authenticated %}
-    	<p id="referral-ins" class="px-1" style="margin: auto; text-align: center;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
-    {% else %}
-    	<p></p>
-    {% endif %}
+	
 
 	<div class="container">
+	<!-- Display referral information -->
+		{% if request.user.is_authenticated %}
+			<p id="referral-ins" class="px-1" style="margin: auto; text-align: center;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
+		{% else %}
+			<p></p>
+		{% endif %}
 		<hr>
 
 		<div aria-label="Filter Controls">
@@ -245,7 +246,7 @@
 
 	<!-- SOWs can make referrals through the 'Make Referrals' button -->
     	<button id="make-referral" type="button" class="white-button">Make Referral</button>
-    	<button id='commit-referral' onclick="commitReferrals()" class='btn btn-warning'></button>
+    	<button id='commit-referral' onclick="commitReferrals()" class="red-button"></button>
 
 
     <p>&nbsp;</p>

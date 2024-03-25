@@ -1,8 +1,8 @@
 {% extends "NewEra/base.html" %}
 
 {% block page_specific_styles %}
-<!-- {% load static %}
-<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css"> -->
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
 {% endblock %}
 
 {% block title %}
@@ -10,21 +10,23 @@ Dashboard
 {% endblock %}
 
 {% block content %}
-<h1 style="margin: auto; margin-top: 50px; text-align: center;">
-    Admin Dashboard
-</h1>
 
-<div class="container">
-    <hr>
 
-    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseUser"
-        aria-expanded="false" aria-controls="collapseUser"><i class="material-icons">person_add</i>Create New
-        User</button>
-    <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseOrg"
-        aria-expanded="false" aria-controls="collapseOrg"><i class="material-icons">group_add</i>Create New
-        Organization</button>
+<div class="parallax-subpage">
+    <h1 class="text-black parallax-text">Admin Dashboard</h1>
+</div>
+
+<div class="container main-page-container">
+    <h2>Create New:</h2><br>
+    <button type="button"  class="orange-button" data-toggle="collapse" data-target="#collapseUser"
+        aria-expanded="false" aria-controls="collapseUser"><i class="material-icons">person_add</i>  Create New
+        User</button>&nbsp;&nbsp;
+    <button type="button" class="orange-button" data-toggle="collapse" data-target="#collapseOrg"
+        aria-expanded="false" aria-controls="collapseOrg"><i class="material-icons">group_add</i>  Create New
+        Organization</button>&nbsp;&nbsp;
     <br>
 
+    
     <div class="collapse {{ modalStatus }}" id="collapseUser">
         <br>
         <div class="card card-body">
@@ -34,15 +36,15 @@ Dashboard
                 </table>
 
                 {% csrf_token %}
-                <button type="submit" class="btn btn-primary"><i class="material-icons">person_add</i>Submit</button>
+                <button type="submit" class="orange-button">Submit</button>
             </form>
         </div>
 
-        <br>
+        <br><br><br>
         <!-- Admin table display -->
         <h2>Admins:</h2>
         <div style="overflow-x: auto">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -310,10 +312,13 @@ Dashboard
         <br>
         <div class="card card-body">
             <form method="POST" action="{% url 'Dashboard' %}">
-                <label for="orgs">Organization: </label><br>
-                <input type="text" id="name" name="org_name">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-primary"><i class="material-icons">group_add</i>Submit</button>
+                <div style="display: flex; align-items: center;">
+                    <label for="orgs">Organization name: </label>&nbsp;&nbsp;
+                    <input type="text" id="name" name="org_name" class="form-control organization" style="width: 300px; height: 40px; margin-bottom: 20px;">
+                    {% csrf_token %}
+                </div>
+                <button type="submit" class="orange-button">Submit</button>
+                <br>
             </form>
         </div>
         <br>
@@ -355,21 +360,16 @@ Dashboard
 
     </div>
 
-    <br>
-
-
+    <br><br><br>
 
 
     <!-- Download spreadsheet or reset resource clicks -->
     <h2>Data Management:</h2><br>
-
-    <a href="{% url 'Export Selected Data' %}" class="btn btn-success"><i class="material-icons">get_app</i>Download
-        Meeting and Risk Data</a>
-    <a href="{% url 'Export Data' %}" class="btn btn-success"><i class="material-icons">get_app</i>Download Referral Data
-        Spreadsheet</a>
-    <a href="{% url 'Reset Views' %}" class="btn btn-danger">Reset Resource Clicks</a>
-
+        <a href="{% url 'Export Selected Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Meeting and Risk Data</button></a>&nbsp;&nbsp;
+        <a href="{% url 'Export Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Referral Data Spreadsheet</button></a>&nbsp;&nbsp;
+        <a href="{% url 'Reset Views' %}"><button type="button" class="red-button">Reset Resource Clicks</button></a>&nbsp;&nbsp;    
     <br><br>
 
 </div>
+
 {% endblock %}
