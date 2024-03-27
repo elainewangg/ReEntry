@@ -60,7 +60,7 @@ class CaseLoadUserForm(forms.ModelForm):
 	email = forms.EmailField(max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=forms.CheckboxSelectMultiple)
+	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget)
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
@@ -73,6 +73,9 @@ class CaseLoadUserForm(forms.ModelForm):
 		exclude = (
 			'user',
 		)
+		widgets = {
+            'case_label': Select2MultipleWidget,
+        }
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)

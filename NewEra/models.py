@@ -16,6 +16,7 @@ from twilio.rest import Client
 from NewEra import neighborhoods, case_labels
 from django.contrib.postgres.fields import ArrayField
 from multiselectfield import MultiSelectField
+from django_select2.forms import Select2MultipleWidget
 
 '''
 COMMON NOTES:
