@@ -142,14 +142,13 @@ a:hover {
     font-size: 14px;
     background-color: #F0430D;
     border: none;
-    padding: 1px 7px;
+    padding: 1px 15px;
     color: white;
     text-align: center;
     display: inline-block;
     margin-right: 6px;
     margin-bottom: 15px;
     border-radius: 14px;
-    width: 100px;
 }
 
 .white-background {

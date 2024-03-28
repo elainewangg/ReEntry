@@ -126,6 +126,11 @@ def sendEmail(load_user):
     # Send the email
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
 
+def sendConfirmation(load_case_user):
+    subject = 'You have signed up for RealisticReEntry'
+    html_message = render_to_string('NewEra/sign_up_mailer.html',
+                                    {'client': load_user})
+
 # function to sign up
 def sign_up(request):
     context = {}
@@ -143,6 +148,7 @@ def sign_up(request):
         form.save()
         load_user.save()
         sendEmail(load_user)
+        
         messages.success(request, '{} {} has successfully signed up.'.format(request.POST.get("first_name", ""), request.POST.get("last_name", "")))
 
     context['form'] = CaseLoadUserForm()
