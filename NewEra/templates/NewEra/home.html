@@ -27,7 +27,7 @@
         <div class="row justify-content-center">
             <div class="col-sm-6 mb-6">
                  <div>
-                {% if not request.user.is_authenticated %}
+                {% if not request.user.is_authenticated and not confirmed %}
                     {% include "NewEra/sign_up_popup.html" %}
                 {% endif %}
                 </div>
