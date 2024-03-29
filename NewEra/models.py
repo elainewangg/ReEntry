@@ -13,8 +13,10 @@ from encrypted_model_fields.fields import (EncryptedCharField,
                                            EncryptedTextField)
 from twilio.rest import Client
 
-from NewEra import neighborhoods
+from NewEra import neighborhoods, case_labels
 from django.contrib.postgres.fields import ArrayField
+from multiselectfield import MultiSelectField
+from django_select2.forms import Select2MultipleWidget
 
 '''
 COMMON NOTES:
@@ -185,7 +187,7 @@ class CaseLoadUser(models.Model):
     email = models.EmailField(max_length=254)
     phone = models.CharField(max_length=11)
     neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
-    case_label = models.CharField(max_length=150, blank=False, null=False, default='')
+    case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
     is_active = models.BooleanField(default=True)
     user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
     age = models.CharField(max_length=3, blank=True, default='')
