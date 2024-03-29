@@ -195,6 +195,7 @@ def confirm_user(request):
         tempUser.delete()
         new_case_load.save()
 
+    sendEmail(new_case_load)
     return redirect(reverse('Home'))
 
 # function to sign up
@@ -213,8 +214,6 @@ def sign_up(request):
             return render(request, 'NewEra/sign_up.html', context)
         form.save()
         load_user.save()
-
-        sendEmail(load_user)
         
         if load_user.email:
             sendEmailConfirmation(load_user)
