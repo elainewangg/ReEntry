@@ -147,14 +147,15 @@ def sendEmailConfirmation(load_case_user):
 def sendSMSConfirmation(load_case_user):
         to = load_case_user.phone
         # Set the message intro string based on whether the referral is to someone on the case load or out of the system
-        messageIntro = 'sms confirmation test'
+        messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
 
         # # Create the query string and the message body
         # queryString = '?key=' + referralTimeStamp
         # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
         # link = 'http://newera412.com/resources/' + str(r.id) + queryString
         # links = ['http://realisticreentry/']
-        messageBody = ' hello'
+        queryString = '?confirmuser='+ load_case_user.id
+        messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
 
 
         client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
