@@ -735,7 +735,7 @@ def get_case_load_user(request, id):
     if case_load_user.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == case_load_user.user.organization ):
         raise Http404
     notes = Note.objects.filter(case=case_load_user).order_by("-date")
-    context = { 'case_load_user': case_load_user, 'notes': notes }
+    context = { 'case_load_user': case_load_user, 'notes': notes}
 
     return render(request, 'NewEra/get_case_load_user.html', context)
 
