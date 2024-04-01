@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
                 # If the tag is not found, create it
                 if (tag == None):
-                    tag = Tag.objects.create(name=row[1])
+                    tag = Tag.objects.create(name=row[1], tag_type="temp")
                     tag.save()
 
                 # Replace all non-numeric digits in the phone number

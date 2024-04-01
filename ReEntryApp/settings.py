@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django_select2',
     'bootstrap_datepicker_plus',
     'encrypted_model_fields',
+    'multiselectfield',
 ]
 
 MIDDLEWARE = [
