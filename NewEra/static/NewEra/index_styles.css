@@ -10,7 +10,6 @@ div.heading-banner {
     background-color: lightgray;
 }
 
-
 div.heading-banner h1 {
     font-size: 2rem;
 }
@@ -158,4 +157,3 @@ h1.parallax-text {
 .list-unstyled {
     list-style: none;
 }
-

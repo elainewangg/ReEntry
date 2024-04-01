@@ -3,22 +3,22 @@
     <p>
     <ul> 
         <li>
-            First Name: {% if client.first_name %} {{ client.first_name }} {% endif %}
+            First Name: * {% if client.first_name %} {{ client.first_name }} {% endif %}
         </li>
         <li>
             Last Name: {% if client.last_name %} {{ client.last_name }} {% endif %}
         </li>
         <li>
-            Email: {% if client.email %} {{ client.email }} {% endif %}
+            Email: * {% if client.email %} {{ client.email }} {% endif %}
         </li>
         <li>
-            Phone: {% if client.phone %} {{ client.phone }} {% endif %}
+            Phone: * {% if client.phone %} {{ client.phone }} {% endif %}
         </li>
         <li>
             Neighborhood: {% if client.neighborhood %} {{ client.neighborhood }} {% endif %}
         </li>
         <li>
-            Case Label: {% if client.case_label %} {{ client.case_label }} {% endif %}
+            Case Label: * {% if client.case_label %} {{ client.case_label }} {% endif %}
         </li>
         <li>
             Age: {% if client.age %} {{ client.age }} {% endif %}

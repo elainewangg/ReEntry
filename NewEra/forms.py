@@ -8,15 +8,17 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods, educations, registrations
+from NewEra import case_labels, neighborhoods, educations, registrations, tags
 # from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            StudentQuarterlyUpdate, StudentReferral,
 #                            StudentWeeklyUpdate, StudentWeeklyUpdateUpload, Tag,
 #                            User)
-from NewEra.models import (CaseLoadUser, MeetingTracker, Note,
+from NewEra.models import (CaseLoadUser, TempCaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource, Tag,
                            User)
+from multiselectfield import MultiSelectField
+from django_select2.forms import Select2MultipleWidget
 
 INPUT_ATTRIBUTES = {
 	'class' : 'form-control organization', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'	}
@@ -52,13 +54,13 @@ COMMON NOTES:
 # Form used to create and edit a CaseLoadUser
 class CaseLoadUserForm(forms.ModelForm):
 	# Set up attributes
-	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	email = forms.EmailField(max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	first_name = forms.CharField(label=('First Name *'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label=('Last Name *'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label=('Phone *'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	email = forms.EmailField(label=('Email *'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=case_labels.CASE_LABEL_LIST))
+	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs={'style':'width: 99%; border-1px solid #ced4da;'}))
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
@@ -74,6 +76,68 @@ class CaseLoadUserForm(forms.ModelForm):
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)
+		self.fields['is_vote_registered'].label = "Voter Registration"
+		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
+		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
+
+		# Hide the is_active field if the model is being created
+		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
+		if not self.instance or self.instance.pk is None:
+			for name, field in self.fields.items():
+				if name in ['is_active', ]:
+					field.widget = forms.HiddenInput()
+		
+
+	# Validate the phone number entered
+	def clean_phone(self):
+		# Obtain only the digits entered from the phone
+		phone = self.cleaned_data['phone']
+		cleaned_phone = ''.join(digit for digit in phone if digit.isdigit())
+
+		# Validate that the phone number is either the standard 10 digits or it is 11 starting with a 1
+		if phone and (len(cleaned_phone) != 10 and not (len(cleaned_phone) == 11 and cleaned_phone[0] == '1')):
+			raise forms.ValidationError('The phone number must be either exactly 10 digits or a 1 followed by 10 digits.')
+
+		return cleaned_phone
+
+	# Ensure that for a case load entry, the SOW has inputted values for either the phone or the email, or both
+	def clean(self):
+		# cleaned_data is necessary to get the fields after they've already been cleaned
+		cleaned_data = super().clean()
+		phone = cleaned_data.get('phone')
+		email = cleaned_data.get('email')
+
+		# Raise an error if neither field is valid
+		if not (phone or email):
+			raise forms.ValidationError('You must input either a phone number or an email address for this user.')
+
+		return cleaned_data
+
+# Form used to create and edit a TempCaseLoadUser
+class TempCaseLoadUserForm(forms.ModelForm):
+	# Set up attributes
+	first_name = forms.CharField(label=('First Name *'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label=('Last Name *'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label=('Phone *'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	email = forms.EmailField(label=('Email *'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
+	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs={'style':'width: 99%; border-1px solid #ced4da;'}))
+	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
+	is_vote_registered = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=registrations.REGISTRATION_LIST), required=False)
+
+	# Define the model and fields to include/exclude
+	class Meta:
+		model = TempCaseLoadUser
+		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
+		exclude = (
+			'user',
+		)
+
+	def __init__(self, *args, **kwargs):
+		super(TempCaseLoadUserForm, self).__init__(*args, **kwargs)
 		self.fields['is_vote_registered'].label = "Voter Registration"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
@@ -384,14 +448,13 @@ class SelectDataTimeframe(forms.Form):
 
 # Form to create or edit tags
 class TagForm(forms.ModelForm):
-	# Name is the only attribute
 	name = forms.CharField(max_length=30, required=True, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	tag_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=tags.TAG_TYPES_LIST))
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = Tag
-		fields = ('name',)
-
+		fields = ('name', 'tag_type')
 # Filter function for the resources; needs instantiation as a form
 class ResourceFilter(django_filters.FilterSet):
 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
@@ -401,6 +464,36 @@ class ResourceFilter(django_filters.FilterSet):
 	class Meta:
 		model = Resource
 		fields = ('tags',)
+
+# Filter function for the resources; needs instantiation as a form
+# class ResourceEmploymentFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Employment"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
+
+# # Filter function for the resources; needs instantiation as a form
+# class ResourceHousingFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Housing and Needs"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
+
+# # Filter function for the resources; needs instantiation as a form
+# class ResourceSupportFilter(django_filters.FilterSet):
+# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
+# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Support and Services"), widget=forms.CheckboxSelectMultiple, label='')
+
+# 	# Define the model and fields to include/exclude
+# 	class Meta:
+# 		model = Resource
+# 		fields = ('tags',)
 
 # Meeting Tracker Form
 class MeetingTrackerForm(forms.ModelForm):
