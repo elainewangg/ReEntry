@@ -10,14 +10,6 @@ div.heading-banner {
     background-color: lightgray;
 }
 
-table {
-    table-layout: fixed;
-}
-
-th {
-    width: 100px;
-}
-
 div.heading-banner h1 {
     font-size: 2rem;
 }

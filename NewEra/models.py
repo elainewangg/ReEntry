@@ -213,6 +213,36 @@ class CaseLoadUser(models.Model):
     class Meta:
         ordering = ['user', 'first_name', 'last_name']
 
+# Model for individuals who signed up but have not confirmed yet
+class TempCaseLoadUser(models.Model):
+    # Attributes
+    first_name = models.CharField(max_length=30, blank=False, null=False)
+    last_name = models.CharField(max_length=150, blank=False, null=False)
+    nickname = models.CharField(max_length=100, default='')
+    email = models.EmailField(max_length=254)
+    phone = models.CharField(max_length=11)
+    neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
+    case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
+    is_active = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT, blank=True, null=True)
+    age = models.CharField(max_length=3, blank=True, default='')
+    zip_code = models.CharField(max_length=5, blank=True, default='', 
+                                validators=[RegexValidator(regex=r'^\d{5}$', message=(u'Must be a 5-digit zipcode'))])
+    education = models.CharField(max_length=150, blank=True, null=False, default='')
+    is_vote_registered = models.CharField(max_length=20, blank=True, null=False, default='')
+
+    # Methods
+    # Basic string printing
+    def __str__(self):
+        return self.get_full_name() + ", phone number " + self.phone
+
+    # Prints the case load user's full name, prettified
+    def get_full_name(self):
+        return self.first_name + " " + self.last_name
+
+    # Sets ordering parameters and their ordering priority
+    class Meta:
+        ordering = ['user', 'first_name', 'last_name']
 
 # Model for an entire referral
 class Referral(models.Model):
