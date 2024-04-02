@@ -27,6 +27,11 @@ div.secondary-content {
     padding-right: 1rem; 
 }
 
+.main-page-container {
+    padding-top: 7.5vh;
+    padding-bottom: 5.5vh;
+}
+
 .parallax-subpage{
     position: relative;
     background-image: url("/static/NewEra/homepage_bg.jpg");
@@ -76,6 +81,8 @@ h1.parallax-text {
     color: white;
     text-align: left;
     padding: 40px 80px;
+    bottom: 0;
+    width: 100%;
 }
 
 .footer p {
@@ -101,6 +108,7 @@ h1.parallax-text {
 .home-founder p {
     font-size: 20px; 
 }
+
 .decorative-box {
     border: 2px solid black; 
     padding: 50px 80px; 
@@ -131,6 +139,13 @@ h1.parallax-text {
     border-radius: 12px;
 }
 
+.orange-button:hover {
+    background-color:#F0430D;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); 
+    transform: translateX(-1px), translateY(-1px);
+}
+
 .white-button {
     background-color: white;
     color: black;
@@ -140,20 +155,97 @@ h1.parallax-text {
     border-radius: 12px;
 }
 
+
+.white-button:hover {
+    background-color: white;
+    color: rgb(90, 90, 90); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); 
+    transform: translateX(-1px), translateY(-1px);
+}
+
+
+.bordered-button {
+    background-color: white;
+    color: black;
+    border-radius: 12px;
+    border: 1px solid darkgray; 
+    padding: 5px 15px;
+    border-radius: 12px;
+    transition: background-color 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.bordered-button:hover {
+    background-color: rgb(240, 240, 240);
+    color: black; 
+    border-color: black; 
+}
+
+.red-button {
+    background-color: #e90c0c;
+    color: white;
+    border: 0px;
+    padding: 5px 15px;
+    border-radius: 12px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.red-button:hover {
+    background-color: #e90c0c;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); 
+    transform: translateX(-1px), translateY(-1px);
+}
+
+.green-button {
+    background-color: #a7e094;
+    color: black;
+    border: 0px;
+    padding: 5px 15px;
+    border-radius: 12px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
+.green-button:hover {
+    background-color: #a7e094;
+    color: black;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.4); 
+    transform: translateX(-1px), translateY(-1px);
+}
+
 .beige {
     background-color: #F9F4EC;
 }
 
-#resource-btn {
-    opacity: 0.95 !important;
-
+.list-unstyled {
+    list-style: none;
 }
 
-#resource-btn:hover {
-    opacity: 1 !important;
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
     background-color: white;
 }
 
-.list-unstyled {
-    list-style: none;
+.styled-table th,
+.styled-table td {
+    padding: 12px 15px;
+}
+
+.styled-table tbody tr {
+    border-bottom: 1px solid #ffffff;
+}
+
+.styled-table tbody tr:nth-of-type(even) {
+    background-color: #ffffff;
+}
+
+.styled-table tbody tr:last-of-type {
+    border-bottom: 1px solid darkGray; /* Matched the border color with the header */
+}
+
+.styled-table tbody tr.active-row {
+    font-weight: bold;
+    color: #ffffff; /* Adjusted for consistency with the header's color scheme */
 }

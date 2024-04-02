@@ -1,18 +1,24 @@
 {% extends "NewEra/base.html" %}
 
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
+
 {% block title %}
 	Tags
 {% endblock %}
 
 {% block content %}
-	<h1 style="margin: auto; margin-top: 50px; text-align: center;">
-		Tags
-	</h1>
+	
+	<div class="parallax-subpage">
+		<h1 class="text-black parallax-text">Tags</h1>
+	</div>
 
-	<div class="container">
-		<hr/>
+	<div class="container main-page-container">
 		{% if perms.tag.create_tag %}
-			<a href="{% url 'Create Tag' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Tag</a>
+			<a href="{% url 'Create Tag' %}" class="orange-button"><i class="material-icons">add</i>Add Tag</a>
 		{% endif %}
 	</div>
 	<p>&nbsp;</p>
