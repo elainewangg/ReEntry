@@ -9,11 +9,11 @@ $(document).ready(function () {
         $('#make-referral').attr('state', 'off');
         $('#make-referral').click(toggleSelect);
         localStorage.stagedResources = "[]";
-        localStorage.inReferralMode = "1";
+        localStorage.inReferralMode = "0";
     }
 
     else {
-        $('#make-referral').attr('state', 'on');
+        $('#make-referral').attr('state', 'off');
         $('#make-referral').click(toggleSelect);
         getReferralsInLocal();
     }

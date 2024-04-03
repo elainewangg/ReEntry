@@ -10,13 +10,17 @@
 {% endblock %}
 
 {% block content %}
-    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
-        General Referrals
-    </h1>
-    <div class="container">
-        <hr/>
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">General Referrals</h1>
+    </div>
 
+    <div class="container main-page-container">
+        <h2>Actions:</h2><br>
+        <p>*To create a referral, go to the resources tab and click "Make Referral".</p>
+        <br><hr><br>
+        
         <!-- Display referrals as tables split into groups across pages -->
+		<h2>All Referrals:</h2><br>
         {% if referrals.paginator.count > 0 %}
             <div style="overflow-x: auto">
                 <table>
@@ -50,7 +54,7 @@
                                 <td style="text-align: center;">&#10060;</td>
                             {% endif %}
 
-                            <td class="button-cell"><a href="{% url 'Show Referral' id=referral.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Show Referral' id=referral.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>&nbsp;&nbsp;
                             <td style="padding: 2px;"><a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit Notes</a></td>
                         </tr>
                     {% endfor %}
@@ -101,8 +105,6 @@
             {% endif %}
         {% endif %}
 
-        <br>
-        <p>To create a referral, go to the resources page and click "Make Referral".</p>
-        <br>
+        <br><br><br><br>
     </div>
 {% endblock %}

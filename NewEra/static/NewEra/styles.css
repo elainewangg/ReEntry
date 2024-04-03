@@ -144,7 +144,7 @@ a:hover {
 
 #make-referral {
     z-index: 100;
-    width: 300px; 
+    width: 250px; 
     position: fixed; 
     bottom: 20px; 
     right: 10%;
@@ -155,7 +155,7 @@ a:hover {
 #commit-referral {
     z-index: 100;
     display: none; 
-    width: 300px; 
+    width: 250px; 
     position: fixed; 
     bottom: 70px; 
     right: 10%;

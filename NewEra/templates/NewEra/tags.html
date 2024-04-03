@@ -17,11 +17,15 @@
 	</div>
 
 	<div class="container main-page-container">
+		<h2>Actions:</h2><br>
 		{% if perms.tag.create_tag %}
-			<a href="{% url 'Create Tag' %}" class="orange-button"><i class="material-icons">add</i>Add Tag</a>
+			<a href="{% url 'Create Tag' %}"><button type="button" class="orange-button"><i class="material-icons">add</i>Add Tag</button></a>
 		{% endif %}
+	<br><br><br><hr><br>
+	<h2>Current Tags:</h2>
 	</div>
-	<p>&nbsp;</p>
+	
+	
 	{% if tags.count > 0 %}
 		<div class="container">
 			<div class="row">
@@ -49,5 +53,6 @@
 	{% else %}
 	  <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are no tags at this time.</em></p>
 	{% endif %}
-	<p>&nbsp;</p>
+	<br><br><br><br>
+
 {% endblock %}

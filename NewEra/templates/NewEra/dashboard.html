@@ -17,15 +17,15 @@ Dashboard
 </div>
 
 <div class="container main-page-container">
-    <h2>Create New:</h2><br>
+    <h2>Actions:</h2><br>
     <button type="button"  class="orange-button" data-toggle="collapse" data-target="#collapseUser"
         aria-expanded="false" aria-controls="collapseUser"><i class="material-icons">person_add</i>  Create New
         User</button>&nbsp;&nbsp;
     <button type="button" class="orange-button" data-toggle="collapse" data-target="#collapseOrg"
         aria-expanded="false" aria-controls="collapseOrg"><i class="material-icons">group_add</i>  Create New
         Organization</button>&nbsp;&nbsp;
-    <br>
-
+    
+    <br><br>
     
     <div class="collapse {{ modalStatus }}" id="collapseUser">
         <br>
@@ -305,7 +305,7 @@ Dashboard
         {% endif %}
 
         <br>
-        <hr><br>
+        <br>
     </div>
 
     <div class="collapse {{ modalStatus }}" id="collapseOrg">
@@ -360,7 +360,7 @@ Dashboard
 
     </div>
 
-    <br><br><br>
+    <br><hr><br>
 
 
     <!-- Download spreadsheet or reset resource clicks -->
@@ -368,7 +368,7 @@ Dashboard
         <a href="{% url 'Export Selected Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Meeting and Risk Data</button></a>&nbsp;&nbsp;
         <a href="{% url 'Export Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Referral Data Spreadsheet</button></a>&nbsp;&nbsp;
         <a href="{% url 'Reset Views' %}"><button type="button" class="red-button">Reset Resource Clicks</button></a>&nbsp;&nbsp;    
-    <br><br>
+    <br><br><br><br>
 
 </div>
 

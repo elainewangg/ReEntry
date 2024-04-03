@@ -7,15 +7,16 @@
 {% endblock %}
 
 {% block content %}
-    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
-		Meeting Tracker Form
-	</h1>
 
-    <div class="container">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Meeting Tracker Form</h1>
+    </div>
 
-        <hr>
-        <a href="{% url 'Create Meeting Tracker Response' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Response</a><br>
-        <br>
+    <div class="container main-page-container">
+
+        <h2>Actions:</h2><br>
+        <a href="{% url 'Create Meeting Tracker Response' %}"><button type="button" class="orange-button"><i class="material-icons">add</i>Add Response</button></a>&nbsp;&nbsp;    
+        <br><br><br><hr><br>
 
         <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
         {% if user.is_superuser %}
@@ -47,12 +48,12 @@
             </div>
         {% else %}
             {% if perms.resource.edit_resource %}
-                <em><p style="margin: auto;">There are currently no responses.</p></em>
+                <em><p style="margin: auto; margin-top: 50px; text-align: center;">There are currently no responses.</p></em>
             {% else %}
-                <em><p style="margin: auto;">You currently have no responses.</p></em>
+                <em><p style="margin: auto; margin-top: 50px; text-align: center;">You currently have no responses.</p></em>
             {% endif %}
         {% endif %}
         
-        <br>
+        <br><br><br><br>
     </div>
 {% endblock %}
