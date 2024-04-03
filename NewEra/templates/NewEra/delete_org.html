@@ -5,15 +5,26 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
+<div class="parallax-subpage">
+    <h1 class="text-black parallax-text">
+        Organization
+    </h1>
+</div>
+
+<div class="container main-page-container">
     <form method="POST" enctype="multipart/form-data" class="resource-form">
         {% csrf_token %}
-        <h3 style="margin: auto; margin-top: 50px; text-align: center;">
+        <h3>
             Are you sure you want to delete {{ org.name }}?
         </h3>
-        <div style="margin: auto; margin-top: 50px; text-align: center;">
+        <div>
+            <br>
             <p><u>WARNING</u>: The organization will be permanently deleted and resources will on longer have it listed.</p>
+            <br>
             <p><button class="btn btn-primary" type="submit">Delete</button>
             <a href="javascript:history.back()" class="btn">Cancel</a></p>
         </div>
     </form>
+</div>
+<br><br><br><br>
 {% endblock %}

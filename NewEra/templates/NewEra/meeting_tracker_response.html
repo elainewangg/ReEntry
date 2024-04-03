@@ -5,43 +5,48 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div style="width: 80%; margin: auto; padding-top: 10vh;">
-        <div class="">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            Meeting Tracker Response
+        </h1>
+    </div>
 
+    <div class="container main-page-container">
+        <div>
             <!-- Display the nickname of the case load user if they have one -->
             {% if response.user.nickname %}
                 <h1>{{ response.user.get_full_name }} ({{ response.user.nickname }})</h1>
             {% else %}
                 <h1>{{ response.user.get_full_name }}</h1>
             {% endif %}
-            {{response.date}} {{response.time}}
-            <br>
-            <br>
+            
+            <p style="font-style: italic;">{{response.date}} {{response.time}} </p>
+        
 
             <h4>Who was the meeting or event with?</h4>
-            <p>{{ response.with_who }}</p>
+            <p style="font-style: italic;">{{ response.with_who }}</p><br>
 
             <h4>What is the nature or purpose of the meeting?</h4>
-            <p>{{ response.purpose }}</p>
+            <p style="font-style: italic;">{{ response.purpose }}</p><br>
 
             <h4>What community or neighborhood does the meeting represent?</h4>
-            <p>{{ response.neighborhood }}</p>
+            <p style="font-style: italic;">{{ response.neighborhood }}</p><br>
 
             <h4>How long did the meeting last?</h4>
-             <p>{{ response.duration }} hours</p>
+             <p style="font-style: italic;">{{ response.duration }} hours</p><br>
 
-            <h4>Notes</h4>
-            <p>{{ response.notes }}</p>
+            <h4>Notes:</h4>
+            <p style="font-style: italic;">{{ response.notes }}</p><br>
 
         </div>
 
-        <br><hr><br>
+        <br><br>
 
         <a href="{% url 'Edit Meeting Tracker Response' response.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
 
         <a href="{% url 'Delete Meeting Tracker Response' response.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
 
     </div>
-    <p>&nbsp;</p>
+    <br><br><br><br>
 
 {% endblock %}

@@ -5,13 +5,15 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div style="width: 80%; margin: auto; padding-top: 10vh;">
-        <div class="">
-            <h1>Referral Details</h1>
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Referral Details</h1>
+    </div>
 
+    <div class="container main-page-container">
+        <div class="">
             <h3>SOW</h3>
             <p>{{ referral.user }}</p>
-            <p></p>
+            <br>
 
             <!-- Display nickname on referral if it has a case load user and they have a nickname -->
             {% if referral.caseUser %}

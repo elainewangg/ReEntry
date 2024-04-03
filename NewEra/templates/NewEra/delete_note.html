@@ -5,17 +5,29 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
+<div class="parallax-subpage">
+    <h1 class="text-black parallax-text">
+        Note
+    </h1>
+</div>
+
+<div class="container main-page-container">
     <form method="POST" enctype="multipart/form-data" class="resource-form">
         {% csrf_token %}
-        <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-            Are you sure you want to delete this note? <br>
-            <br>
-            {{ note.notes }}
+        <h3>
+            Are you sure you want to delete this note?
         </h3>
-        <div style="margin: auto; margin-top: 50px; text-align: center;">
+        <br><br>
+        <p>{{ note.notes }}
+        </p><br>
+        <div>
+            <br>
             <p><u>WARNING</u>: This case load user will be permanently deleted, unless they have been referred before, in which case they will be made inactive.</p>
+            <br>
             <p><button class="btn btn-primary" type="submit">Delete</button>
             <a href="javascript:history.back()" class="btn">Cancel</a></p>
         </div>
     </form>
+</div>
+<br><br><br><br>
 {% endblock %}
