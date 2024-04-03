@@ -292,3 +292,12 @@ h1.parallax-text {
     margin-bottom: 30px; /* Adds space between cards */
 }
 
+.embedded-link {
+    text-decoration: underline; 
+    color: black;
+}
+
+.embedded-link:hover {
+    text-decoration: underline; 
+    color: #00964D; 
+}
