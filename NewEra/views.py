@@ -8,6 +8,7 @@ from datetime import date, datetime, timedelta
 from dateutil.parser import isoparse
 from decimal import Decimal
 from pathlib import Path
+from itertools import chain
 
 import openpyxl
 from django.contrib import messages
@@ -32,6 +33,7 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 from django.core import mail
+from twilio.rest import Client
 
 # from NewEra.forms import (BiweeklyForm, CaseLoadUserForm, CreateNoteForm,
 #                           CreateResourceForm, EditOrganizationForm,
@@ -41,7 +43,7 @@ from django.core import mail
 #                           SelectDataTimeframe, StudentForm,
 #                           StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm,
 #                           StudentWeeklyUpdateUploadFormset, TagForm, RoleSwitchForm)
-from NewEra.forms import (CaseLoadUserForm, CreateNoteForm,
+from NewEra.forms import (CaseLoadUserForm, TempCaseLoadUserForm, CreateNoteForm,
                           CreateResourceForm, EditOrganizationForm,
                           EditReferralNotesForm, EditSelfUserForm,
                           EditUserForm, LoginForm, MeetingTrackerForm,
@@ -51,7 +53,7 @@ from NewEra.forms import (CaseLoadUserForm, CreateNoteForm,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            Student, StudentQuarterlyUpdate, StudentReferral,
 #                            StudentWeeklyUpdate, Tag, User)
-from NewEra.models import (CaseLoadUser, MeetingTracker, Note,
+from NewEra.models import (CaseLoadUser, TempCaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource,
                            Tag, User)
 
@@ -75,9 +77,16 @@ REFERRAL_PAGINATION_COUNT = 20
 
 # function to display home page
 def home(request): 
+
+    context = {}
     markReferralAsSeen(request)
-    # markStudentReferralAsSeen(request)
-    return render(request, 'NewEra/home.html', {})
+    
+    if 'confirmuser' in request.GET:
+        confirm_user(request)
+        context['confirmed'] = True
+    
+
+    return render(request, 'NewEra/home.html', context)
 
 # function to login
 def login(request):
@@ -120,31 +129,100 @@ def sendEmail(load_user):
 
     # Set recipient
     # to = settings.EMAIL_HOST_USER
-    to = "aeli@andrew.cmu.edu"
+    to = "eywang@andrew.cmu.edu"
 
     # Send the email
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
+
+def sendEmailConfirmation(load_case_user):
+    subject = 'You have signed up for RealisticReEntry'
+    html_message = render_to_string('NewEra/email_confirmation.html', 
+                    {'tempid': load_case_user.id})
+    plain_message = strip_tags(html_message)
+    from_email = settings.EMAIL_HOST_USER
+    to = load_case_user.email
+
+    mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
+
+def sendSMSConfirmation(load_case_user):
+        to = load_case_user.phone
+        # Set the message intro string based on whether the referral is to someone on the case load or out of the system
+        messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
+
+        # # Create the query string and the message body
+        # queryString = '?key=' + referralTimeStamp
+        # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
+        # link = 'http://newera412.com/resources/' + str(r.id) + queryString
+        # links = ['http://realisticreentry/']
+        queryString = '?confirmuser='+ load_case_user.id
+        messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
+
+
+        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+        client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, to=to, body=messageIntro + messageBody)
+
+# Function to convert temp user to caseload user when they confirm signup 
+def confirm_user(request):
+    if 'confirmuser' not in request.GET:
+        return 
+
+    try:
+        key_str = request.GET['confirmuser']
+    except ValueError as e:
+        # Log the error and return
+        print(f"Error getting 'confirmuser' parameter: {str(e)}")
+        return
+
+    tempUsers = TempCaseLoadUser.objects.filter(id=key_str)
+
+    if tempUsers.count() == 1:
+        tempUser = tempUsers.first()
+        new_case_load = CaseLoadUser.objects.create(first_name=tempUser.first_name, 
+                                        last_name=tempUser.last_name,
+                                        nickname=tempUser.nickname,
+                                        email=tempUser.email, 
+                                        phone=tempUser.phone, 
+                                        neighborhood=tempUser.neighborhood,
+                                        case_label=tempUser.case_label,
+                                        is_active=tempUser.is_active,
+                                        user=tempUser.user,
+                                        age=tempUser.age,
+                                        zip_code=tempUser.zip_code,
+                                        education=tempUser.education,
+                                        is_vote_registered=tempUser.is_vote_registered)
+        
+        messages.success(request, '{} {} has successfully signed up.'.format(tempUser.first_name, tempUser.last_name))
+        tempUser.delete()
+        new_case_load.save()
+
+    sendEmail(new_case_load)
+    return redirect(reverse('Home'))
 
 # function to sign up
 def sign_up(request):
     context = {}
 
     if request.method == 'GET':
-        context['form'] = CaseLoadUserForm()
+        context['form'] = TempCaseLoadUserForm()
         return render(request, 'NewEra/sign_up.html', context)
     if request.method == 'POST':
         staff_user = User.objects.filter(is_superuser=True).first()
-        load_user = CaseLoadUser(user=staff_user)
-        form = CaseLoadUserForm(request.POST, instance=load_user)
+        load_user = TempCaseLoadUser(user=staff_user)
+        form = TempCaseLoadUserForm(request.POST, instance=load_user)
         if not form.is_valid():
             context['form'] = form 
             return render(request, 'NewEra/sign_up.html', context)
         form.save()
         load_user.save()
-        sendEmail(load_user)
-        messages.success(request, '{} {} has successfully signed up.'.format(request.POST.get("first_name", ""), request.POST.get("last_name", "")))
+        
+        if load_user.email:
+            sendEmailConfirmation(load_user)
+        elif load_user.phone:
+            sendSMSConfirmation(load_user)
 
-    context['form'] = CaseLoadUserForm()
+        messages.success(request, 'A confirmation email has been sent to you!')
+
+    context['form'] = TempCaseLoadUserForm()
     return redirect(reverse('Home'))
 
 def switch_role(request):
@@ -205,6 +283,7 @@ def markReferralAsSeen(request):
         referral.date_accessed = datetime.now()
         referral.save()
 
+
 # Function to check visitor cookie, and see if they accessed the resource
 def isUniqueVisit(request, response, id): 
     siteStaff = request.COOKIES.get('siteStaff', '')
@@ -240,6 +319,10 @@ def isUniqueVisit(request, response, id):
 def resources(request):
     all_resources = Resource.objects.all()
     context = { 'filter': ResourceFilter(request.GET, queryset=all_resources) }
+    # context['employment_filter'] =  ResourceEmploymentFilter(request.GET, queryset=all_resources)
+    # context = { 'employment_filter': ResourceEmploymentFilter(request.GET, queryset=all_resources) }
+    # context['housing_filter'] = ResourceHousingFilter(request.GET, queryset=all_resources)
+    # context['support_filter'] = ResourceSupportFilter(request.GET, queryset=all_resources)
 
     if request.method == 'GET':
         # SEARCH QUERY
@@ -652,7 +735,7 @@ def get_case_load_user(request, id):
     if case_load_user.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == case_load_user.user.organization ):
         raise Http404
     notes = Note.objects.filter(case=case_load_user).order_by("-date")
-    context = { 'case_load_user': case_load_user, 'notes': notes }
+    context = { 'case_load_user': case_load_user, 'notes': notes}
 
     return render(request, 'NewEra/get_case_load_user.html', context)
 
@@ -1352,6 +1435,7 @@ def create_tag(request):
         form = TagForm(request.POST, instance=tag)
         
         if form.is_valid():
+            tag.tag_type=form.cleaned_data['tag_type']
             form.save()
             tag.save()
 

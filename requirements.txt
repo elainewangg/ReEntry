@@ -10,6 +10,7 @@ django-appconf==1.0.4
 django-bootstrap-datepicker-plus==3.0.5
 django-encrypted-model-fields==0.6.5
 django-filter==2.2.0
+django-multiselectfield==0.1.12
 django-select2==7.6.2
 et_xmlfile==1.0.1
 gunicorn==20.0.4

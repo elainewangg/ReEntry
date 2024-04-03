@@ -9,10 +9,8 @@
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
 	<div class="parallax-subpage">
-        <h1 class="text-black parallax-text">Resources</h1>
+        <h1 class="text-black parallax-text" style="font-size: 4vw;">Resources</h1>
     </div>
-
-
 	<!-- only for users: Display referral information -->
 		{% if request.user.is_authenticated %}
 			<div class="container main-page-container">
@@ -82,13 +80,14 @@
 	                            {% endif %} 
 	                            <div class="card-body">
 	                                <h4 class="card-title">{{ r.name }}</h4>
-	                                <p class="card-text">{{r.description|truncatewords:35}}</p>
+									{% for t in r.tags.all %}
+										<div class="tag-capsule"> {{ t.name }} </div>
+									{% endfor %}
+	                                <p class="card-text">{{r.description|truncatewords:30}}</p>
+									<a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>read more</b></a>
 	                                {% if perms.resource.create_resource %}
 	                                    <p>Views: {{ r.clicks }}</p>
 	                                {% endif %}
-	                                <br>
-	                                <a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>Read More</b></a>
-	                                <br><br>
 	                                <div class="row">
 	                                    <div class="col">
 	                                        {% if perms.resource.edit_resource %}
