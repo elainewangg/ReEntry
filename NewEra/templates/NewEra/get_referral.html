@@ -11,43 +11,51 @@
 
     <div class="container main-page-container">
         <div class="">
-            <h3>SOW</h3>
-            <p>{{ referral.user }}</p>
+            <h4 style="font-style: italic;">SOW: {{ referral.user }}</h4>
             <br>
 
             <!-- Display nickname on referral if it has a case load user and they have a nickname -->
             {% if referral.caseUser %}
-                <h3>Case Load User</h3>
                 {% if referral.caseUser.nickname %}
-                    {{ referral.caseUser.get_full_name }} ({{ referral.caseUser.nickname }})
+                    <h4 style="font-style: italic;">
+                        Case Load User: 
+                        <a class="read-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
+                            {{ referral.caseUser.get_full_name }} ({{ referral.caseUser.nickname }})
+                        </a>
+                    </h4>
                 {% else %}
-                    {{ referral.caseUser.get_full_name }}
+                    <h4 style="font-style: italic;">
+                        Case Load User: 
+                        <a class="read-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
+                            {{ referral.caseUser.get_full_name }}
+                        </a>
+                    </h4>
                 {% endif %}
-                </p>
-                <a class="read-link" href="{% url 'Show Case Load User' id=referral.caseUser.id %}"><b>Read More</b></a>
-                <br/><br/>
+                <br/><hr><br/>
             {% endif %}
 
-            <h3>Phone</h3>
-            <p>{{ referral.phone }}</p>
+            <h4>Phone:</h4>
+            <p>{{ referral.phone }}</p><br>
 
-            <h3>Email</h3>
-            <p>{{ referral.email }}</p>
+            <h4>Email:</h4>
+            <p>{{ referral.email }}</p><br>
 
-            <h3>Notes <a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning">Edit Notes</a></h3>
+            <h4>Notes:</h4>
             <p>{{ referral.notes }}</p>
+            <a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning">Edit Notes</a>
+            <br><br><br>
             
-            <h3>Date Created:</h3>
-            <p>{{ referral.referral_date }}</p>
+            <h4>Date Created:</h4>
+            <p>{{ referral.referral_date }}</p><br>
 
-            <h3>Accessed:</h3>
+            <h4>Accessed:</h4>
             {% if referral.date_accessed %}
-                <p>Yes, on {{ referral.date_accessed }}</p>
+                <p>Yes, on {{ referral.date_accessed }}</p><br>
             {% else %}
-                <p>No</p>
+                <p>No</p><br>
             {% endif %}
 
-            <h3>Resources Referred</h3>
+            <h4>Resources Referred:</h4><br>
             <div class="row">
                 {% for r in resources %}
                     <a href="{% url 'Show Resource' id=r.id %}">
@@ -98,9 +106,8 @@
             </div>
         </div>
 
-        <br><hr></br>
+        <br><br><br><br>
 
     </div>
-    <p>&nbsp;</p>
 
 {% endblock %}
