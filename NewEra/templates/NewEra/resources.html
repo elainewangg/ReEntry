@@ -21,7 +21,7 @@
 				<p style="padding-top: 20px; padding-bottom: 0px; padding-left: 0px; text-align: left;">*To make referrals, click "Make Referral" at bottom and select the resources you'd like. When you're done, click "Select Resources" to finish the referral.</p>
 				<!-- SOWs can make referrals through the 'Make Referrals' button -->
 				<button id="make-referral" type="button" class="white-button">Make Referral</button>
-				<button id="commit-referral" onclick="commitReferrals()" class="red-button"></button>
+				<button id="commit-referral" onclick="commitReferrals()" class="danger-button"></button>
 				<br><hr><br>
 				<h2>View Resources:</h2><br>
 				
@@ -92,12 +92,12 @@
 	                                <div class="row">
 	                                    <div class="col">
 	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+	                                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
 	                                        {% endif %}
 	                                    </div>
 	                                    <div class="col">
 	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+	                                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
 	                                        {% endif %}
 	                                    </div>
 	                                </div>
@@ -175,12 +175,12 @@
 	                                <div class="row">
 	                                    <div class="col">
 	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+	                                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
 	                                        {% endif %}
 	                                    </div>
 	                                    <div class="col">
 	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+	                                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
 	                                        {% endif %}
 	                                    </div>
 	                                </div>

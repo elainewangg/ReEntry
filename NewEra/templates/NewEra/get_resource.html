@@ -171,11 +171,11 @@
         {% endif %}
 
         {% if perms.resource.edit_resource %}
-            <a href="{% url 'Edit Resource' resource.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+            <a href="{% url 'Edit Resource' resource.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
         {% endif %}
 
         {% if perms.resource.delete_resource %}
-            <a href="{% url 'Delete Resource' resource.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+            <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
         {% endif %}
 
     </div>

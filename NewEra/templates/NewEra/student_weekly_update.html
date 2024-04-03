@@ -15,7 +15,7 @@
         <hr>
         <div class="row">
             <div class="col">
-                <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseStudentWeeklyUpdate" aria-expanded="false" aria-controls="collapseStudentWeeklyUpdate">Add Weekly Student Update</button>
+                <button type="button" class="orange-button" data-toggle="collapse" data-target="#collapseStudentWeeklyUpdate" aria-expanded="false" aria-controls="collapseStudentWeeklyUpdate">Add Weekly Student Update</button>
             </div>
             <div class="col text-right">
                 <form method="GET" action="{% url 'Weekly Student Update' %}" class="d-inline-block">
@@ -31,7 +31,7 @@
                     </select>
                 </form>
                 <form action="{% url 'Download Weekly Student Update' %}" method="get" class="d-inline-block">
-                    <button type="submit" class="btn btn-primary">Download</button>
+                    <button type="submit" class="orange-button">Download</button>
                 </form>
             </div>
         </div>
@@ -55,7 +55,7 @@
                     </table>
                     
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <button type="submit" class="orange-button">Submit</button>
                 </form>  
             </div>
         </div>
@@ -109,10 +109,10 @@
                             {% else %}
                                 <td>&#10060;</td>
                             {% endif %}
-                            <td class="button-cell"><a href="{% url 'Upload Weekly Student Update Files' id=update.id %}" class="btn btn-sm btn-primary"><i class="material-icons">cloud_upload</i>Manage Files</a></td>
-                            <td class="button-cell"><a href="{% url 'Show Weekly Student Update' id=update.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
-                            <td class="button-cell"><a href="{% url 'Edit Weekly Student Update' id=update.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
-                            <td class="button-cell"><a href="{% url 'Delete Weekly Student Update' id=update.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            <td class="button-cell"><a href="{% url 'Upload Weekly Student Update Files' id=update.id %}" class="btn btn-sm details-button"><i class="material-icons">cloud_upload</i>Manage Files</a></td>
+                            <td class="button-cell"><a href="{% url 'Show Weekly Student Update' id=update.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Weekly Student Update' id=update.id %}" class="btn btn-sm warning-button"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Weekly Student Update' id=update.id %}" class="btn btn-sm danger-button"><i class="material-icons">delete</i>Delete</a></td>
                         </tr>
                     {% endfor %}
                 </table>

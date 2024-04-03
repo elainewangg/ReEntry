@@ -47,7 +47,7 @@
              <p>{{ case_load_user.case_label }}</p><br>
 
             <h4>Notes:</h4><br>
-            <a href="{% url 'Create Note' case_load_user.id %}" class="btn btn-primary"><i class="material-icons">add</i>Add Note</a><br>
+            <a href="{% url 'Create Note' case_load_user.id %}" class="orange-button"><i class="material-icons">add</i>Add Note</a><br>
             <br>
             {% for n in notes %}
                 <div class="card card-body">
@@ -63,9 +63,9 @@
 
         </div>
 
-        <br><br>
-        <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
-        <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+        <br><hr><br>
+        <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
+        <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
 
     </div>
     <br><br><br><br>

@@ -67,11 +67,11 @@ Dashboard
                     {% else %}
                     <td>&#10060;</td>
                     {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id=admin.id %}" class="btn btn-warning"><i
+                    <td class="button-cell"><a href="{% url 'Edit User' id=admin.id %}" class="warning-button"><i
                                 class="material-icons">edit</i>Edit</a></td>
                     <!-- Hide a delete option for the admin already logged in -->
                     {% if admin.id != user.id %}
-                    <td class="button-cell"><a href="{% url 'Delete User' id=admin.id %}" class="btn btn-danger"><i
+                    <td class="button-cell"><a href="{% url 'Delete User' id=admin.id %}" class="danger-button"><i
                                 class="material-icons">delete</i>Delete</a></td>
                     {% endif %}
                 </tr>
@@ -109,9 +109,9 @@ Dashboard
                     {% else %}
                     <td>&#10060;</td>
                     {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id=supervisor.id %}" class="btn btn-warning"><i
+                    <td class="button-cell"><a href="{% url 'Edit User' id=supervisor.id %}" class="warning-button"><i
                                 class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete User' id=supervisor.id %}" class="btn btn-danger"><i
+                    <td class="button-cell"><a href="{% url 'Delete User' id=supervisor.id %}" class="danger-button"><i
                                 class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
@@ -155,9 +155,9 @@ Dashboard
                     <td>&#10060;</td>
                     {% endif %}
                     <td class="button-cell"><a href="{% url 'Edit User' id=reentry_coordinator.id %}"
-                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            class="warning-button"><i class="material-icons">edit</i>Edit</a></td>
                     <td class="button-cell"><a href="{% url 'Delete User' id=reentry_coordinator.id %}"
-                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            class="danger-button"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -200,9 +200,9 @@ Dashboard
                     <td>&#10060;</td>
                     {% endif %}
                     <td class="button-cell"><a href="{% url 'Edit User' id=community_outreach_worker.id %}"
-                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            class="warning-button"><i class="material-icons">edit</i>Edit</a></td>
                     <td class="button-cell"><a href="{% url 'Delete User' id=community_outreach_worker.id %}"
-                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            class="danger-button"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -245,9 +245,9 @@ Dashboard
                     <td>&#10060;</td>
                     {% endif %}
                     <td class="button-cell"><a href="{% url 'Edit User' id=service_provider.id %}"
-                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            class="warning-button"><i class="material-icons">edit</i>Edit</a></td>
                     <td class="button-cell"><a href="{% url 'Delete User' id=service_provider.id %}"
-                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            class="danger-button"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -290,9 +290,9 @@ Dashboard
                     <td>&#10060;</td>
                     {% endif %}
                     <td class="button-cell"><a href="{% url 'Edit User' id resource_coordinator.id %}"
-                            class="btn btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                            class="warning-button"><i class="material-icons">edit</i>Edit</a></td>
                     <td class="button-cell"><a href="{% url 'Delete User' id resource_coordinator.id %}"
-                            class="btn btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            class="danger-button"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
             </table>
@@ -339,9 +339,9 @@ Dashboard
                     {% else %}
                     <td>&#10060;</td>
                     {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit Org' id=org.id %}" class="btn btn-warning"><i
+                    <td class="button-cell"><a href="{% url 'Edit Org' id=org.id %}" class="warning-button"><i
                                 class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete Org' id=org.id %}" class="btn btn-danger"><i
+                    <td class="button-cell"><a href="{% url 'Delete Org' id=org.id %}" class="danger-button"><i
                                 class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
@@ -367,7 +367,7 @@ Dashboard
     <h2>Data Management:</h2><br>
         <a href="{% url 'Export Selected Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Meeting and Risk Data</button></a>&nbsp;&nbsp;
         <a href="{% url 'Export Data' %}"><button type="button" class="bordered-button"><i class="material-icons">get_app</i>Download Referral Data Spreadsheet</button></a>&nbsp;&nbsp;
-        <a href="{% url 'Reset Views' %}"><button type="button" class="red-button">Reset Resource Clicks</button></a>&nbsp;&nbsp;    
+        <a href="{% url 'Reset Views' %}"><button type="button" class="large-danger-button">Reset Resource Clicks</button></a>&nbsp;&nbsp;    
     <br><br><br><br>
 
 </div>
