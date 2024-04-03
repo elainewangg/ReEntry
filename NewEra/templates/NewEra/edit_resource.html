@@ -7,13 +7,17 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-<div class="container ">
-    <div class="row">
-        <div class="col">
 
-            <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-                {{ action }} Resource
-            </h3>
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            {{ action }} Resource
+        </h1>
+    </div>
+
+    <div class="container main-page-container">
+        <div class="row">
+            <div class="col">
 
             <br/>
             <form method="POST" enctype="multipart/form-data" class="resource-form">

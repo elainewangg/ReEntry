@@ -5,13 +5,15 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container ">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            Edit Referral Notes
+        </h1>
+    </div>
+
+    <div class="container main-page-container">
         <div class="row">
             <div class="col">
-            
-            <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-                Edit Referral Notes
-            </h3>
 
             <form method="POST" enctype="multipart/form-data" class="resource-form">
                 {% csrf_token %}

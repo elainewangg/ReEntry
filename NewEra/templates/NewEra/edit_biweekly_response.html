@@ -5,11 +5,15 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-	<h3 style="margin: auto; margin-top: 50px; text-align: center;">
-		{{ action }} Bi-Weekly Attendance Resposne
-	</h3>
 
-    <div class="container">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            {{ action }} Bi-Weekly Attendance Response
+        </h1>
+    </div>
+
+    <div class="container main-page-container">
+
         <form method="POST" enctype="multipart/form-data" class="resource-form">
             {% csrf_token %}
             <table>
