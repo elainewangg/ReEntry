@@ -181,6 +181,11 @@ h1.parallax-text {
     border-color: black; 
 }
 
+.btn-primary{
+    border-radius: 12px;
+    padding: 5px 15px;
+}
+
 .red-button {
     background-color: #e90c0c;
     color: white;
