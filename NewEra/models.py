@@ -85,10 +85,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.get_username() + " (" + self.get_full_name() + ")"
 
-    # Returns if the user is an active staff member (an SOW or an admin)
-    def is_active_staff(self):
-        return self.is_active and self.is_staff()
-
     # Returns the case load of the user
     def get_case_load(self):
         return CaseLoadUser.objects.filter(user=self)

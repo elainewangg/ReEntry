@@ -154,7 +154,7 @@ def sendSMSConfirmation(load_case_user):
         # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
         # link = 'http://newera412.com/resources/' + str(r.id) + queryString
         # links = ['http://realisticreentry/']
-        queryString = '?confirmuser='+ load_case_user.id
+        queryString = '?confirmuser='+ str(load_case_user.id)
         messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
 
 

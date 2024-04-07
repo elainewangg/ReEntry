@@ -9,9 +9,9 @@ class UserTests(TestCase):
 	def test_printing(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong")
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		self.assertEqual(str(admin), "admin (Admin Guy)")
 		self.assertEqual(str(brenth), "brenth (Brent Hong)")
@@ -27,9 +27,9 @@ class UserTests(TestCase):
 	def test_active_users(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_reentry_coordinator=True)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_supervisor=True)
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		self.assertEqual(admin.is_active, True)
 		self.assertEqual(brenth.is_active, True)
@@ -43,28 +43,10 @@ class UserTests(TestCase):
 		maxk.delete()
 		joeyp.delete()
 
-	def test_active_staff_users(self):
-		# Set up users
-		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
-
-		self.assertEqual(admin.is_active_staff(), False)
-		self.assertEqual(brenth.is_active_staff(), True)
-		self.assertEqual(maxk.is_active_staff(), True)
-		self.assertEqual(joeyp.is_active_staff(), False)
-
-		# Delete users
-		admin.delete()
-		brenth.delete()
-		maxk.delete()
-		joeyp.delete()
-
 	def test_superuser(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
 		
 		self.assertEqual(admin.is_superuser, True)
 		self.assertEqual(maxk.is_superuser, False)
@@ -88,9 +70,9 @@ class UserTests(TestCase):
 	def test_case_load(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong")
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="George", last_name="Test", email="test@test.net", phone="5555555555", user=brenth)
@@ -116,9 +98,9 @@ class UserTests(TestCase):
 
 	def test_get_referrals(self):
 		# Set up users
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		brenth = User.objects.create_user(username="brenth", password="testtest", first_name="Brent", last_name="Hong", is_staff=True, is_active=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		brenth = User.objects.create_user(username="brenth", password="testtest", first_name="Brent", last_name="Hong", is_active=True)
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="Steve", last_name="Test", email="test@abcd.com", phone="7777777777",  user=maxk)
@@ -154,9 +136,9 @@ class CaseLoadUserTests(TestCase):
 	def test_printing(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong")
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="George", last_name="Test", email="test@test.net", phone="5555555555",  user=brenth)
@@ -180,9 +162,9 @@ class CaseLoadUserTests(TestCase):
 	def test_full_name(self):
 		# Set up users
 		admin = User.objects.create_user(username="admin", password="administrator45", first_name="Admin", last_name="Guy", email="testemail@check.com", phone="5555555556", is_superuser=True)
-		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong", is_staff=True)
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		brenth = User.objects.create_user(username="brenth", password="testsyay", first_name="Brent", last_name="Hong")
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="George", last_name="Test", email="test@test.net", phone="5555555555",  user=brenth)
@@ -205,8 +187,8 @@ class CaseLoadUserTests(TestCase):
 
 	def test_get_referrals(self):
 		# Set up users
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="Steve", last_name="Test", email="test@abcd.com", phone="7777777777",  user=maxk)
@@ -242,8 +224,8 @@ class ReferralTests(TestCase):
 
 	def test_printing(self):
 		# Set up users
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="Steve", last_name="Test", email="test@abcd.com", phone="7777777777",  user=maxk)
@@ -292,8 +274,8 @@ class ResourceTests(TestCase):
 
 	def test_printing(self):
 		# Set up users
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="Steve", last_name="Test", email="test@abcd.com", phone="7777777777",  user=maxk)
@@ -346,8 +328,8 @@ class ResourceTests(TestCase):
 		Referral.objects.all().delete()
 
 		# Set up users
-		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net", is_staff=True)
-		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_staff=True, is_active=False)
+		maxk = User.objects.create_user(username="maxk", password="testtime", first_name="Max", last_name="Kornyev", email="maxk@testingsuite.net")
+		joeyp = User.objects.create_user(username="joeyp", password="testtest", first_name="Joey", last_name="Perrino", is_active=False)
 
 		# Set up case load
 		c1 = CaseLoadUser.objects.create(first_name="Steve", last_name="Test", email="test@abcd.com", phone="7777777777",  user=maxk)
