@@ -166,6 +166,10 @@ a:hover {
     display: flex;
 }
 
+.admin-options {
+    margin-left: 120px;
+}
+
 .contact-info {
     background-color: rgba(217, 208, 198, .3) ;
 }

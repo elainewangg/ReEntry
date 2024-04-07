@@ -5,7 +5,7 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container" style="padding-top: 10vh;">
+    <div class="container" id="aligned" style="padding-top: 10vh;">
         <!-- Display attributes depending on if they're provided -->
         <div class="side-by-side">
             {% if resource.phone or resource.email or resource.contact_name%}
@@ -151,14 +151,17 @@
                     
                 </div>
             </div>
+            
         </div>
-        <br><hr></br>
+    </div>
+    <br><hr></br>
+    <div class="admin-options">
         {% if perms.resource.edit_resource %}
-            {% if resource.is_active %}
-                Status: <p class="text-success">Active</p>
-            {% else %}
-                Status: <p class="text-danger">Inactive</p>
-            {% endif %}
+        {% if resource.is_active %}
+            Status: <p class="text-success">Active</p>
+        {% else %}
+            Status: <p class="text-danger">Inactive</p>
+        {% endif %}
         {% endif %}
 
         {% if perms.resource.edit_resource %}
@@ -168,7 +171,6 @@
         {% if perms.resource.delete_resource %}
             <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
         {% endif %}
-
     </div>
     <p>&nbsp;</p>
 
