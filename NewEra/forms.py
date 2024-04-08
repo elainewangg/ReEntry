@@ -54,10 +54,10 @@ COMMON NOTES:
 # Form used to create and edit a CaseLoadUser
 class CaseLoadUserForm(forms.ModelForm):
 	# Set up attributes
-	first_name = forms.CharField(label=('First Name *'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	last_name = forms.CharField(label=('Last Name *'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	phone = forms.CharField(label=('Phone *'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	email = forms.EmailField(label=('Email *'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	first_name = forms.CharField(label=('*First Name'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label=('*Last Name'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label=('*Phone'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
 	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs={'style':'width: 99%; border-1px solid #ced4da;'}))

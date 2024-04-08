@@ -129,13 +129,13 @@ a:hover {
     font-size: 14px;
     background-color: #F0430D;
     border: none;
-    padding: 1px 7px;
+    padding: 1px 12px 2px 12px;
     color: white;
     text-align: center;
     display: inline-block;
     margin-right: 2px;
     margin-bottom: 5px;
-    border-radius: 14px;
+    border-radius: 15px;
 }
 
 .resource-tag {

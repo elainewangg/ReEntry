@@ -277,24 +277,25 @@ h1.parallax-text {
 }
 
 .styled-table tbody tr:last-of-type {
-    border-bottom: 1px solid darkGray; /* Matched the border color with the header */
+    border-bottom: 1px solid darkGray; 
 }
 
 .styled-table tbody tr.active-row {
     font-weight: bold;
-    color: #ffffff; /* Adjusted for consistency with the header's color scheme */
+    color: #ffffff; 
 }
 
 
 .resource-card {
     background-color: white;
     color: black;
-    height: 300px;
+    height: 400px;
     overflow: hidden; 
     border-radius: 15px;
-    border: 0; /* Removes the default border */
-    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); /* Adds a subtle shadow for depth */
-    margin-bottom: 30px; /* Adds space between cards */
+    border: 0; 
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); 
+    padding: 10px;
+    margin-bottom: 40px; 
 }
 
 .embedded-link {

@@ -5,7 +5,10 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container" id="aligned" style="padding-top: 10vh;">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text" style="font-size: 4vw;">Resource Details</h1>
+    </div>
+    <div class="container main-page-container">
         <!-- Display attributes depending on if they're provided -->
         <div class="side-by-side">
             {% if resource.phone or resource.email or resource.contact_name%}
@@ -154,7 +157,7 @@
             
         </div>
     </div>
-    <br><hr></br>
+    <br></br><br>
     <div class="admin-options">
         {% if perms.resource.edit_resource %}
         {% if resource.is_active %}
@@ -172,7 +175,7 @@
             <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
         {% endif %}
     </div>
-    <p>&nbsp;</p>
+    <br><br><br><br>
 
 {% endblock %}
 
