@@ -47,7 +47,7 @@ urlpatterns = [
     path('supervisor_dashboard/', views.supervisor_dashboard, name='Supervisor Dashboard'),
 
     # Maps
-    # path('maps/', views.get_maps, name='Maps'), # Superuser only
+    path('maps/', views.get_maps, name='Maps'), # Superuser only
 
     # User actions
     path('users/<int:id>/edit', views.edit_user, name='Edit User'), # Staff only
