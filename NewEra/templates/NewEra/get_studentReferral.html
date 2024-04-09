@@ -32,7 +32,7 @@
             <h3>Email</h3>
             <p>{{ referral.email }}</p>
 
-            <h3>Notes <a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning">Edit Notes</a></h3>
+            <h3>Notes <a href="{% url 'Edit Referral Notes' id=referral.id %}" class="btn btn-sm warning-button">Edit Notes</a></h3>
             <p>{{ referral.notes }}</p>
             
             <h3>Date Created:</h3>
@@ -75,16 +75,16 @@
                                     {% else %}
                                         <p>&nbsp;</p>
                                     {% endif %}
-                                    <br/>
+                                    <br><hr><br>
                                     <div class="row">
                                         <div class="col">
                                             {% if perms.resource.edit_resource %}
-                                                <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+                                                <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
                                             {% endif %}
                                         </div>
                                         <div class="col">
                                             {% if perms.resource.delete_resource %}
-                                                <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+                                                <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
                                             {% endif %}
                                         </div>
                                     </div>
@@ -96,7 +96,7 @@
             </div>
         </div>
 
-        <br><hr></br>
+        <br></br>
 
     </div>
     <p>&nbsp;</p>

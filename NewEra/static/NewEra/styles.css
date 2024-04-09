@@ -56,7 +56,7 @@ a:hover {
 
 #searchBar {
     display: inline-block;
-    width: calc(100% - 200px);
+    width: calc(70%);
     margin-left: auto;
     margin-right: auto;
     border-radius: 15px;
@@ -129,13 +129,13 @@ a:hover {
     font-size: 14px;
     background-color: #F0430D;
     border: none;
-    padding: 1px 7px;
+    padding: 1px 12px 2px 12px;
     color: white;
     text-align: center;
     display: inline-block;
     margin-right: 2px;
     margin-bottom: 5px;
-    border-radius: 14px;
+    border-radius: 15px;
 }
 
 .resource-tag {
@@ -201,7 +201,7 @@ a:hover {
 
 #make-referral {
     z-index: 100;
-    width: 300px; 
+    width: 250px; 
     position: fixed; 
     bottom: 20px; 
     right: 10%;
@@ -212,7 +212,7 @@ a:hover {
 #commit-referral {
     z-index: 100;
     display: none; 
-    width: 300px; 
+    width: 250px; 
     position: fixed; 
     bottom: 70px; 
     right: 10%;

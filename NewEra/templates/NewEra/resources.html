@@ -11,103 +11,70 @@
 	<div class="parallax-subpage">
         <h1 class="text-black parallax-text" style="font-size: 4vw;">Resources</h1>
     </div>
-
-	<!-- Display referral information
-	{% if request.user.is_authenticated %}
-    	<p id="referral-ins" class="px-1" style="margin: auto; text-align: left;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
-    {% else %}
-    	<p></p>
-    {% endif %} -->
-
-	<div class="container">
-		<!-- <hr> -->
-		<!-- Display referral information -->
-		<br/>
+	<!-- only for users: Display referral information -->
 		{% if request.user.is_authenticated %}
-			<p id="referral-ins" class="px-1" style="margin: auto; text-align: left;">Click "Make Referral" and click the resources to stage them for your referral. When you're done, click Select Resources to finish the referral.</p>
+			<div class="container main-page-container">
+				<h2>Actions:</h2><br>
+				<a href="{% url 'Create Resource' %}"><button type="button" class="orange-button"><i class="material-icons">add</i>Add Resource</button></a>
+				<p style="padding-top: 20px; padding-bottom: 0px; padding-left: 0px; text-align: left;">*To make referrals, click "Make Referral" at bottom and select the resources you'd like. When you're done, click "Select Resources" to finish the referral.</p>
+				<!-- SOWs can make referrals through the 'Make Referrals' button -->
+				<button id="make-referral" type="button" class="white-button">Make Referral</button>
+				<button id="commit-referral" onclick="commitReferrals()" class="danger-button"></button>
+				<br><hr><br>
+				<h2>View Resources:</h2><br>
+				
+			<!-- </div> -->
 		{% else %}
 			<p></p>
 		{% endif %}
+	<!-- </div> -->
 
-		<div aria-label="Filter Controls">
-			<form method="GET" action="">
-				<!-- Search Filter  -->
-				<a id="searchFilter" class="orange-button dropdown-toggle"  data-toggle="collapse" href="#filterDropdown" role="button" aria-expanded="false" aria-controls="filterDropdown">Filter</a>
-				<!-- Text search bar -->
-				<input id="searchBar" name="query" value="{{ request.GET.query }}" class="form-control" type="search" placeholder="search resources" aria-label="Search">
-				<!-- <button id="searchBarButton" class="orange-button" type="submit">Search</button> -->
-			
-			</form>
-		</div>
-
-		<div class="collapse" id="filterDropdown">
-			<br>
-			<div id="filter-card" class="card card-body">
-				<!-- Tag filter actions -->
-				<form action="" method="GET" class="tag-form">
-					<!-- <div class="form-group">
-						<input id="filter-search" class="form-control" placeholder="Search for a tag" aria-label="Search" onkeyup="searchFilters(event);">
-					</div> -->
-
-					<!-- <hr style="margin-bottom: 0;"> -->
-					<br/>
-					<!-- DEPENDENCY ON THIS SECTION STRUCTURE: in resourceScripts.js -->
-					<div class="scroll-section">
-						{{ filter.form.as_table }}
-					</div>
-		
-					<hr style="margin-top: 0;">
-
-					<button class="orange-button" type="submit"><i class="material-icons">filter_list</i>Filter</button>
-					<button class="orange-button" onclick="uncheckAll(event);">Clear Selection</button>
+		<!-- FILTER SECTION -->
+		<div class="container" style="padding-left: 0vh;">
+			<div aria-label="Filter Controls">
+				<form method="GET" action="">
+					<a class="btn orange-button dropdown-toggle" data-toggle="collapse" href="#filter-dropdown" role="button" aria-expanded="false" aria-controls="filter-dropdown">Filter Resources</a>
+					
+					<!-- Text search bar -->
+					<input id="searchBar" name="query" value="{{ request.GET.query }}" class="form-control" type="search" placeholder="Search for a Resource" aria-label="Search">
+					<button class="bordered-button" type="submit">Search</button>
 				</form>
 			</div>
-		</div>
-		<br>
-	</div>
 
-	<div class="container" style="position: relative;">
+			<div class="collapse" id="filter-dropdown">
+				<br>
+				<div id="filter-card" class="card card-body">
+					<!-- Tag filter actions -->
+					<form action="" method="GET" class="tag-form">
+						
+						<!-- DEPENDENCY ON THIS SECTION STRUCTURE: in resourceScripts.js -->
+						<div class="scroll-section">
+							{{ filter.form.as_table }}
+						</div>
 
-		{% if active_resources.paginator.count > 0 or inactive_resources.count > 0 %}
-			{% if perms.resource.edit_resource %}
-				<h3>Active Resources</h3>
-				<a href="{% url 'Create Resource' %}" class="orange button"><i class="material-icons">add</i>Add Resource</a>
-				<br><br>
-			{% endif %}
+						<button class="orange-button" type="submit"><i class="material-icons">filter_list</i>Filter</button>&nbsp;&nbsp;&nbsp;
+						<button class="bordered-button" onclick="uncheckAll(event);">Clear Selection</button>
+					</form>
+				</div>
+			</div>
+			<br>
+		</div> 
+		<!-- FILTER SECTION -->
+
+    <div class="container" style="padding-left: 0vh;">
+
+        {% if active_resources.paginator.count > 0 or inactive_resources.count > 0 %}
+            {% if perms.resource.edit_resource %}
+                <h4>Active:</h4>
+                <br>
+            {% endif %}
 
 			<!-- Active resource listing and pagination; seen by all users and visitors -->
 			{% if active_resources.paginator.count > 0 %}
 				<div class="row">
                     {% for r in active_resources %}
 	                    <div class="col-lg-4 mb-3">
-	                        <div id="resource-{{ r.id }}" class="card resource-card border-0 shadow">
-	                            <!-- {% if r.image %}
-	                            	<img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
-	                            {% endif %}  -->
-	                            <div class="card-body">
-	                                <h4 class="card-title">{{ r.name }}</h4>
-									{% for t in r.tags.all %}
-										<div class="tag-capsule"> {{ t.name }} </div>
-									{% endfor %}
-	                                <p class="card-text">{{r.description|truncatewords:30}}</p>
-									<a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>read more</b></a>
-	                                {% if perms.resource.create_resource %}
-	                                    <p>Views: {{ r.clicks }}</p>
-	                                {% endif %}
-	                                <div class="row">
-	                                    <div class="col">
-	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
-	                                        {% endif %}
-	                                    </div>
-	                                    <div class="col">
-	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
-	                                        {% endif %}
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+							{% include 'NewEra/resource_card.html' %}
 	                    </div>
 	                {% endfor %}				
 				</div>
@@ -153,47 +120,19 @@
 				</div>
 
 			{% else %}
-				<p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are no active resources at this time.</em></p>
+				<p style="margin: auto; margin-top: 50px; text-align: cennter;"><em>There are no active resources at this time.</em></p>
 			{% endif %}
 
 			<!-- Inactive resource listing and pagination; seen by only admins -->
 			{% if perms.resource.create_resource %}
-				<hr>
 				{% if inactive_resources.paginator.count > 0 %}
-					<h3>Inactive Resources</h3>
-					<a href="{% url 'Create Resource' %}" class="orange-button"><i class="material-icons">add</i>Add Resource</a>
+					<h4>Inactive:</h4>
 					<br>
-					<br>
+
 					<div class="row">
 	                    {% for r in inactive_resources %}
 	                    <div class="col-lg-4 mb-3">
-	                        <div id="resource-{{ r.id }}" class="card border-0 shadow">
-	                            {% if r.image %}
-	                            	<img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
-	                            {% endif %} 
-	                            <div class="card-body">
-	                                <h4 class="card-title">{{ r.name }}</h4>
-	                                <p class="card-text">{{r.description|truncatewords:35}}</p>
-	                                {% if perms.resource.create_resource %}
-	                                    <p>Views: {{ r.clicks }}</p>
-	                                {% endif %}
-	                                <br>
-	                                <a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>Read More</b></a>
-	                                <br><br>
-	                                <div class="row">
-	                                    <div class="col">
-	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
-	                                        {% endif %}
-	                                    </div>
-	                                    <div class="col">
-	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
-	                                        {% endif %}
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+							{% include 'NewEra/resource_card.html' %}
 	                    </div>
 	                	{% endfor %}				
 					</div>
@@ -244,19 +183,14 @@
 			{% endif %}
 
 		{% else %}
-			<a href="{% url 'Create Resource' %}" class="orange-button"><i class="material-icons">add</i>Add Resource</a>
-			<br>
-			<p style="margin: auto; margin-top: 50px; text-align: center;"><em>No resources were found.</em></p>
+		<p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are no resources at this time.</em></p>
+		<br><br>
 		{% endif %}
 
 	</div>
 
-	<!-- SOWs can make referrals through the 'Make Referrals' button -->
-    	<button id="make-referral" type="button" class="white-button">Make Referral</button>
-    	<button id='commit-referral' onclick="commitReferrals()" class="red-button"></button>
 
-
-    <p>&nbsp;</p>
+    <br><br><br><br>
 
 {% endblock %}
 

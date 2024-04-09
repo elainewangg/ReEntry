@@ -160,7 +160,7 @@ function toggleItem(event) {
     if (state === 'in') {
         // Remove the border from the resource and remove it from the staged resources
         $(this).attr('state', 'out');
-        $(this).addClass("border-0");
+        $(this).addClass("border-5");
         $(this).removeClass("border-success");
         $(this).removeClass("border-3");
         stagedResources = stagedResources.filter((inId) => inId != id);

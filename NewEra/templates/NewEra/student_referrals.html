@@ -50,8 +50,8 @@
                                 <td style="text-align: center;">&#10060;</td>
                             {% endif %}
 
-                            <td class="button-cell"><a href="{% url 'Show Student Referral' id=referral.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
-                            <td style="padding: 2px;"><a href="{% url 'Edit Student Referral Notes' id=referral.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit Notes</a></td>
+                            <td class="button-cell"><a href="{% url 'Show Student Referral' id=referral.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>
+                            <td style="padding: 2px;"><a href="{% url 'Edit Student Referral Notes' id=referral.id %}" class="btn btn-sm warning-button"><i class="material-icons">edit</i>Edit Notes</a></td>
                         </tr>
                     {% endfor %}
                 </table>

@@ -15,8 +15,8 @@
             <h3 class="text-white">Are you sure you want to remove this resource?</h3>
             <p class="text-white">Note: If this is the last resource, it will redirect you out of this page!</p>
             <div class="clearfix">
-                <button type="button" onclick="cancel()" class="btn btn-light">Cancel</button>
-                <button type="button" onclick="confirmDelete()" class="btn btn-danger">Remove</button>
+                <button type="button" onclick="cancel()" class="bordered-button">Cancel</button>
+                <button type="button" onclick="confirmDelete()" class="danger-button">Remove</button>
             </div>
         </div>
     </div>
@@ -91,7 +91,7 @@
                             <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><hr>
 
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-primary">Make Referral</button>
+                            <button type="submit" class="orange-button">Make Referral</button>
                         </form>
                     {% else %}
                         {% if perms.resource.edit_resource %}
@@ -124,7 +124,7 @@
 
                         {% csrf_token %}
                         <!-- Perform a validation check when the form is submitted -->
-                        <button onsubmit="return validateOutOfSystemForm();" type="submit" class="btn btn-primary">Make Referral</button>
+                        <button onsubmit="return validateOutOfSystemForm();" type="submit" class="orange-button">Make Referral</button>
                     </form>
                 </div>
             </div>

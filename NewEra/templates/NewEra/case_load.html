@@ -7,16 +7,16 @@
 {% endblock %}
 
 {% block content %}
-    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
-		Case Load
-	</h1>
+    
+	<div class="parallax-subpage">
+		<h1 class="text-black parallax-text">Case Load</h1>
+	</div>
 
-    <div class="container">
-
-        <hr>
-        <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapseCaseLoadUser" aria-expanded="false" aria-controls="collapseCaseLoadUser">Add to Caseload</button>
-        <br>
-
+	<div class="container main-page-container">
+		<h2>Actions:</h2><br>
+        <button type="button" class="orange-button" data-toggle="collapse" data-target="#collapseCaseLoadUser" aria-expanded="false" aria-controls="collapseCaseLoadUser">Add to Caseload</button>
+        
+        <br>	
         <div class="collapse {{ modalStatus }}" id="collapseCaseLoadUser">
             <br>
             <div class="card card-body">
@@ -42,12 +42,14 @@
                     {% endif %}
                     
                     {% csrf_token %}
-                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <br><br>
+                    <button type="submit" class="orange-button">Submit</button>
+                    <br><br><br><br>
                 </form>  
             </div>
-        </div>
-
-        <br>
+        </div> <!-- end of dropdown -->
+        
+        <br><br><hr><br>
 
         <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
         {% if user.is_superuser %}
@@ -55,6 +57,8 @@
         {% else %}
             <h2>Your Caseload:</h2>
         {% endif %}
+
+        <br><br>
 
         <!-- List the case load users in a table format -->
         {% if caseload_users.count > 0 %}
@@ -82,21 +86,22 @@
                             {% else %}
                                 <td>&#10060;</td>
                             {% endif %}
-                            <td class="button-cell"><a href="{% url 'Show Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
-                            <td class="button-cell"><a href="{% url 'Edit Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
-                            <td class="button-cell"><a href="{% url 'Delete Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            <td class="button-cell"><a href="{% url 'Show Case Load User' id=caseload_user.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Case Load User' id=caseload_user.id %}" class="btn btn-sm warning-button"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Case Load User' id=caseload_user.id %}" class="btn btn-sm danger-button"><i class="material-icons">delete</i>Delete</a></td>
                         </tr>
                     {% endfor %}
                 </table>
             </div>
         {% else %}
             {% if perms.resource.edit_resource %}
-                <em><p style="margin: auto;">There are currently no case load users.</p></em>
+                <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are currently no case load users.</em></p>
             {% else %}
-                <em><p style="margin: auto;">There is no one currently on your case load.</p></em>
+                <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There is no one currently on your case load.</em></p>
             {% endif %}
         {% endif %}
         
-        <br></br>
+        <br><br><br><br>
+    </div>
     </div>
 {% endblock %}
