@@ -34,7 +34,7 @@ div.secondary-content {
 
 .parallax-subpage{
     position: relative;
-    background-image: url("/static/NewEra/homepage_bg.jpg");
+    background-image: url("/static/NewEra/homewood_bridge.jpg");
     height: 100px;
     padding-top: 6vh; 
     padding-bottom: 10vh; 
@@ -50,7 +50,7 @@ div.secondary-content {
 .parallax{
     /* Credit: https://www.w3schools.com/howto/howto_css_parallax.asp */
     position: relative;
-    background-image: url("/static/NewEra/homepage_bg.jpg");
+    background-image: url("/static/NewEra/homewood_bridge.jpg");
     height: 400px;
     padding-top: 16vh; 
     padding-bottom: 7vh; 
@@ -248,7 +248,7 @@ h1.parallax-text {
 }
 
 .beige {
-    background-color: #F9F4EC;
+    background-color: #ECF1EF;
 }
 
 .list-unstyled {
@@ -292,11 +292,25 @@ h1.parallax-text {
     height: 400px;
     overflow: hidden; 
     border-radius: 15px;
-    border: 0; 
+    /* border: 0;  */
     box-shadow: 0 4px 4px rgba(0, 0, 0, 0.1); 
     padding: 10px;
     margin-bottom: 40px; 
 }
+
+.resource-card-actions {
+    position: absolute;
+    bottom: 30px; 
+    right: 40px; 
+}
+
+
+.resource-card-views {
+    position: absolute;
+    bottom: 15px; 
+    left: 30px; 
+}
+
 
 .embedded-link {
     text-decoration: underline; 

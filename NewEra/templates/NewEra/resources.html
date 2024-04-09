@@ -74,35 +74,7 @@
 				<div class="row">
                     {% for r in active_resources %}
 	                    <div class="col-lg-4 mb-3">
-	                        <div id="resource-{{ r.id }}" class="card resource-card">
-	                            {% if r.image %}
-	                            	<img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
-	                            {% endif %} 
-	                            <div class="card-body">
-	                                <h4 class="card-title">{{ r.name }}</h4>
-									{% for t in r.tags.all %}
-										<div class="tag-capsule"> {{ t.name }} </div>
-									{% endfor %}
-									<br><br>
-	                                <p class="card-text">{{r.description|truncatewords:30}}</p>
-									<a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>read more</b></a>
-	                                {% if perms.resource.create_resource %}
-	                                    <p>Views: {{ r.clicks }}</p>
-	                                {% endif %}
-	                                <div class="row">
-	                                    <div class="col">
-	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
-	                                        {% endif %}
-	                                    </div>
-	                                    <div class="col">
-	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
-	                                        {% endif %}
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+							{% include 'NewEra/resource_card.html' %}
 	                    </div>
 	                {% endfor %}				
 				</div>
@@ -156,37 +128,11 @@
 				{% if inactive_resources.paginator.count > 0 %}
 					<h4>Inactive:</h4>
 					<br>
+
 					<div class="row">
 	                    {% for r in inactive_resources %}
 	                    <div class="col-lg-4 mb-3">
-	                        <div id="resource-{{ r.id }}" class="card resource-card">
-	                            {% if r.image %}
-	                            	<img class="card-img-top" src="{% url 'Image' r.id %}" alt="Card image cap">
-	                            {% endif %} 
-	                            <div class="card-body">
-	                                <h4 class="card-title">{{ r.name }}</h4>
-									<br><br>
-	                                <p class="card-text">{{r.description|truncatewords:35}}</p>
-	                                {% if perms.resource.create_resource %}
-	                                    <p>Views: {{ r.clicks }}</p>
-	                                {% endif %}
-	                                <br>
-	                                <a class="read-link" href="{% url 'Show Resource' id=r.id %}"><b>Read More</b></a>
-	                                <br><br>
-	                                <div class="row">
-	                                    <div class="col">
-	                                        {% if perms.resource.edit_resource %}
-	                                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
-	                                        {% endif %}
-	                                    </div>
-	                                    <div class="col">
-	                                        {% if perms.resource.delete_resource %}
-	                                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
-	                                        {% endif %}
-	                                    </div>
-	                                </div>
-	                            </div>
-	                        </div>
+							{% include 'NewEra/resource_card.html' %}
 	                    </div>
 	                	{% endfor %}				
 					</div>
