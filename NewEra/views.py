@@ -34,25 +34,12 @@ from django.utils.html import strip_tags
 from django.conf import settings
 from django.core import mail
 from twilio.rest import Client
-
-# from NewEra.forms import (BiweeklyForm, CaseLoadUserForm, CreateNoteForm,
-#                           CreateResourceForm, EditOrganizationForm,
-#                           EditReferralNotesForm, EditSelfUserForm, EditStudentReferralNotesForm,
-#                           EditUserForm, LoginForm, MeetingTrackerForm,
-#                           RegistrationForm, ResourceFilter, RiskAssessmentForm,
-#                           SelectDataTimeframe, StudentForm,
-#                           StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm,
-#                           StudentWeeklyUpdateUploadFormset, TagForm, RoleSwitchForm)
 from NewEra.forms import (CaseLoadUserForm, TempCaseLoadUserForm, CreateNoteForm,
                           CreateResourceForm, EditOrganizationForm,
                           EditReferralNotesForm, EditSelfUserForm,
                           EditUserForm, LoginForm, MeetingTrackerForm,
                           RegistrationForm, ResourceFilter,
                           SelectDataTimeframe, TagForm, RoleSwitchForm)
-# from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
-#                            Organization, Referral, Resource, RiskAssessment,
-#                            Student, StudentQuarterlyUpdate, StudentReferral,
-#                            StudentWeeklyUpdate, Tag, User)
 from NewEra.models import (CaseLoadUser, TempCaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource,
                            Tag, User)
@@ -335,10 +322,6 @@ def isUniqueVisit(request, response, id):
 def resources(request):
     all_resources = Resource.objects.all()
     context = { 'filter': ResourceFilter(request.GET, queryset=all_resources) }
-    # context['employment_filter'] =  ResourceEmploymentFilter(request.GET, queryset=all_resources)
-    # context = { 'employment_filter': ResourceEmploymentFilter(request.GET, queryset=all_resources) }
-    # context['housing_filter'] = ResourceHousingFilter(request.GET, queryset=all_resources)
-    # context['support_filter'] = ResourceSupportFilter(request.GET, queryset=all_resources)
 
     if request.method == 'GET':
         # SEARCH QUERY
@@ -907,12 +890,6 @@ def get_maps(request):
             name = None  # Update this with appropriate handling
         
         if name is not None:
-            # get the risk assessment
-            # risks = RiskAssessment.objects.filter(neighborhood=name).order_by('-risk_level')		
-            # risk = 0
-            # if len(risks) > 0 :
-            #     risk = risks[0].risk_level
-            # neighborhood['properties']['x_risk'] = risk
 
             # get the active cases
             active_cases = CaseLoadUser.objects.filter(neighborhood=name, is_active=True)
@@ -1232,203 +1209,6 @@ def delete_meeting_tracker_response(request, id):
     
     return render(request, 'NewEra/delete_meeting_tracker_response.html', {'response': response})
 
-# @login_required
-# def risk_assessment(request):
-#     context = {} 
-#     if request.user.is_superuser: 
-#         context['responses'] = RiskAssessment.objects.all().order_by('-date')
-#     elif request.user.is_supervisor:
-#         context['responses'] = RiskAssessment.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
-#    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
-#         context['responses'] = RiskAssessment.objects.filter(user=request.user).order_by('-date')
-#     else:  
-#         raise Http404
-#     return render(request, 'NewEra/risk_assessment.html', context)
-
-# @login_required
-# def create_risk_assessment_response(request):
-#     context = {}
-#     form = RiskAssessmentForm()
-#     context['form'] = form
-#     context['action'] = 'Create'
-
-#     if request.method == 'POST':
-#         response = RiskAssessment(user=request.user)
-#         form = RiskAssessmentForm(request.POST, instance=response)
-        
-#         if form.is_valid():
-#             response.risk_level=form.cleaned_data['risk_level']
-#             response.actions=form.cleaned_data['actions']
-#             response.neighborhood=form.cleaned_data['neighborhood']
-#             response.notes=form.cleaned_data['notes']
-#             response.date=form.cleaned_data['date']
-#             response.time=form.cleaned_data['time']
-#             form.save()
-#             response.save()
-
-#             messages.success(request, 'Risk Assessment Form successfully submitted!')
-
-#             if int(response.risk_level) > 2:
-#                 response.send_email()
-
-#             return redirect('Show Risk Assessment Response', id=response.id)
-        
-#     else:
-#         response = RiskAssessmentForm()
-    
-#     return render(request, 'NewEra/edit_risk_assessment_response.html', context)
-
-# @login_required
-# def edit_risk_assessment_response(request, id):
-#     response = RiskAssessment.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser):
-#         raise Http404
-#     context = {}
-#     context['action'] = 'Edit'
-
-#     if request.method == "POST":
-#         form = RiskAssessmentForm(request.POST, instance=response)
-#         context['form'] = form
-
-#         if form.is_valid():
-#             form.save()
-#             response.save()
-
-#             messages.success(request, 'Submission successfully edited!')
-#             return redirect('Show Risk Assessment Response', id=response.id)
-        
-#     else:
-#         form = RiskAssessmentForm(instance=response)
-#         context['form'] = form
-#     return render(request, 'NewEra/edit_risk_assessment_response.html', context)
-
-# @login_required
-# def get_risk_assessment_response(request, id):
-#     context = {}
-#     response = RiskAssessment.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == response.user.organization ):
-#         raise Http404
-#     context['response'] = response
-#     return render(request, 'NewEra/risk_assessment_response.html', context)
-
-# @login_required
-# def delete_risk_assessment_response(request, id):
-#     response = RiskAssessment.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser):
-#         raise Http404
-#     if request.method == 'POST':
-#         response.delete()
-#         messages.success(request, 'Response successfully deleted.')
-#         return redirect('Risk Assessment')
-    
-#     return render(request, 'NewEra/delete_risk_assessment_response.html', {'response': response})
-
-# @login_required
-# def biweekly(request):
-#     context = {} 
-#     if request.user.is_superuser: 
-#         context['responses'] = Biweekly.objects.all().order_by('-date')
-#     elif request.user.is_supervisor:
-#         context['responses'] = Biweekly.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('-date')
-#    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
-#         context['responses'] = Biweekly.objects.filter(user=request.user).order_by('-date')
-#     else:  
-#         raise Http404
-#     return render(request, 'NewEra/biweekly.html', context)
-
-# @login_required
-# def create_biweekly_response(request):
-#     context = {}
-#     cases = CaseLoadUser.objects.filter(user=request.user)
-#     hours = 0
-#     for case in cases:
-#       notes = Note.objects.filter(case=case, date__gte=timezone.now()-timedelta(days=14)).exclude(activity_type="Group Meeting")
-#       for note in notes:
-#           hours += note.hours
-
-#     form = BiweeklyForm(initial={'work_hours': hours})
-
-#     context['form'] = form
-#     context['action'] = 'Create'
-#     if request.method == 'POST':
-#         response = Biweekly(user=request.user)
-#         form = BiweeklyForm(request.POST, instance=response)
-        
-#         if form.is_valid():
-#             response.pay_start=form.cleaned_data['pay_start']
-#             response.pay_end=form.cleaned_data['pay_end']
-#             response.work_hours=form.cleaned_data['work_hours']
-#             response.special_hours=form.cleaned_data['special_hours']
-#             response.meeting_hours=form.cleaned_data['meeting_hours']
-#             response.num_meetings=form.cleaned_data['num_meetings']
-#             response.other=form.cleaned_data['other']
-#             response.num_served=form.cleaned_data['num_served']
-#             response.location=form.cleaned_data['location']
-#             response.intervention=form.cleaned_data['intervention']
-#             response.num_response=form.cleaned_data['num_responses']
-#             response.num_events=form.cleaned_data['num_events']
-#             response.num_visits=form.cleaned_data['num_visits']
-#             response.num_mediations=form.cleaned_data['num_mediations']
-#             response.first_summary=form.cleaned_data['first_summary']
-#             response.second_summary=form.cleaned_data['second_summary']
-#             response.date=form.cleaned_data['date']
-#             form.save()
-#             response.save()
-
-#             messages.success(request, 'Bi-Weekly Attendance Form successfully submitted!')
-
-#             return redirect('Show Biweekly Response', id=response.id)
-        
-#     else:
-#         response = BiweeklyForm()
-    
-#     return render(request, 'NewEra/edit_biweekly_response.html', context)
-
-# @login_required
-# def edit_biweekly_response(request, id):
-#     response = Biweekly.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser):
-#         raise Http404
-#     context = {}
-#     context['action'] = 'Edit'
-
-#     if request.method == "POST":
-#         form = BiweeklyForm(request.POST, instance=response)
-#         context['form'] = form
-
-#         if form.is_valid():
-#             form.save()
-#             response.save()
-
-#             messages.success(request, 'Submission successfully edited!')
-#             return redirect('Show Biweekly Response', id=response.id)
-        
-#     else:
-#         form = BiweeklyForm(instance=response)
-#         context['form'] = form
-#     return render(request, 'NewEra/edit_biweekly_response.html', context)
-
-# @login_required
-# def get_biweekly_response(request, id):
-#     context = {}
-#     response = Biweekly.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser) and not (request.user.is_supervisor and request.user.organization == response.user.organization ):
-#         raise Http404
-#     context['response'] = response
-#     return render(request, 'NewEra/biweekly_response.html', context)
-
-# @login_required
-# def delete_biweekly_response(request, id):
-#     response = Biweekly.objects.filter(id=id).first()
-#     if response.user != request.user and not(request.user.is_superuser):
-#         raise Http404
-#     if request.method == 'POST':
-#         response.delete()
-#         messages.success(request, 'Response successfully deleted.')
-#         return redirect('Biweekly')
-    
-#     return render(request, 'NewEra/delete_biweekly_response.html', {'response': response})
-
 # endregion
 
 # region TAGS
@@ -1535,7 +1315,6 @@ def export_selected_data(request):
     else:
         form  =  SelectDataTimeframe(request.POST)
         if form.is_valid():
-            # risk_assessments = RiskAssessment.objects.all().filter(date__range=(form.cleaned_data["start_date"],form.cleaned_data["end_date"]))
             meeting_trackers  = MeetingTracker.objects.all().filter(date__range=(form.cleaned_data["start_date"],form.cleaned_data["end_date"])).order_by('user')
 
             # Define the workbook and sheet
@@ -1544,43 +1323,6 @@ def export_selected_data(request):
 
             # Set the bold font
             bold = Font(bold=True)
-
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-            # ws['C1'].font = bold
-            # ws['D1'].font = bold
-            # ws['E1'].font = bold
-            # ws['F1'].font = bold
-
-            # ws['A1'] = "Date"
-            # ws['B1'] = "User"
-            # ws['C1'] = "Neighborhood"
-            # # ws['D1'] = "Risk Level"
-            # ws['D1'] = "Actions"
-            # ws['E1'] = "Notes"
-
-            # for r in risk_assessments:
-            #     date = r.date.__str__()
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     risk_level = r.risk_level
-            #     actions = r.actions
-            #     notes = r.notes
-            #     ws.append([date,user, neighborhood, risk_level, actions, notes])
-
-            
-
-            # ws = wb.worksheets[0]
-            # ws.auto_filter.ref = ws.dimensions
-            
-            # ws.title = "Risk Level Assessments"
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-            # ws.column_dimensions[get_column_letter(3)].width = 50
-            # ws.column_dimensions[get_column_letter(4)].width = 50
-            # ws.column_dimensions[get_column_letter(5)].width = 50
-            # ws.column_dimensions[get_column_letter(6)].width = 50
 
             ws1 = wb.create_sheet("Meeting Tracker Forms")
             ws = ws1
@@ -1621,76 +1363,6 @@ def export_selected_data(request):
             ws.column_dimensions[get_column_letter(7)].width = 50
 
             ws.auto_filter.ref = ws.dimensions
-
-            # ws2 = wb.create_sheet("Average Risk Level")
-            # ws = ws2
-
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-
-            # ws['A1'] = "Neighborhood"
-            # ws['B1'] = "Average Risk Level"
-
-            # risk_dict = dict()
-            # for r in risk_assessments:
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     risk_level = int(r.risk_level)
-            #     if neighborhood not in risk_dict:
-            #         risk_dict[neighborhood] = []
-            #     else:
-            #         risk_dict[neighborhood].append(risk_level)
-
-            # new_list = []
-
-            # for key in risk_dict:
-            #     lst = risk_dict[key]
-            #     if len(lst) > 0:
-            #         new_list.append( (key, round( (sum(lst) / len(lst) ), 2) ) )
-            #     else:
-            #         new_list.append((key, 0))
-
-            # new_list.sort(key = lambda x: x[1], reverse = True)
-            
-            # for (k,v) in new_list:
-            #     ws.append([k,v])
-
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-
-            # ws2 = wb.create_sheet("Actions Count")
-            # ws = ws2
-
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-
-            # ws['A1'] = "Action"
-            # ws['B1'] = "Count"
-
-            # risk_dict = dict()
-            # for r in risk_assessments:
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     actions = r.actions
-            #     if actions not in risk_dict:
-            #         risk_dict[actions] = 0
-            #     else:
-            #         risk_dict[actions]+=1
-            
-            # new_list = []
-            # for key in risk_dict:
-            #     new_list.append( (key, risk_dict[key]) )
-            
-            # new_list.sort(key = lambda x: x[1], reverse = True)
-            
-            # for (k,v) in new_list:
-            #     ws.append([k,v])
-
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-            
 
             ws3 = wb.create_sheet("Meeting With Who Count")
             ws = ws3
@@ -1775,7 +1447,6 @@ def export_data(request):
             start_date = form.cleaned_data["start_date"]
             end_date = form.cleaned_data["end_date"]
             resources = Resource.objects.filter(is_active=True, referrals__referral_date__gte=start_date, referrals__referral_date__lte=end_date).distinct()
-            # student_resources = Resource.objects.filter(is_active=True, student_referrals__referral_date__gte=start_date, student_referrals__referral_date__lte=end_date).distinct()
     
             # Define the workbook and sheet
             wb = Workbook()
@@ -1817,40 +1488,6 @@ def export_data(request):
 
             # Export breakdown by tag
 
-            # ws_student = wb.create_sheet("Student Referral Resources")
-            # ws = ws_student
-
-             # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-            # ws['C1'].font = bold
-            # ws['D1'].font = bold
-
-            # ws['A1'] = "Resource"
-            # ws['B1'] = "# Referrals"
-            # ws['C1'] = "# Accessed Referrals"
-            # ws['D1'] = "# Views"
-
-            # # Write resources
-            # for r in student_resources:
-            #     # Get name
-            #     name = r.name
-            #     # Get referrals including the resource
-            #     referrals_count = r.student_referrals.count()
-            #     # Get accessed referrals
-            #     accessed_count = r.student_referrals.exclude(date_accessed=None).count()
-            #     # Get clicks
-            #     clicks = r.clicks
-            #     # Write to the Excel file
-            #     ws.append([name, referrals_count, accessed_count, clicks])
-            
-            # ws.column_dimensions[get_column_letter(1)].width = 60
-            # ws.column_dimensions[get_column_letter(2)].width = 20
-            # ws.column_dimensions[get_column_letter(3)].width = 20
-            # ws.column_dimensions[get_column_letter(4)].width = 20
-
-            # Export breakdown by tag
-
             ws1 = wb.create_sheet("By Tag")
             ws = ws1
 
@@ -1860,8 +1497,6 @@ def export_data(request):
             ws['C1'].font = bold
             ws['D1'].font = bold
             ws['E1'].font = bold
-            # ws['F1'].font = bold
-            # ws['G1'].font = bold
 
             ws['A1'] = "Tag"
             ws['B1'] = "# Resources"
@@ -1879,9 +1514,7 @@ def export_data(request):
                 resources_count = 0
 
                 general_referrals_count_by_tag = 0
-                # student_referrals_count_by_tag = 0
                 accessed_count = 0
-                # student_accessed_count = 0
                 clicks = 0
 
                 for r in resources:
@@ -1890,12 +1523,8 @@ def export_data(request):
                         resources_count += 1
                         # Get general referrals associated with the tag
                         general_referrals_count_by_tag += r.referrals.count()
-                        # Get student referrals associated with the tag
-                        # student_referrals_count_by_tag += r.student_referrals.count()
                         # Get accessed referrals by tag
                         accessed_count += r.referrals.exclude(date_accessed=None).count()
-                        # Get accessed student referrals by tag
-                        # student_accessed_count += r.student_referrals.exclude(date_accessed=None).count()
                         # Get clicks
                         clicks += r.clicks
 
@@ -1907,8 +1536,6 @@ def export_data(request):
             ws.column_dimensions[get_column_letter(3)].width = 20
             ws.column_dimensions[get_column_letter(4)].width = 30
             ws.column_dimensions[get_column_letter(5)].width = 20
-            # ws.column_dimensions[get_column_letter(6)].width = 30
-            # ws.column_dimensions[get_column_letter(7)].width = 20
 
 
             # Export user data
@@ -1922,16 +1549,11 @@ def export_data(request):
             ws['C1'].font = bold
             ws['D1'].font = bold
             ws['E1'].font = bold
-            # ws['F1'].font = bold
-            # ws['G1'].font = bold
 
             ws['A1'] = "User"
             ws['B1'] = "# Case Load Users"
             ws['C1'] = "# General Referrals"
             ws['D1'] = "# Accessed General Referrals"
-            # ws['E1'] = "# Student Referrals"
-            # ws['F1'] = "# Accessed Student Referrals"
-            # ws['G1'] = "Date of Last Referral"
             ws['E1'] = "Date of Last Referral"
 
             # Get users
@@ -1941,10 +1563,7 @@ def export_data(request):
                 case_load_count = u.get_case_load().count()
                 referrals_count = u.get_referrals().count()
                 accessed_referrals_count = u.get_referrals().exclude(date_accessed=None).count()
-                # student_referrals_count = u.get_student_referrals().count()
-                # accessed_student_referrals_count = u.get_student_referrals().exclude(date_accessed=None).count()
                 last_general_referral_date = u.get_referrals().order_by('-referral_date').first()
-                # last_student_referral_date = u.get_referrals().order_by('-referral_date').first()
                 if last_general_referral_date is not None:
                     last_referral_date = last_general_referral_date.referral_date.strftime('%m-%d-%Y')
                 else:
@@ -1958,8 +1577,6 @@ def export_data(request):
             ws.column_dimensions[get_column_letter(3)].width = 20
             ws.column_dimensions[get_column_letter(4)].width = 30
             ws.column_dimensions[get_column_letter(5)].width = 20
-            # ws.column_dimensions[get_column_letter(6)].width = 30
-            # ws.column_dimensions[get_column_letter(7)].width = 20
 
 
             # Export referral data by phone
@@ -2041,62 +1658,6 @@ def export_data(request):
             ws.column_dimensions[get_column_letter(4)].width = 20
             ws.column_dimensions[get_column_letter(4)].width = 20
 
-            # Export referral data by student
-            # ws_stud = wb.create_sheet("By Student")
-            # ws = ws_stud
-
-            # Create header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-            # ws['C1'].font = bold
-            # ws['D1'].font = bold
-            # ws['E1'].font = bold
-            # ws['F1'].font = bold
-            # ws['G1'].font = bold
-            # ws['H1'].font = bold
-
-            # ws['A1'] = "Student"
-            # ws['B1'] = "Email"
-            # ws['C1'] = "Phone"
-            # ws['D1'] = "Referrer"
-            # ws['E1'] = "School"
-            # ws['F1'] = "# Referrals"
-            # ws['G1'] = "# Accessed Referrals"
-            # ws['H1'] = "Date of Last Referral"
-
-            # Get referrals
-            # referrals = StudentReferral.objects.filter(referral_date__gte=start_date, referral_date__lte=end_date).order_by('-referral_date')
-
-            # Sets to keep track of phones and emails seen
-            # students = set()
-            # schools_dict = dict()
-            # referrer_dict = dict()
-            # phones_dict = dict()
-            # emails_dict = dict()
-            # referrals_dict = dict()
-            # accessed_referrals_dict = dict()
-            # last_referral_dict = dict()
-
-            # for r in referrals:
-            #     # Format phone number
-            #     # if (len(r.phone) == 10):
-            #     #     phone_number = "(" + r.phone[0:3] + ") " + r.phone[3:6] + "-" + r.phone[6:10]
-            #     # else:
-            #     #     phone_number = r.phone[0] + " (" + r.phone[1:4] + ") " + r.phone[4:7] + "-" + r.phone[7:11]
-            #     referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict = export_student_attribute(r.student, students, referrals_dict, accessed_referrals_dict, referrer_dict, schools_dict, phones_dict, emails_dict, last_referral_dict, r)
-
-            # for s in students:
-            #     # Write to the Excel file
-            #     ws.append([s.get_full_name(), emails_dict[s], phones_dict[s], referrer_dict[s], schools_dict[s], referrals_dict[s], accessed_referrals_dict[s], last_referral_dict[s]])
-
-            # ws.column_dimensions[get_column_letter(1)].width = 25
-            # ws.column_dimensions[get_column_letter(2)].width = 30
-            # ws.column_dimensions[get_column_letter(3)].width = 20
-            # ws.column_dimensions[get_column_letter(4)].width = 20
-            # ws.column_dimensions[get_column_letter(5)].width = 20
-            # ws.column_dimensions[get_column_letter(6)].width = 20
-            # ws.column_dimensions[get_column_letter(7)].width = 20
-
             # Export referral data by team
             ws5 = wb.create_sheet("By Team")
             ws = ws5
@@ -2105,9 +1666,7 @@ def export_data(request):
             teams = set()
             team_cases = dict()
             team_referrals = dict()
-            # team_student_referrals = dict()
             team_accessed_referrals = dict()
-            # team_accessed_student_referrals = dict()
             team_last_referral_date = dict()
             users = User.objects.all()
 
@@ -2125,23 +1684,13 @@ def export_data(request):
                 else:
                     team_referrals[u.team] = u.get_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
 
-                # if u.team in team_student_referrals.keys():
-                #     team_student_referrals[u.team] += u.get_student_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
-                # else:
-                #     team_student_referrals[u.team] = u.get_student_referrals().filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
-                
                 if u.team in team_accessed_referrals.keys():
                     team_accessed_referrals[u.team] += u.get_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
                 else:
                     team_accessed_referrals[u.team] = u.get_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
 
-                # if u.team in team_accessed_student_referrals.keys():
-                #     team_accessed_student_referrals[u.team] += u.get_student_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
-                # else:
-                #     team_accessed_student_referrals[u.team] = u.get_student_referrals().exclude(date_accessed=None).filter(referral_date__gte=start_date, referral_date__lte=end_date).count()
                 
                 last_referral_date = u.get_referrals().order_by('-referral_date').first()
-                # last_student_referral_date = u.get_student_referrals().order_by('-referral_date').first()
 
                 if u.team in team_last_referral_date:
                     if last_referral_date:
@@ -2164,15 +1713,11 @@ def export_data(request):
             ws['C1'].font = bold
             ws['D1'].font = bold
             ws['E1'].font = bold
-            # ws['F1'].font = bold
-            # ws['G1'].font = bold
 
             ws['A1'] = "Team"
             ws['B1'] = "# Case Load Users"
             ws['C1'] = "# General Referrals"
             ws['D1'] = "# Accessed General Referrals"
-            # ws['E1'] = "# Student Referrals"
-            # ws['F1'] = "# Accessed Student Referrals"
             ws['E1'] = "Date of Last Referral"
 
             for t in teams:
@@ -2184,8 +1729,6 @@ def export_data(request):
             ws.column_dimensions[get_column_letter(3)].width = 30
             ws.column_dimensions[get_column_letter(4)].width = 30
             ws.column_dimensions[get_column_letter(5)].width = 30
-            # ws.column_dimensions[get_column_letter(6)].width = 30
-            # ws.column_dimensions[get_column_letter(7)].width = 25
 
             # Save and download the Excel file
             response = HttpResponse(content_type='application/vnd.ms-excel')

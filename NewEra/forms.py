@@ -9,15 +9,9 @@ from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
 from NewEra import case_labels, neighborhoods, educations, registrations, tags, employments
-# from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
-#                            Organization, Referral, Resource, RiskAssessment,
-#                            StudentQuarterlyUpdate, StudentReferral,
-#                            StudentWeeklyUpdate, StudentWeeklyUpdateUpload, Tag,
-#                            User)
 from NewEra.models import (CaseLoadUser, TempCaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource, Tag,
                            User)
-from multiselectfield import MultiSelectField
 from django_select2.forms import Select2MultipleWidget
 
 INPUT_ATTRIBUTES = {'class' : 'form-control organization', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'	}
@@ -142,13 +136,6 @@ class TempCaseLoadUserForm(forms.ModelForm):
 		self.fields['is_employed'].label = "Employment Status"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
-
-		# Hide the is_active field if the model is being created
-		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-		if not self.instance or self.instance.pk is None:
-			for name, field in self.fields.items():
-				if name in ['is_active', ]:
-					field.widget = forms.HiddenInput()
 
 	# Validate the phone number entered
 	def clean_phone(self):
@@ -428,16 +415,6 @@ class EditReferralNotesForm(forms.ModelForm):
 		model = Referral
 		fields = ('notes',)
 
-# # Form only used to edit notes in a Student Referral
-# class EditStudentReferralNotesForm(forms.ModelForm):
-# 	# Notes is the only attribute SOWs can freely edit
-# 	notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = StudentReferral
-# 		fields = ('notes',)
-
 # Form to select timeframe of risk assessment data
 class SelectDataTimeframe(forms.Form):
 	start_date = forms.DateField(widget=forms.widgets.DateInput(attrs={'type': 'date'}))
@@ -465,36 +442,6 @@ class ResourceFilter(django_filters.FilterSet):
 		model = Resource
 		fields = ('tags',)
 
-# Filter function for the resources; needs instantiation as a form
-# class ResourceEmploymentFilter(django_filters.FilterSet):
-# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
-# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Employment"), widget=forms.CheckboxSelectMultiple, label='')
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = Resource
-# 		fields = ('tags',)
-
-# # Filter function for the resources; needs instantiation as a form
-# class ResourceHousingFilter(django_filters.FilterSet):
-# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
-# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Housing and Needs"), widget=forms.CheckboxSelectMultiple, label='')
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = Resource
-# 		fields = ('tags',)
-
-# # Filter function for the resources; needs instantiation as a form
-# class ResourceSupportFilter(django_filters.FilterSet):
-# 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
-# 	tags = django_filters.ModelMultipleChoiceFilter(queryset=Tag.objects.filter(tag_type="Support and Services"), widget=forms.CheckboxSelectMultiple, label='')
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = Resource
-# 		fields = ('tags',)
-
 # Meeting Tracker Form
 class MeetingTrackerForm(forms.ModelForm):
     notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
@@ -505,39 +452,6 @@ class MeetingTrackerForm(forms.ModelForm):
     class Meta:
         model = MeetingTracker
         fields = ['with_who', 'purpose', 'neighborhood', 'duration', 'date', 'time', 'notes']
-
-# Risk Assessment Form
-# class RiskAssessmentForm(forms.ModelForm):
-#     notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-#     date = forms.DateField(widget=DatePickerInput())
-#     time = forms.TimeField(widget=TimePickerInput())
-
-#     class Meta:
-#         model = RiskAssessment
-#         fields = ['risk_level', 'actions', 'neighborhood', 'notes', 'date', 'time']
-
-# Bi-weekly Form
-# class BiweeklyForm(forms.ModelForm):
-#     pay_start = forms.DateField(label='Start of the pay period', widget=DatePickerInput())
-#     pay_end = forms.DateField(label='End of the pay period', widget=DatePickerInput())
-#     work_hours = forms.IntegerField(label='Total hours work this pay period')
-#     special_hours = forms.IntegerField(label='Total hours of special event')
-#     num_special_events = forms.IntegerField(label='Number of special events')
-#     meeting_hours = forms.IntegerField(label='Total hours of meetings attended')
-#     num_meetings = forms.IntegerField(label='Number of meetings attended')
-#     other = forms.IntegerField(label='Other hours')
-#     num_served = forms.IntegerField(label='Number Served')
-#     num_responses = forms.IntegerField(label='Number of incident responses')
-#     num_events = forms.IntegerField(label='Number of community meetings/events')
-#     num_visits = forms.IntegerField(label='Number of home visits')
-#     num_mediations = forms.IntegerField(label='Number of mediations')
-#     first_summary = forms.CharField(max_length=1000, required=False, label='Summary for the first week', widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-#     second_summary = forms.CharField(max_length=1000, required=False, label='Summary for the second week', widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-#     date = forms.DateField(widget=DatePickerInput())
-
-#     class Meta:
-#         model = Biweekly
-#         fields = ['pay_start', 'pay_end', 'work_hours', 'special_hours', 'num_special_events', 'meeting_hours', 'num_meetings', 'other', 'num_served', 'location', 'intervention', 'num_responses', 'num_events', 'num_visits', 'num_mediations', 'first_summary', 'second_summary', 'date']
 
 # Standard Validation Forms 
 
@@ -641,171 +555,3 @@ class RegistrationForm(forms.Form):
 
 		if len(roles) == 0:
 			raise forms.ValidationError('At least one role must be selected.')
-
-# Form used to create and edit a StudentWeeklyUpdateForm
-# class StudentWeeklyUpdateForm(forms.ModelForm):
-# 	# Set up attributes
-# 	weekly_absences = forms.IntegerField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), min_value=0, max_value=100)
-# 	extra_curricular = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	special_needs = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	goals = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = StudentWeeklyUpdate
-# 		fields = [
-# 			'weekly_absences',
-# 			'extra_curricular',
-# 			'special_needs',
-# 			'goals',
-# 			'notes',
-# 			'is_active',
-# 			'student',
-# 			'date'
-# 		]
-# 		exclude = (
-# 			'student', 'date'
-# 		)
-
-# 	def __init__(self, *args, **kwargs):
-# 		super(StudentWeeklyUpdateForm, self).__init__(*args, **kwargs)
-# 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
-# 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
-
-# 		# Hide the is_active field if the model is being created
-# 		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-# 		if not self.instance or self.instance.pk is None:
-# 			for name, field in self.fields.items():
-# 				if name in ['is_active', ]:
-# 					field.widget = forms.HiddenInput()
-
-# Form used to create and edit a Student
-# class StudentForm(forms.ModelForm):
-# 	current_year = datetime.now().year
-# 	min_year = current_year - 1
-# 	max_year = current_year + 10
-
-# 	# Set up attributes
-# 	first_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-# 	last_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-# 	graduation_year = forms.IntegerField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), min_value=min_year, max_value=max_year, initial=current_year)
-# 	email = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-# 	phone = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-# 	parent_first_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-# 	parent_last_name = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-# 	parent_email = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-# 	parent_phone = forms.CharField(max_length=255, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = Student
-# 		fields = [
-# 			'first_name',
-# 			'last_name',
-# 			'graduation_year',
-# 			'email',
-# 			'phone',
-# 			'parent_first_name',
-# 			'parent_last_name',
-# 			'parent_email',
-# 			'parent_phone',
-# 			'is_active',
-# 			'user',
-# 			'date_created',
-# 		]
-# 		exclude = (
-# 			'user', 'date_created'
-# 		)
-
-# 	def __init__(self, *args, **kwargs):
-# 		super(StudentForm, self).__init__(*args, **kwargs)
-# 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
-# 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
-
-# 		# Hide the is_active field if the model is being created
-# 		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-# 		if not self.instance or self.instance.pk is None:
-# 			for name, field in self.fields.items():
-# 				if name in ['is_active', ]:
-# 					field.widget = forms.HiddenInput()
-
-# 	# Ensure that for a student entry, the SPC has inputted values for either the phone or the email, or both
-# 	def clean(self):
-# 		# cleaned_data is necessary to get the fields after they've already been cleaned
-# 		cleaned_data = super().clean()
-# 		phone = cleaned_data.get('phone')
-# 		email = cleaned_data.get('email')
-
-# 		# Raise an error if neither field is valid
-# 		if not (phone or email):
-# 			raise forms.ValidationError('You must input either a phone number or an email address for this student.')
-
-# 		return cleaned_data
-
-# Form used to create and edit a StudentQuarterlyUpdateForm
-# class StudentQuarterlyUpdateForm(forms.ModelForm):
-# 	# Set up attributes
-# 	q1_gpa = forms.DecimalField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), decimal_places=2, min_value=0, max_value=5, required=False)
-# 	q1_behavioral_infractions = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	q2_gpa = forms.DecimalField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), decimal_places=2, min_value=0, max_value=5, required=False)
-# 	q2_behavioral_infractions = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	q3_gpa = forms.DecimalField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), decimal_places=2, min_value=0, max_value=5, required=False)
-# 	q3_behavioral_infractions = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-# 	q4_gpa = forms.DecimalField(widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES), decimal_places=2, min_value=0, max_value=5, required=False)
-# 	q4_behavioral_infractions = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-
-# 	# Define the model and fields to include/exclude
-# 	class Meta:
-# 		model = StudentQuarterlyUpdate
-# 		fields = [
-# 			'student',
-# 			'q1_gpa',
-# 			'q1_behavioral_infractions',
-# 			'q2_gpa',
-# 			'q2_behavioral_infractions',
-# 			'q3_gpa',
-# 			'q3_behavioral_infractions',
-# 			'q4_gpa',
-# 			'q4_behavioral_infractions',
-# 			'is_active',
-# 			'date_created',
-# 		]
-# 		exclude = ('student', 'date_created')
-
-# 	def __init__(self, *args, **kwargs):
-# 		super(StudentQuarterlyUpdateForm, self).__init__(*args, **kwargs)
-# 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
-# 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
-
-# 		# Hide the is_active field if the model is being created
-# 		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-# 		if not self.instance or self.instance.pk is None:
-# 			for name, field in self.fields.items():
-# 				if name in ['is_active', ]:
-# 					field.widget = forms.HiddenInput()
-
-# class StudentWeeklyUpdateUploadForm(forms.ModelForm):
-# 	class Meta:
-# 		model = StudentWeeklyUpdateUpload
-# 		fields = ['file']
-
-# 	def clean_file(self):
-# 		file = self.cleaned_data.get('file')
-
-# 		if file:
-# 			if isinstance(file, UploadedFile) and file.content_type not in ['image/jpeg', 'image/png', 'application/pdf']:
-# 				raise forms.ValidationError('Invalid file format. Only JPEG, PNG, and PDF files are allowed.')
-
-# 			if isinstance(file, UploadedFile) and file.size > 2 * 1024 * 1024:
-# 				raise forms.ValidationError('File size exceeds the limit of 2MB.')
-
-# 		return file
-
-# StudentWeeklyUpdateUploadFormset = forms.modelformset_factory(
-#     StudentWeeklyUpdateUpload,
-#     form=StudentWeeklyUpdateUploadForm,
-#     extra=1,
-#     max_num=5,  # Optional: Set a maximum number of file uploads per formset
-#     can_delete=True,  # Optional: Allow deleting uploaded files
-# )

@@ -5,18 +5,10 @@
 var stagedDeleteId = null;
 
 $(document).ready(function () {
-    // if (localStorage.inReferralMode == undefined || localStorage.inReferralMode.length === 0) {
     $('#make-referral').attr('state', 'off');
     $('#make-referral').click(toggleSelect);
     localStorage.stagedResources = "[]";
     localStorage.inReferralMode = "1";
-    // }
-
-    // else {
-    //     $('#make-referral').attr('state', 'on');
-    //     $('#make-referral').click(toggleSelect);
-    //     getReferralsInLocal();
-    // }
 
     // Validation to require ONE of: { phone, email }
     $('#outOfSystemForm').on('submit', function (e) {
@@ -188,11 +180,3 @@ function commitReferrals() {
 
     document.location.href = '/create_referral?resources=' + stagedResources;
 }
-
-// Send the resources to the referral
-// function commitStudentReferrals() {
-//     stagedResources = window.localStorage.stagedResources
-//     if (stagedResources === "[]") return;
-
-//     document.location.href = '/create_student_referral?resources=' + stagedResources;
-// }
