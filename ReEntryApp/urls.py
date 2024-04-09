@@ -32,7 +32,6 @@ urlpatterns = [
     path('sign_up/', views.sign_up, name='Sign Up'),  # Visitors (anyone not logged in) only
     path('logout/', views.logout, name='Logout'),   # Staff and superuser (admin) only
     path('about_us/', views.about_us, name='About Us'),  # All users
-    path('switch_role/', views.switch_role, name='Switch Role'), # All users
 
     # Programs
     path('programs/', views.programs, name="Programs"),
