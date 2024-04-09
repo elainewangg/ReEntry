@@ -858,66 +858,66 @@ def delete_note(request, id):
 # endregion
 
 # region MAPS
-# def get_maps(request):
-#     if not request.user.is_superuser:
-#         raise Http404
+def get_maps(request):
+    if not request.user.is_superuser:
+        raise Http404
     
-#     # read json file of neighborhoods
-#     with open('NewEra/static/NewEra/pgh_neighborhoods.geojson') as file:
-#         neighborhoods = json.load(file)
+    # read json file of neighborhoods
+    with open('NewEra/static/NewEra/pgh_neighborhoods.geojson') as file:
+        neighborhoods = json.load(file)
 
-#     # read json file of second neighborhoods
-#     with open('NewEra/static/NewEra/Allegheny_County.geojson') as file:
-#         second_neighborhoods = json.load(file)
+    # read json file of second neighborhoods
+    with open('NewEra/static/NewEra/Allegheny_County.geojson') as file:
+        second_neighborhoods = json.load(file)
 
-#     neighborhoods['features'].extend(second_neighborhoods['features'])
+    neighborhoods['features'].extend(second_neighborhoods['features'])
 
-#     # # Filter out entries with name "PITTSBURGH"
-#     neighborhoods['features'] = [neighborhood for neighborhood in neighborhoods['features'] if not is_pittsburgh(neighborhood)]
+    # # Filter out entries with name "PITTSBURGH"
+    neighborhoods['features'] = [neighborhood for neighborhood in neighborhoods['features'] if not is_pittsburgh(neighborhood)]
 
-#     for neighborhood in neighborhoods['features'] :
-#         # Extract the neighborhood name from the appropriate field
-#         if 'hood' in neighborhood['properties']:
-#             name = neighborhood['properties']['hood']
-#         elif 'NAME' in neighborhood['properties']:
-#             name = neighborhood['properties']['LABEL']
-#         else:
-#             # Handle the case when the name field is not found in the properties
-#             name = None  # Update this with appropriate handling
+    for neighborhood in neighborhoods['features'] :
+        # Extract the neighborhood name from the appropriate field
+        if 'hood' in neighborhood['properties']:
+            name = neighborhood['properties']['hood']
+        elif 'NAME' in neighborhood['properties']:
+            name = neighborhood['properties']['LABEL']
+        else:
+            # Handle the case when the name field is not found in the properties
+            name = None  # Update this with appropriate handling
         
-#         if name is not None:
-#             # get the risk assessment
-#             # risks = RiskAssessment.objects.filter(neighborhood=name).order_by('-risk_level')		
-#             # risk = 0
-#             # if len(risks) > 0 :
-#             #     risk = risks[0].risk_level
-#             # neighborhood['properties']['x_risk'] = risk
+        if name is not None:
+            # get the risk assessment
+            # risks = RiskAssessment.objects.filter(neighborhood=name).order_by('-risk_level')		
+            # risk = 0
+            # if len(risks) > 0 :
+            #     risk = risks[0].risk_level
+            # neighborhood['properties']['x_risk'] = risk
 
-#             # get the active cases
-#             active_cases = CaseLoadUser.objects.filter(neighborhood=name, is_active=True)
-#             neighborhood['properties']['x_active_cases'] = len(active_cases)
+            # get the active cases
+            active_cases = CaseLoadUser.objects.filter(neighborhood=name, is_active=True)
+            neighborhood['properties']['x_active_cases'] = len(active_cases)
 
-#             # get the number of referrals
-#             referrals = Referral.objects.filter(referral_date__gte=timezone.now()-timedelta(days=30), caseUser__neighborhood=name)
-#             neighborhood['properties']['x_referrals'] = len(referrals)
+            # get the number of referrals
+            referrals = Referral.objects.filter(referral_date__gte=timezone.now()-timedelta(days=30), caseUser__neighborhood=name)
+            neighborhood['properties']['x_referrals'] = len(referrals)
 
-#     output = json.dumps(neighborhoods)
+    output = json.dumps(neighborhoods)
 
-#     context = { 'output': output }
+    context = { 'output': output }
     
-#     response = render(request, 'NewEra/maps.html', context)
+    response = render(request, 'NewEra/maps.html', context)
 
-#     return response
+    return response
 
-# def is_pittsburgh(neighborhood):
-#     if 'hood' in neighborhood['properties']:
-#         name = neighborhood['properties']['hood']
-#     elif 'NAME' in neighborhood['properties']:
-#         name = neighborhood['properties']['NAME']
-#     else:
-#         name = None
+def is_pittsburgh(neighborhood):
+    if 'hood' in neighborhood['properties']:
+        name = neighborhood['properties']['hood']
+    elif 'NAME' in neighborhood['properties']:
+        name = neighborhood['properties']['NAME']
+    else:
+        name = None
 
-#     return name == "PITTSBURGH"
+    return name == "PITTSBURGH"
 
 # endregion
 

@@ -65,7 +65,13 @@
 					</div>
 				</li>
 
-
+				{% if request.session.role == 'is_superuser' %}
+				<li class="nav-item">
+					{% url 'Maps' as maps_url %}
+					<a class="nav-link {% if request.path == maps_url %}active{% endif %}" href="{{ maps_url }}">Maps</a>
+				</li>
+				{% endif %}
+				
 				<!-- Only show the dashboard link if the user is logged in and an admin -->
 				{% if request.session.role == 'is_superuser' %}
 				<li class="nav-item">
