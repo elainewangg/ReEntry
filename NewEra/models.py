@@ -392,7 +392,6 @@ class Resource(models.Model):
     # Blank section added for the admin dashboard management (otherwise resources can't be added)
     tags = models.ManyToManyField(Tag, blank=True)
     referrals = models.ManyToManyField(Referral, blank=True)
-    # student_referrals = models.ManyToManyField(StudentReferral, blank=True)
 
     # Methods
     # Basic string printing

@@ -393,7 +393,6 @@ def get_resource(request, id):
         resource.save()
 
     markReferralAsSeen(request)
-    # markStudentReferralAsSeen(request)
     return response
 
 # get resource attachment when uploading a new resource

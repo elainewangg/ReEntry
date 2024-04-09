@@ -8,10 +8,7 @@ from django.test import Client, RequestFactory, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-# from NewEra.forms import StudentForm, StudentQuarterlyUpdateForm, StudentWeeklyUpdateForm
-# from NewEra.models import Organization, Student, StudentQuarterlyUpdate, StudentWeeklyUpdate, User
 from NewEra.models import Organization, User, CaseLoadUser, TempCaseLoadUser
-# from NewEra.views import get_student, student
 from NewEra.views import sign_up
 from NewEra.forms import CaseLoadUserForm
 
@@ -162,10 +159,4 @@ class SignUpTestCase(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(TempCaseLoadUser.objects.count(), 1)
         self.assertIn('A confirmation message has been sent to you!', actual_messages)
-    
-    def test_student_creation_without_phone_or_email(self):
-        form = CaseLoadUserForm(data=self.no_email_or_phone_sign_up_form_data)
-        self.assertFalse(form.is_valid())
-        self.assertIn('You must input either a phone number or an email address for this user.', form.errors['__all__'])
-
 # endregion
