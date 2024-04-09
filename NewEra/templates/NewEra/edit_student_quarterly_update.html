@@ -5,23 +5,24 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container ">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+           Student Quarterly Update Actions
+        </h1>
+    </div>
+
+    <div class="container main-page-container">
         <div class="row">
             <div class="col">
-
-                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-                    Edit Student Quarterly Update
-                </h3>
-
                 <form method="POST" enctype="multipart/form-data" class="resource-form">
                     {% csrf_token %}
                     <table>
                         {{ form }}
                         <input type="hidden" name="id_student" value="{{ quarterly_update.student.id }}"><br>
                     </table>
-                    <button class="btn btn-primary" type="submit">Save Student Quarterly Update</button>
+                    <button class="orange-button" type="submit">Save Student Quarterly Update</button>
                 </form>
-                <br></br>
+                <br><br><br><br>
             </div>
         </div>
     </div>

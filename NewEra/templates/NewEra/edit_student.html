@@ -5,14 +5,15 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container ">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            Student Actions
+        </h1> 
+    </div>
+
+    <div class="container main-page-container">
         <div class="row">
             <div class="col">
-
-                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-                    Edit Student
-                </h3>
-
                 <form method="POST" enctype="multipart/form-data" class="resource-form">
                     {% csrf_token %}
                     <table>
@@ -34,9 +35,9 @@
                     {% endif %}
                     </table>
 
-                    <button class="btn btn-primary" type="submit">Save Student</button>
+                    <button class="orange-button" type="submit">Save Student</button>
                 </form>
-                <br></br>
+                <br><br><br><br>
             </div>
         </div>
     </div>
