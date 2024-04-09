@@ -30,7 +30,10 @@
             Education: {% if client.education %} {{ client.education }} {% endif %}
         </li>
         <li>
-            Voter Registration: {% if client.is_vote_registered %} {{ client.is_vote_registered }} {% endif %}
+            Voter Registration Status: {% if client.is_vote_registered %} {{ client.is_vote_registered }} {% endif %}
+        </li>
+        <li>
+            Employment Status: {% if client.is_employed %} {{ client.is_employed }} {% endif %}
         </li>
     </ul>
     </p>

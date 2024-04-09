@@ -201,7 +201,8 @@ def confirm_user(request):
                                         age=tempUser.age,
                                         zip_code=tempUser.zip_code,
                                         education=tempUser.education,
-                                        is_vote_registered=tempUser.is_vote_registered)
+                                        is_vote_registered=tempUser.is_vote_registered,
+                                        is_employed=tempUser.is_employed)
         
         messages.success(request, '{} {} has successfully signed up.'.format(tempUser.first_name, tempUser.last_name))
         tempUser.delete()

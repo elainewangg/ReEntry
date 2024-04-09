@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods, educations, registrations, tags
+from NewEra import case_labels, neighborhoods, educations, registrations, tags, employments
 # from NewEra.models import (Biweekly, CaseLoadUser, MeetingTracker, Note,
 #                            Organization, Referral, Resource, RiskAssessment,
 #                            StudentQuarterlyUpdate, StudentReferral,
@@ -65,15 +65,17 @@ class CaseLoadUserForm(forms.ModelForm):
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
 	is_vote_registered = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=registrations.REGISTRATION_LIST), required=False)
+	is_employed = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=employments.EMPLOYMENT_LIST), required=False)
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = CaseLoadUser
-		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
+		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered', 'is_employed']
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)
-		self.fields['is_vote_registered'].label = "Voter Registration"
+		self.fields['is_vote_registered'].label = "Voter Registration Status"
+		self.fields['is_employed'].label = "Employment Status"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
 
@@ -124,18 +126,20 @@ class TempCaseLoadUserForm(forms.ModelForm):
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
 	is_vote_registered = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=registrations.REGISTRATION_LIST), required=False)
+	is_employed = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=employments.EMPLOYMENT_LIST), required=False)
 
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = TempCaseLoadUser
-		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
+		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered', 'is_employed']
 		exclude = (
 			'user',
 		)
 
 	def __init__(self, *args, **kwargs):
 		super(TempCaseLoadUserForm, self).__init__(*args, **kwargs)
-		self.fields['is_vote_registered'].label = "Voter Registration"
+		self.fields['is_vote_registered'].label = "Voter Registration Status"
+		self.fields['is_employed'].label = "Employment Status"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
 

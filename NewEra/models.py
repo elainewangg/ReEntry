@@ -180,8 +180,8 @@ class CaseLoadUser(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
     nickname = models.CharField(max_length=100, default='')
-    email = models.EmailField(max_length=254, unique=True)
-    phone = models.CharField(max_length=11, unique=True)
+    email = models.EmailField(max_length=254, unique=True, error_messages={'unique': 'This email has already been registered'}, default=None)
+    phone = models.CharField(max_length=11, unique=True, error_messages={'unique': 'This phone number has already been registered'}, default=None)
     neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
     case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
     is_active = models.BooleanField(default=True)
@@ -191,6 +191,7 @@ class CaseLoadUser(models.Model):
                                 validators=[RegexValidator(regex=r'^\d{5}$', message=(u'Must be a 5-digit zipcode'))])
     education = models.CharField(max_length=150, blank=True, null=False, default='')
     is_vote_registered = models.CharField(max_length=20, blank=True, null=False, default='')
+    is_employed = models.CharField(max_length=20, blank=True, null=False, default='')
 
     # Methods
     # Basic string printing
@@ -215,8 +216,8 @@ class TempCaseLoadUser(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
     nickname = models.CharField(max_length=100, default='')
-    email = models.EmailField(max_length=254, unique=True, error_messages={'unique': 'This email has already been registered'})
-    phone = models.CharField(max_length=11, unique=True, error_messages={'unique': 'This phone number has already been registered'})
+    email = models.EmailField(max_length=254, unique=True, error_messages={'unique': 'This email has already been registered'}, default=None)
+    phone = models.CharField(max_length=11, unique=True, error_messages={'unique': 'This phone number has already been registered'}, default=None)
     neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
     case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
     is_active = models.BooleanField(default=True)
@@ -226,6 +227,7 @@ class TempCaseLoadUser(models.Model):
                                 validators=[RegexValidator(regex=r'^\d{5}$', message=(u'Must be a 5-digit zipcode'))])
     education = models.CharField(max_length=150, blank=True, null=False, default='')
     is_vote_registered = models.CharField(max_length=20, blank=True, null=False, default='')
+    is_employed = models.CharField(max_length=20, blank=True, null=False, default='')
 
     # Methods
     # Basic string printing
