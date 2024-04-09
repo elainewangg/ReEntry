@@ -15,7 +15,9 @@
 		{% if request.user.is_authenticated %}
 			<div class="container main-page-container">
 				<h2>Actions:</h2><br>
-				<a href="{% url 'Create Resource' %}"><button type="button" class="orange-button"><i class="material-icons">add</i>Add Resource</button></a>
+				{% if request.user.is_superuser %}
+					<a href="{% url 'Create Resource' %}"><button type="button" class="orange-button"><i class="material-icons">add</i>Add Resource</button></a>
+				{% endif %}
 				<p style="padding-top: 20px; padding-bottom: 0px; padding-left: 0px; text-align: left;">*To make referrals, click "Make Referral" at bottom and select the resources you'd like. When you're done, click "Select Resources" to finish the referral.</p>
 				<!-- SOWs can make referrals through the 'Make Referrals' button -->
 				<button id="make-referral" type="button" class="white-button">Make Referral</button>
