@@ -133,37 +133,45 @@ def sendEmail(load_user):
 
     # Set recipient
     # to = settings.EMAIL_HOST_USER
-    to = "eywang@andrew.cmu.edu"
+    to = "aeli@andrew.cmu.edu"
 
     # Send the email
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
 
 def sendEmailConfirmation(load_case_user):
-    subject = 'You have signed up for RealisticReEntry'
-    html_message = render_to_string('NewEra/email_confirmation.html', 
-                    {'tempid': load_case_user.id})
-    plain_message = strip_tags(html_message)
-    from_email = settings.EMAIL_HOST_USER
-    to = load_case_user.email
+    try:
+        subject = 'You have signed up for RealisticReEntry'
+        html_message = render_to_string('NewEra/email_confirmation.html', 
+                        {'tempid': load_case_user.id})
+        plain_message = strip_tags(html_message)
+        from_email = settings.EMAIL_HOST_USER
+        to = load_case_user.email
 
-    mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
+        mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=False)
+        return True
+    except:
+        return False
 
 def sendSMSConfirmation(load_case_user):
-        to = load_case_user.phone
-        # Set the message intro string based on whether the referral is to someone on the case load or out of the system
-        messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
+        try:
+            to = load_case_user.phone
+            # Set the message intro string based on whether the referral is to someone on the case load or out of the system
+            messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
 
-        # # Create the query string and the message body
-        # queryString = '?key=' + referralTimeStamp
-        # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
-        # link = 'http://newera412.com/resources/' + str(r.id) + queryString
-        # links = ['http://realisticreentry/']
-        queryString = '?confirmuser='+ load_case_user.id
-        messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
+            # # Create the query string and the message body
+            # queryString = '?key=' + referralTimeStamp
+            # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
+            # link = 'http://newera412.com/resources/' + str(r.id) + queryString
+            # links = ['http://realisticreentry/']
+            queryString = '?confirmuser='+ str(load_case_user.id)
+            messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
 
 
-        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, to=to, body=messageIntro + messageBody)
+            client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+            client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, to=to, body=messageIntro + messageBody)
+            return True
+        except:
+            return False
 
 # Function to convert temp user to caseload user when they confirm signup 
 def confirm_user(request):
@@ -189,7 +197,7 @@ def confirm_user(request):
                                         neighborhood=tempUser.neighborhood,
                                         case_label=tempUser.case_label,
                                         is_active=tempUser.is_active,
-                                        user=tempUser.user,
+                                        user=None,
                                         age=tempUser.age,
                                         zip_code=tempUser.zip_code,
                                         education=tempUser.education,
@@ -218,13 +226,16 @@ def sign_up(request):
             return render(request, 'NewEra/sign_up.html', context)
         form.save()
         load_user.save()
-        
+        confirmationSent = False
         if load_user.email:
-            sendEmailConfirmation(load_user)
+            confirmationSent = sendEmailConfirmation(load_user)
         elif load_user.phone:
-            sendSMSConfirmation(load_user)
+            confirmationSent = sendSMSConfirmation(load_user)
+        if confirmationSent:
+            messages.success(request, 'A confirmation message has been sent to you!')
+        else:
+            messages.error(request, 'A confirmation message was not able to be sent. Please provide a different email/phone number!')
 
-        messages.success(request, 'A confirmation email has been sent to you!')
 
     context['form'] = TempCaseLoadUserForm()
     return redirect(reverse('Home'))
@@ -705,13 +716,15 @@ def case_load(request):
 
     # Set users to show differently based on the current user logged in
     if request.user.is_superuser: 
-        users = CaseLoadUser.objects.all()	
+        users = CaseLoadUser.objects.filter(user__isnull=False)
+        context['unassigned_caseload_users'] = CaseLoadUser.objects.filter(user=None)
         # Changed to account for inactive users
         context['staff'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
     elif request.user.is_supervisor:
         users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
-    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
+    elif request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
+        print("HOLA")
     else:  
         raise Http404
 
@@ -726,11 +739,15 @@ def case_load(request):
             context['modalStatus'] = 'show'
             return render(request, 'NewEra/case_load.html', context)
         form.save()
+        load_user.user = staff_user
         load_user.save()
         messages.success(request, 'Successfully added {} {} to the CaseLoad.'.format(load_user.first_name, load_user.last_name))
 
     context['caseload_users'] = users
-    context['form'] = CaseLoadUserForm()
+    if request.user.is_superuser:  
+        context['form'] = CaseLoadUserForm()
+    else:
+        context['form'] = CaseLoadUserForm(instance=request.user)
     return render(request, 'NewEra/case_load.html', context)
 
 @login_required
@@ -759,7 +776,10 @@ def edit_case_load_user(request, id):
             messages.success(request, '{} successfully edited.'.format(case_load_user.get_full_name()))
             return redirect('Show Case Load User', id=case_load_user.id)
     else:
-        form = CaseLoadUserForm(instance=case_load_user)
+        if request.user.is_superuser:  
+            form = CaseLoadUserForm()
+        else:
+            form = CaseLoadUserForm(instance=request.user)
     return render(request, 'NewEra/edit_case_load_user.html', {'form': form, 'case_load_user': case_load_user, 'action': 'Edit'})
 
 @login_required

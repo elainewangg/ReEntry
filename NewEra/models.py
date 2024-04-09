@@ -85,10 +85,6 @@ class User(AbstractUser):
     def __str__(self):
         return self.get_username() + " (" + self.get_full_name() + ")"
 
-    # Returns if the user is an active staff member (an SOW or an admin)
-    def is_active_staff(self):
-        return self.is_active and self.is_staff()
-
     # Returns the case load of the user
     def get_case_load(self):
         return CaseLoadUser.objects.filter(user=self)
@@ -184,8 +180,8 @@ class CaseLoadUser(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
     nickname = models.CharField(max_length=100, default='')
-    email = models.EmailField(max_length=254)
-    phone = models.CharField(max_length=11)
+    email = models.EmailField(max_length=254, unique=True)
+    phone = models.CharField(max_length=11, unique=True)
     neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
     case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
     is_active = models.BooleanField(default=True)
@@ -219,8 +215,8 @@ class TempCaseLoadUser(models.Model):
     first_name = models.CharField(max_length=30, blank=False, null=False)
     last_name = models.CharField(max_length=150, blank=False, null=False)
     nickname = models.CharField(max_length=100, default='')
-    email = models.EmailField(max_length=254)
-    phone = models.CharField(max_length=11)
+    email = models.EmailField(max_length=254, unique=True, error_messages={'unique': 'This email has already been registered'})
+    phone = models.CharField(max_length=11, unique=True, error_messages={'unique': 'This phone number has already been registered'})
     neighborhood = models.CharField(max_length=150, blank=True, null=False, default='')
     case_label = MultiSelectField(choices=case_labels.CASE_LABEL_LIST)
     is_active = models.BooleanField(default=True)

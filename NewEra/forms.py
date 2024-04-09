@@ -60,7 +60,7 @@ class CaseLoadUserForm(forms.ModelForm):
 	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs={'style':'width: 99%; border-1px solid #ced4da;'}))
+	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs=INPUT_ATTRIBUTES))
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
@@ -70,9 +70,6 @@ class CaseLoadUserForm(forms.ModelForm):
 	class Meta:
 		model = CaseLoadUser
 		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
-		exclude = (
-			'user',
-		)
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)
@@ -80,11 +77,11 @@ class CaseLoadUserForm(forms.ModelForm):
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
 
-		# Hide the is_active field if the model is being created
+		# Hide the user field if not admin
 		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-		if not self.instance or self.instance.pk is None:
+		if self.instance:
 			for name, field in self.fields.items():
-				if name in ['is_active', ]:
+				if name in ['user', ]:
 					field.widget = forms.HiddenInput()
 		
 
