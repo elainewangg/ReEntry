@@ -724,6 +724,7 @@ def case_load(request):
         users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
     elif request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
+        print("HOLA")
     else:  
         raise Http404
 
@@ -738,11 +739,15 @@ def case_load(request):
             context['modalStatus'] = 'show'
             return render(request, 'NewEra/case_load.html', context)
         form.save()
+        load_user.user = staff_user
         load_user.save()
         messages.success(request, 'Successfully added {} {} to the CaseLoad.'.format(load_user.first_name, load_user.last_name))
 
     context['caseload_users'] = users
-    context['form'] = CaseLoadUserForm()
+    if request.user.is_superuser:  
+        context['form'] = CaseLoadUserForm()
+    else:
+        context['form'] = CaseLoadUserForm(instance=request.user)
     return render(request, 'NewEra/case_load.html', context)
 
 @login_required
@@ -771,7 +776,10 @@ def edit_case_load_user(request, id):
             messages.success(request, '{} successfully edited.'.format(case_load_user.get_full_name()))
             return redirect('Show Case Load User', id=case_load_user.id)
     else:
-        form = CaseLoadUserForm(instance=case_load_user)
+        if request.user.is_superuser:  
+            form = CaseLoadUserForm()
+        else:
+            form = CaseLoadUserForm(instance=request.user)
     return render(request, 'NewEra/edit_case_load_user.html', {'form': form, 'case_load_user': case_load_user, 'action': 'Edit'})
 
 @login_required
