@@ -5,22 +5,24 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container ">
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">
+            Case Load User Actions
+        </h1>
+    </div>
+
+    <div class="container main-page-container">
         <div class="row">
             <div class="col">
-
-                <h3 style="margin: auto; margin-top: 50px; text-align: center;">
-                    Edit Case Load User
-                </h3>
-
                 <form method="POST" enctype="multipart/form-data" class="resource-form">
                     {% csrf_token %}
                     <table>
                         {{ form }}
                     </table>
-                    <button class="btn btn-primary" type="submit">Save Case Load User</button>
+                    <button class="orange-button" type="submit">Save Case Load User</button>
                 </form>
-                <br></br>
+                <br><br><br><br>
             </div>
         </div>
     </div>

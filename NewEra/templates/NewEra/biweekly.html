@@ -14,7 +14,7 @@
     <div class="container">
 
         <hr>
-        <a href="{% url 'Create Biweekly Response' %}" class="btn btn-primary"><i class="material-icons">add</i>Add Response</a><br>
+        <a href="{% url 'Create Biweekly Response' %}" class="orange-button"><i class="material-icons">add</i>Add Response</a><br>
         <br>
 
         <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
@@ -36,9 +36,9 @@
                         <tr>
                             <td>{{ r.user.get_full_name }}</td>
                             <td>{{ r.date }}</td>
-                            <td class="button-cell"><a href="{% url 'Show Biweekly Response' id=r.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
-                            <td class="button-cell"><a href="{% url 'Edit Biweekly Response' id=r.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
-                            <td class="button-cell"><a href="{% url 'Delete Biweekly Response' id=r.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            <td class="button-cell"><a href="{% url 'Show Biweekly Response' id=r.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>
+                            <td class="button-cell"><a href="{% url 'Edit Biweekly Response' id=r.id %}" class="btn btn-sm warning-button"><i class="material-icons">edit</i>Edit</a></td>
+                            <td class="button-cell"><a href="{% url 'Delete Biweekly Response' id=r.id %}" class="btn btn-sm danger-button"><i class="material-icons">delete</i>Delete</a></td>
                         </tr>
                     {% endfor %}
                 </table>

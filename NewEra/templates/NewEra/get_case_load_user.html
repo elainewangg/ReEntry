@@ -5,43 +5,49 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div style="width: 80%; margin: auto; padding-top: 10vh;">
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">Case Load User</h1>
+    </div>
+
+    <div class="container main-page-container">
         <div class="">
 
             <!-- Display the nickname of the case load user if they have one -->
             {% if case_load_user.nickname %}
-                <h1>{{ case_load_user.get_full_name }} ({{ case_load_user.nickname }})</h1>
+                <h4 style="font-style: italic;">Name: {{ case_load_user.get_full_name }} ({{ case_load_user.nickname }})</h4>
             {% else %}
-                <h1>{{ case_load_user.get_full_name }}</h1>
+                <h4 style="font-style: italic;">Name: {{ case_load_user.get_full_name }}</h4>
             {% endif %}
-
+            <br>
+            
             <!-- Mark the case load user as active or inactive -->
+            <h4>Status:</h4>
             {% if case_load_user.is_active %}
-                Status: <p class="text-success">Active</p>
+                <p class="text-success">Active</p><br>
             {% else %}
-                Status: <p class="text-danger">Inactive</p>
+                Status: <p class="text-danger">Inactive</p><br>
             {% endif %}
 
             {% if request.user.is_superuser %}
                 <h3>Assignee</h3>
-                <p>{{ case_load_user.user }}</p>
+                <p>{{ case_load_user.user }}</p><br>
             {% endif %}
 
-            <h3>Phone</h3>
-            <p><a href="tel:{{case_load_user.phone}}"><i class="material-icons">phone</i>{{ case_load_user.phone }}</a></p>
+            <h4>Phone:</h4>
+            <p><a href="tel:{{case_load_user.phone}}">{{ case_load_user.phone }}</a></p><br>
 
-            <h3>Email</h3>
-            <p><a href="mailto:{{case_load_user.email}}"><i class="material-icons">email</i>{{ case_load_user.email }}</a></p>
+            <h4>Email:</h4>
+            <p><a href="mailto:{{case_load_user.email}}">{{ case_load_user.email }}</a></p><br>
 
-            <h3>Neighborhood</h3>
-            <p>{{ case_load_user.neighborhood }}</p>
+            <h4>Neighborhood:</h4>
+            <p>{{ case_load_user.neighborhood }}</p><br>
 
-            <h3>Case Label</h3>
-            <p>{{ case_load_user.case_label }}</p>
+            <h4>Case Label:</h4>
+             <p>{{ case_load_user.case_label }}</p><br>
 
-
-            <h3>Notes</h3>
-            <a href="{% url 'Create Note' case_load_user.id %}" class="btn btn-primary"><i class="material-icons">add</i>Add Note</a><br>
+            <h4>Notes:</h4><br>
+            <a href="{% url 'Create Note' case_load_user.id %}" class="orange-button"><i class="material-icons">add</i>Add Note</a><br>
             <br>
             {% for n in notes %}
                 <div class="card card-body">
@@ -58,12 +64,10 @@
         </div>
 
         <br><hr><br>
-
-        <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
-
-        <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+        <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
+        <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
 
     </div>
-    <p>&nbsp;</p>
+    <br><br><br><br>
 
 {% endblock %}

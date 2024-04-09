@@ -5,7 +5,10 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div class="container" id="aligned" style="padding-top: 10vh;">
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text" style="font-size: 4vw;">Resource Details</h1>
+    </div>
+    <div class="container main-page-container">
         <!-- Display attributes depending on if they're provided -->
         <div class="side-by-side">
             {% if resource.phone or resource.email or resource.contact_name%}
@@ -35,21 +38,21 @@
                                 {% endif %}
 
                                 {% if resource.url %}
-                                    <p><a href="{{resource.url}}" class="read-link"><i class="material-icons">link</i>&nbsp;&nbsp;{{ resource.url }}</a></p>
+                                    <p><i class="material-icons">link</i><a href="{{resource.url}}" class="read-link">{{ resource.url }}</a></p>
                                 {% endif %}
                             {% endif %}
                         {% endwith %}
 
                         {% if resource.phone and resource.extension %}
-                            <p>Phone: <a href="tel:{{resource.phone}}p{{resource.extension}}" class="read-link"><i class="material-icons">phone</i>&nbsp;&nbsp;{{ resource.phone }}x{{resource.extension}}</a></p>
+                            <p><i class="material-icons">phone</i>&nbsp;&nbsp;Phone: <a href="tel:{{resource.phone}}p{{resource.extension}}" class="read-link">{{ resource.phone }}x{{resource.extension}}</a></p>
                         {% else %}
                             {% if resource.phone %}
-                                <p>Phone: <a href="tel:{{resource.phone}}" class="read-link"><i class="material-icons">phone</i>&nbsp;&nbsp;{{ resource.phone }}</a></p>
+                                <p><i class="material-icons">phone</i>Phone: <a href="tel:{{resource.phone}}" class="read-link">{{ resource.phone }}</a></p>
                             {% endif %}
                         {% endif %}
 
                         {% if resource.email %}
-                            <p>Email: <a href="mailto:{{resource.email}}" class="read-link"><i class="material-icons">email</i>&nbsp;&nbsp;{{ resource.email }}</a></p>
+                            <p><i class="material-icons">email</i>Email: <a href="mailto:{{resource.email}}" class="read-link">{{ resource.email }}</a></p>
                         {% endif %}
 
                         <!-- {% if resource.fax_number %}
@@ -123,7 +126,7 @@
                             {% endif %}
 
                             {% if resource.url %}
-                                <p>Website: <a href="{{resource.url}}" class="read-link"><i class="material-icons">link</i>&nbsp;&nbsp;{{ resource.url }}</a></p>
+                                <p><i class="material-icons">link</i>Website: <a href="{{resource.url}}" class="read-link">{{ resource.url }}</a></p>
                             {% endif %}
                         {% endif %}
                     {% endwith %}
@@ -132,9 +135,9 @@
                         {% if resource.resource_type in types.split %}
                             {% if resource.street %}
                                 {% if resource.street_secondary %}
-                                    <p>Address: <i class="material-icons">location_on</i>{{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                                    <p><i class="material-icons">location_on</i>Address: {{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
                                 {% else %}
-                                    <p>Address: <i class="material-icons">location_on</i>{{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                                    <p><i class="material-icons">location_on</i>Address: {{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
                                 {% endif %}
                             {% endif %}
 
@@ -154,25 +157,25 @@
             
         </div>
     </div>
-    <br><hr></br>
+    <br><br><br>
     <div class="admin-options">
         {% if perms.resource.edit_resource %}
         {% if resource.is_active %}
-            Status: <p class="text-success">Active</p>
+            <p>Status: <b>Active</b></p>
         {% else %}
-            Status: <p class="text-danger">Inactive</p>
+            <p>Status: <b>Inactive</b></p>
         {% endif %}
         {% endif %}
 
         {% if perms.resource.edit_resource %}
-            <a href="{% url 'Edit Resource' resource.id %}" class="btn btn-warning"><i class="material-icons">edit</i>Edit</a>
+            <a href="{% url 'Edit Resource' resource.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
         {% endif %}
 
         {% if perms.resource.delete_resource %}
-            <a href="{% url 'Delete Resource' resource.id %}" class="btn btn-danger"><i class="material-icons">delete</i>Delete</a>
+            <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
         {% endif %}
     </div>
-    <p>&nbsp;</p>
+    <br><br><br><br>
 
 {% endblock %}
 
