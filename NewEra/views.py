@@ -139,31 +139,39 @@ def sendEmail(load_user):
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
 
 def sendEmailConfirmation(load_case_user):
-    subject = 'You have signed up for RealisticReEntry'
-    html_message = render_to_string('NewEra/email_confirmation.html', 
-                    {'tempid': load_case_user.id})
-    plain_message = strip_tags(html_message)
-    from_email = settings.EMAIL_HOST_USER
-    to = load_case_user.email
+    try:
+        subject = 'You have signed up for RealisticReEntry'
+        html_message = render_to_string('NewEra/email_confirmation.html', 
+                        {'tempid': load_case_user.id})
+        plain_message = strip_tags(html_message)
+        from_email = settings.EMAIL_HOST_USER
+        to = load_case_user.email
 
-    mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
+        mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=False)
+        return True
+    except:
+        return False
 
 def sendSMSConfirmation(load_case_user):
-        to = load_case_user.phone
-        # Set the message intro string based on whether the referral is to someone on the case load or out of the system
-        messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
+        try:
+            to = load_case_user.phone
+            # Set the message intro string based on whether the referral is to someone on the case load or out of the system
+            messageIntro = 'Thank you for signing up for ReEntry Services at RealisticReEntry!'
 
-        # # Create the query string and the message body
-        # queryString = '?key=' + referralTimeStamp
-        # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
-        # link = 'http://newera412.com/resources/' + str(r.id) + queryString
-        # links = ['http://realisticreentry/']
-        queryString = '?confirmuser='+ str(load_case_user.id)
-        messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
+            # # Create the query string and the message body
+            # queryString = '?key=' + referralTimeStamp
+            # queryString = queryString.replace(' ', '%20')  # Make SMS links accessible
+            # link = 'http://newera412.com/resources/' + str(r.id) + queryString
+            # links = ['http://realisticreentry/']
+            queryString = '?confirmuser='+ str(load_case_user.id)
+            messageBody = 'Please click on this link to confirm your signup: http://127.0.0.1:8000' + queryString
 
 
-        client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-        client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, to=to, body=messageIntro + messageBody)
+            client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
+            client.messages.create(from_=settings.TWILIO_PHONE_NUMBER, to=to, body=messageIntro + messageBody)
+            return True
+        except:
+            return False
 
 # Function to convert temp user to caseload user when they confirm signup 
 def confirm_user(request):
@@ -218,13 +226,16 @@ def sign_up(request):
             return render(request, 'NewEra/sign_up.html', context)
         form.save()
         load_user.save()
-        
+        confirmationSent = False
         if load_user.email:
-            sendEmailConfirmation(load_user)
+            confirmationSent = sendEmailConfirmation(load_user)
         elif load_user.phone:
-            sendSMSConfirmation(load_user)
+            confirmationSent = sendSMSConfirmation(load_user)
+        if confirmationSent:
+            messages.success(request, 'A confirmation message has been sent to you!')
+        else:
+            messages.error(request, 'A confirmation message was not able to be sent. Please provide a different email/phone number!')
 
-        messages.success(request, 'A confirmation message has been sent to you!')
 
     context['form'] = TempCaseLoadUserForm()
     return redirect(reverse('Home'))
