@@ -70,9 +70,9 @@ class CaseLoadUserForm(forms.ModelForm):
 	class Meta:
 		model = CaseLoadUser
 		fields = ['first_name', 'last_name', 'nickname', 'email', 'phone', 'neighborhood', 'case_label', 'is_active', 'user', 'age', 'zip_code', 'education', 'is_vote_registered']
-		exclude = (
-			'user',
-		)
+		# exclude = (
+		# 	'user',
+		# )
 
 	def __init__(self, *args, **kwargs):
 		super(CaseLoadUserForm, self).__init__(*args, **kwargs)
@@ -82,10 +82,10 @@ class CaseLoadUserForm(forms.ModelForm):
 
 		# Hide the is_active field if the model is being created
 		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
-		if not self.instance or self.instance.pk is None:
-			for name, field in self.fields.items():
-				if name in ['is_active', ]:
-					field.widget = forms.HiddenInput()
+		# if not self.instance or self.instance.pk is None:
+		# 	for name, field in self.fields.items():
+		# 		if name in ['is_active', ]:
+		# 			field.widget = forms.HiddenInput()
 		
 
 	# Validate the phone number entered

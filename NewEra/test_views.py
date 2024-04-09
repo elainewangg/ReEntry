@@ -161,7 +161,7 @@ class SignUpTestCase(TestCase):
         actual_messages = [m.message for m in messages]
         self.assertEqual(response.status_code, 302)
         self.assertEqual(TempCaseLoadUser.objects.count(), 1)
-        self.assertIn('A confirmation email has been sent to you!', actual_messages)
+        self.assertIn('A confirmation message has been sent to you!', actual_messages)
     
     def test_student_creation_without_phone_or_email(self):
         form = CaseLoadUserForm(data=self.no_email_or_phone_sign_up_form_data)

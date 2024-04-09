@@ -133,7 +133,7 @@ def sendEmail(load_user):
 
     # Set recipient
     # to = settings.EMAIL_HOST_USER
-    to = "eywang@andrew.cmu.edu"
+    to = "aeli@andrew.cmu.edu"
 
     # Send the email
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
@@ -189,7 +189,7 @@ def confirm_user(request):
                                         neighborhood=tempUser.neighborhood,
                                         case_label=tempUser.case_label,
                                         is_active=tempUser.is_active,
-                                        user=tempUser.user,
+                                        user=None,
                                         age=tempUser.age,
                                         zip_code=tempUser.zip_code,
                                         education=tempUser.education,
@@ -224,7 +224,7 @@ def sign_up(request):
         elif load_user.phone:
             sendSMSConfirmation(load_user)
 
-        messages.success(request, 'A confirmation email has been sent to you!')
+        messages.success(request, 'A confirmation message has been sent to you!')
 
     context['form'] = TempCaseLoadUserForm()
     return redirect(reverse('Home'))
@@ -705,12 +705,13 @@ def case_load(request):
 
     # Set users to show differently based on the current user logged in
     if request.user.is_superuser: 
-        users = CaseLoadUser.objects.all()	
+        users = CaseLoadUser.objects.filter(user__isnull=False)
+        context['unassigned_caseload_users'] = CaseLoadUser.objects.filter(user=None)
         # Changed to account for inactive users
         context['staff'] = User.objects.filter(is_active=True).order_by('first_name', 'last_name')
     elif request.user.is_supervisor:
         users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
-    elif request.user.is_superuser or request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
+    elif request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
     else:  
         raise Http404
