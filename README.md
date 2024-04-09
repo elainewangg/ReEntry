@@ -53,7 +53,7 @@ If you are running on a fresh linux environment, you need to also install these 
 * Install all dependencies: `pip install -r requirements.txt`
 * install postgres on your machine with `brew install postgres`
 * with postgres installed, use this command `brew services start postgresql` to start postgresql database
-* in terminal, enter `psql`  to open postgresql console. you know ur in the console when u see `postgres=#` at the front
+* in terminal, enter `psql postgres`  to open postgresql console. you know ur in the console when u see `postgres=#` at the front
 * in the console, enter `CREATE USER taili WITH PASSWORD 'VeChain3d3$$';`  to create a new user taili
 * in the console, enter `create database newera;`  to create a new database.
 * in the console, enter `grant all privileges on database newera to taili;`  to give the privileges to user taili.

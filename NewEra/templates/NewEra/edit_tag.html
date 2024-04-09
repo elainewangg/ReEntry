@@ -1,22 +1,30 @@
 {% extends "NewEra/base.html" %}
 
+{% block page_specific_styles %}
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+{% endblock %}
+
 {% block title %}{% block navtitle %}
-	Edit Tag
+    Edit Tag
 {% endblock %}{% endblock %}
 
-{% block content %}
-	<h3 style="margin: auto; margin-top: 50px; text-align: center;">
-		{{ action }} Tag
-	</h3>
 
-    <div class="container">
+{% block content %}
+
+    <div class="parallax-subpage">
+        <h1 class="text-black parallax-text">{{ action }} Tag</h1>
+    </div>
+
+    <div class="container main-page-container">
         <form method="POST" enctype="multipart/form-data" class="resource-form">
             {% csrf_token %}
             <table>
             	{{ form }}
             </table>
             <br>
-            <button class="btn btn-primary" type="submit">Save Tag</button>
+            <button class="orange button" type="submit">Save</button>
         </form>
     </div>
+
 {% endblock %}

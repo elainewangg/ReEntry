@@ -116,7 +116,11 @@ def login(request):
         return render(request, 'NewEra/login.html', context)
     else:
         request.session['role'] = role
-    return redirect(reverse('Home'))
+
+    if user.is_superuser:
+        return redirect(reverse('Dashboard'))
+    else:
+        return redirect(reverse('Home'))
 
 # Sends an email to the staff_user
 def sendEmail(load_user):
