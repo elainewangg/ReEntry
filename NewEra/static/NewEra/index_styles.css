@@ -201,6 +201,15 @@ h1.parallax-text {
     transform: translateX(-1px), translateY(-1px);
 }
 
+.download-button {
+    background-color: #F0430D;
+    color: white;
+    border: 0px;
+    padding: 5px 8px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+
 /* SMALL BUTTONS FOR DETAILS, EDIT, AND DELETE */
 .details-button {
     background-color: #498cff;
