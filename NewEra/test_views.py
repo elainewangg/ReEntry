@@ -137,7 +137,7 @@ class SignUpTestCase(TestCase):
         self.sign_up_form_data = {
             'first_name': 'John',
             'last_name': 'Doe',
-            'phone': '7139722716',
+            'email': 'hi@gmail.com',
             'neighborhood': 'Prefer Not To Say',
             'case_label': 'Other'
         }
