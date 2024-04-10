@@ -99,6 +99,7 @@ urlpatterns = [
 
     # Resource data export action
     path('export_selected', views.export_selected_data, name='Export Selected Data'),  # Superusers only
+    path('export_caseload/<int:id>/', views.export_caseload_data, name='Export CaseLoadUser Data'),  # Superusers only
     path('export', views.export_data, name='Export Data'),  # Superusers only
     path('resetViews', views.resetViews, name='Reset Views'),   # Superusers only
 

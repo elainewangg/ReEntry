@@ -1578,6 +1578,57 @@ def export_selected_data(request):
         messages.error(request, 'An error occurred while trying to export data.')
         return render(redirect('Dashboard'))
 
+
+# Export data on each caseload user's meeting notes
+@login_required
+def export_caseload_data(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    caseload = get_object_or_404(CaseLoadUser, id=id)
+
+    if caseload:
+        wb = Workbook()
+        # Set the bold font
+        bold = Font(bold=True)
+
+        ws = wb.active  
+        ws.title = f"Caseload Notes - {caseload.first_name}"
+        # Create Header row
+        ws['A1'].font = bold
+        ws['B1'].font = bold
+        ws['C1'].font = bold
+        ws['D1'].font = bold
+
+        ws['A1'] = "Date"
+        ws['B1'] = "Hours Spent"
+        ws['C1'] = "Activity Type"
+        ws['D1'] = "Note"
+
+        all_notes = Note.objects.filter(case=caseload).distinct()
+
+        for n in all_notes: 
+            date = n.date.__str__()
+            hours = n.hours
+            activity = n.activity_type
+            note = n.notes
+            # Write to the Excel file
+            ws.append([date, hours, activity, note])
+
+        ws.column_dimensions[get_column_letter(1)].width = 50
+        ws.column_dimensions[get_column_letter(2)].width = 50
+        ws.column_dimensions[get_column_letter(3)].width = 50
+        ws.column_dimensions[get_column_letter(4)].width = 80
+        ws.auto_filter.ref = ws.dimensions
+
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = f"attachment; filename=RR_{caseload.first_name}_{caseload.last_name}_spreadsheet.xlsx"
+        wb.save(response)
+
+        return response
+    else:
+        return Http404
+
 # Export data on resources and referrals
 @login_required
 def export_data(request):
