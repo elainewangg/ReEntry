@@ -44,7 +44,13 @@
             <p>{{ case_load_user.neighborhood }}</p><br>
 
             <h4>Case Label:</h4>
-             <p>{{ case_load_user.case_label }}</p><br>
+            <p>{{ case_load_user.case_label }}</p><br>
+
+            <h4>Voter Registration Status:</h4>
+            <p>{{ case_load_user.is_vote_registered }}</p><br>
+            
+            <h4>Employment Status:</h4>
+            <p>{{ case_load_user.is_employed }}</p><br>
 
             <h4>Notes:</h4><br>
             <a href="{% url 'Create Note' case_load_user.id %}" class="orange-button"><i class="material-icons">add</i>Add Note</a><br>

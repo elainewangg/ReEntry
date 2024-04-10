@@ -283,3 +283,14 @@ a:hover {
 #role-switch-modal .modal-title, #role-switch-modal .modal-footer button {
     margin: 0 auto;
 }
+
+.select2-selection.select2-selection--multiple{
+    margin-bottom: 20px;
+    width: 300px;
+    margin-left: 5px;
+    border: 1px solid #ced4da;
+}
+
+.select2-container--default .select2-selection--multiple{
+    border: 1px solid #ced4da;
+}

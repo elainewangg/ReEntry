@@ -30,9 +30,8 @@ urlpatterns = [
     path('', views.home, name='Home'),  # All users
     path('login/', views.login, name='Login'),  # Visitors (anyone not logged in) only
     path('sign_up/', views.sign_up, name='Sign Up'),  # Visitors (anyone not logged in) only
-    path('logout/', views.logout, name='Logout'),   # Staff (SOWs) and superuser (admin) only
+    path('logout/', views.logout, name='Logout'),   # Staff and superuser (admin) only
     path('about_us/', views.about_us, name='About Us'),  # All users
-    path('switch_role/', views.switch_role, name='Switch Role'), # All users
 
     # Programs
     path('programs/', views.programs, name="Programs"),
@@ -77,12 +76,8 @@ urlpatterns = [
     # Referral actions
     path('referrals/', views.referrals, name='Referrals'),  # Staff and superusers only
     path('create_referral/', views.create_referral, name='Create Referral'),    # Staff and superusers only
-    # path('create_student_referral/', views.create_student_referral, name='Create Student Referral'),
     path('referrals/<int:id>/', views.get_referral, name='Show Referral'),  # Staff and superusers only
     path('referrals/<int:id>/edit/', views.edit_referral_notes, name='Edit Referral Notes'),    # Staff and superusers only
-    # path('referrals/student/<int:id>/', views.get_studentReferral, name='Show Student Referral'),  # Staff and superusers only
-    # path('referrals/student/<int:id>/edit/', views.edit_studentReferral_notes, name='Edit Student Referral Notes'),    # Staff and superusers only
-    # path('student_referrals/', views.student_referrals, name='Student Referrals'),
     
     # Case load actions
     path('case_load/', views.case_load, name='Case Load'),  # Staff and superusers only
@@ -102,19 +97,6 @@ urlpatterns = [
     path('meeting_tracker_form/edit/<int:id>', views.edit_meeting_tracker_response, name='Edit Meeting Tracker Response'),
     path('meeting_tracker_form/delete/<int:id>', views.delete_meeting_tracker_response, name='Delete Meeting Tracker Response'),
 
-    # path('risk_assessment_form/', views.risk_assessment, name='Risk Assessment'),
-    # path('risk_assessment_form/new', views.create_risk_assessment_response, name='Create Risk Assessment Response'),
-
-    # path('risk_assessment_form/<int:id>', views.get_risk_assessment_response, name='Show Risk Assessment Response'),
-    # path('risk_assessment_form/edit/<int:id>', views.edit_risk_assessment_response, name='Edit Risk Assessment Response'),
-    # path('risk_assessment_form/delete/<int:id>', views.delete_risk_assessment_response, name='Delete Risk Assessment Response'),
-
-    # path('biweekly_form/', views.biweekly, name='Biweekly'),
-    # path('biweekly_form/new', views.create_biweekly_response, name='Create Biweekly Response'),
-    # path('biweekly_form/<int:id>', views.get_biweekly_response, name='Show Biweekly Response'),
-    # path('biweekly_form/edit/<int:id>', views.edit_biweekly_response, name='Edit Biweekly Response'),
-    # path('biweekly_form/delete/<int:id>', views.delete_biweekly_response, name='Delete Biweekly Response'),
-    
     # Resource data export action
     path('export_selected', views.export_selected_data, name='Export Selected Data'),  # Superusers only
     path('export_caseload/<int:id>/', views.export_caseload_data, name='Export CaseLoadUser Data'),  # Superusers only
@@ -134,31 +116,6 @@ urlpatterns = [
     path('reset_password/complete/', auth_views.PasswordResetCompleteView.as_view(template_name='NewEra/password_reset_complete.html'), name='password_reset_complete'),    # Emailed user only
 
     path("select2/", include("django_select2.urls")),
-
-    # Weekly Student Update
-    # path('schools/student_weekly_update/', views.student_weekly_update, name='Weekly Student Update'),
-    # path('schools/student_weekly_update/<int:id>/upload/', views.student_weekly_update_upload, name='Upload Weekly Student Update Files'),
-    # path('schools/student_weekly_update/download', views.download_student_weekly_update, name='Download Weekly Student Update'),  
-    # path('schools/student_weekly_update/<int:id>', views.get_student_weekly_update, name='Show Weekly Student Update'),
-    # path('schools/student_weekly_update/<int:id>/edit/', views.edit_student_weekly_update, name='Edit Weekly Student Update'),
-    # path('schools/student_weekly_update/<int:id>/delete/', views.delete_student_weekly_update, name='Delete Weekly Student Update'),
-
-    # Student
-    # path('schools/student/', views.student, name='Student'),
-    # path('schools/student/download', views.download_student, name='Download Students'),
-    # path('schools/student/<int:id>', views.get_student, name='Show Student'),
-    # path('schools/student/<int:id>/edit/', views.edit_student, name='Edit Student'),
-    # path('schools/student/<int:id>/delete/', views.delete_student, name='Delete Student'),
-
-    # Quarterly Student Update
-    # path('schools/student_quarterly_update/', views.student_quarterly_update, name='Quarterly Student Update'),
-    # path('schools/student_quarterly_update/download', views.download_student_quarterly_update, name='Download Quarterly Student Update'),  
-    # path('schools/student_quarterly_update/<int:id>', views.get_student_quarterly_update, name='Show Quarterly Student Update'),
-    # path('schools/student_quarterly_update/<int:id>/edit/', views.edit_student_quarterly_update, name='Edit Quarterly Student Update'),
-    # path('schools/student_quarterly_update/<int:id>/delete/', views.delete_student_quarterly_update, name='Delete Quarterly Student Update'),
-
-    # Dashboard
-    # path('schools/dashboard/', views.student_dashboard, name='Student Dashboard'),
 ]
 
 if settings.DEBUG:
