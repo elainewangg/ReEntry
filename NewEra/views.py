@@ -1544,43 +1544,6 @@ def export_selected_data(request):
             # Set the bold font
             bold = Font(bold=True)
 
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-            # ws['C1'].font = bold
-            # ws['D1'].font = bold
-            # ws['E1'].font = bold
-            # ws['F1'].font = bold
-
-            # ws['A1'] = "Date"
-            # ws['B1'] = "User"
-            # ws['C1'] = "Neighborhood"
-            # # ws['D1'] = "Risk Level"
-            # ws['D1'] = "Actions"
-            # ws['E1'] = "Notes"
-
-            # for r in risk_assessments:
-            #     date = r.date.__str__()
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     risk_level = r.risk_level
-            #     actions = r.actions
-            #     notes = r.notes
-            #     ws.append([date,user, neighborhood, risk_level, actions, notes])
-
-            
-
-            # ws = wb.worksheets[0]
-            # ws.auto_filter.ref = ws.dimensions
-            
-            # ws.title = "Risk Level Assessments"
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-            # ws.column_dimensions[get_column_letter(3)].width = 50
-            # ws.column_dimensions[get_column_letter(4)].width = 50
-            # ws.column_dimensions[get_column_letter(5)].width = 50
-            # ws.column_dimensions[get_column_letter(6)].width = 50
-
             ws1 = wb.create_sheet("Meeting Tracker Forms")
             ws = ws1
 
@@ -1620,76 +1583,6 @@ def export_selected_data(request):
             ws.column_dimensions[get_column_letter(7)].width = 50
 
             ws.auto_filter.ref = ws.dimensions
-
-            # ws2 = wb.create_sheet("Average Risk Level")
-            # ws = ws2
-
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-
-            # ws['A1'] = "Neighborhood"
-            # ws['B1'] = "Average Risk Level"
-
-            # risk_dict = dict()
-            # for r in risk_assessments:
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     risk_level = int(r.risk_level)
-            #     if neighborhood not in risk_dict:
-            #         risk_dict[neighborhood] = []
-            #     else:
-            #         risk_dict[neighborhood].append(risk_level)
-
-            # new_list = []
-
-            # for key in risk_dict:
-            #     lst = risk_dict[key]
-            #     if len(lst) > 0:
-            #         new_list.append( (key, round( (sum(lst) / len(lst) ), 2) ) )
-            #     else:
-            #         new_list.append((key, 0))
-
-            # new_list.sort(key = lambda x: x[1], reverse = True)
-            
-            # for (k,v) in new_list:
-            #     ws.append([k,v])
-
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-
-            # ws2 = wb.create_sheet("Actions Count")
-            # ws = ws2
-
-            # # Create Header row
-            # ws['A1'].font = bold
-            # ws['B1'].font = bold
-
-            # ws['A1'] = "Action"
-            # ws['B1'] = "Count"
-
-            # risk_dict = dict()
-            # for r in risk_assessments:
-            #     user = r.user.__str__()
-            #     neighborhood = r.neighborhood
-            #     actions = r.actions
-            #     if actions not in risk_dict:
-            #         risk_dict[actions] = 0
-            #     else:
-            #         risk_dict[actions]+=1
-            
-            # new_list = []
-            # for key in risk_dict:
-            #     new_list.append( (key, risk_dict[key]) )
-            
-            # new_list.sort(key = lambda x: x[1], reverse = True)
-            
-            # for (k,v) in new_list:
-            #     ws.append([k,v])
-
-            # ws.column_dimensions[get_column_letter(1)].width = 50
-            # ws.column_dimensions[get_column_letter(2)].width = 50
-            
 
             ws3 = wb.create_sheet("Meeting With Who Count")
             ws = ws3
@@ -1759,6 +1652,57 @@ def export_selected_data(request):
         else:
             return Http404
 
+
+# Export data on each caseload user's meeting notes
+@login_required
+def export_caseload_data(request, id):
+    if not request.user.is_superuser:
+        raise Http404
+
+    caseload = get_object_or_404(CaseLoadUser, id=id)
+
+    if caseload:
+        wb = Workbook()
+        # Set the bold font
+        bold = Font(bold=True)
+
+        ws = wb.active  
+        ws.title = f"Caseload Notes - {caseload.first_name}"
+        # Create Header row
+        ws['A1'].font = bold
+        ws['B1'].font = bold
+        ws['C1'].font = bold
+        ws['D1'].font = bold
+
+        ws['A1'] = "Date"
+        ws['B1'] = "Hours Spent"
+        ws['C1'] = "Activity Type"
+        ws['D1'] = "Note"
+
+        all_notes = Note.objects.filter(case=caseload).distinct()
+
+        for n in all_notes: 
+            date = n.date.__str__()
+            hours = n.hours
+            activity = n.activity_type
+            note = n.notes
+            # Write to the Excel file
+            ws.append([date, hours, activity, note])
+
+        ws.column_dimensions[get_column_letter(1)].width = 50
+        ws.column_dimensions[get_column_letter(2)].width = 50
+        ws.column_dimensions[get_column_letter(3)].width = 50
+        ws.column_dimensions[get_column_letter(4)].width = 80
+        ws.auto_filter.ref = ws.dimensions
+
+        response = HttpResponse(content_type='application/vnd.ms-excel')
+        response['Content-Disposition'] = f"attachment; filename=RR_{caseload.first_name}_{caseload.last_name}_spreadsheet.xlsx"
+        wb.save(response)
+
+        return response
+    else:
+        return Http404
+
 # Export data on resources and referrals
 @login_required
 def export_data(request):
@@ -1779,7 +1723,6 @@ def export_data(request):
             # Define the workbook and sheet
             wb = Workbook()
             ws = wb.active
-
             # Set the bold font
             bold = Font(bold=True)
 
