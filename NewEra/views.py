@@ -330,8 +330,18 @@ def resources(request):
 
             # Set context value based on if the filter is set on the resources page
             if query:
-                context['active_resources'] = context['filter'].qs.filter( Q(is_active=True) & (Q(name__icontains=query) | Q(description__icontains=query)) )
-                context['inactive_resources'] = context['filter'].qs.filter( Q(is_active=False) & (Q(name__icontains=query) | Q(description__icontains=query)) )
+                context['active_resources'] = context['filter'].qs.filter(
+                    Q(is_active=True) & 
+                    (Q(name__icontains=query) | 
+                    Q(description__icontains=query) | 
+                    Q(tags__name__icontains=query)) 
+                )
+                context['inactive_resources'] = context['filter'].qs.filter(
+                    Q(is_active=False) & 
+                    (Q(name__icontains=query) | 
+                    Q(description__icontains=query) | 
+                    Q(tags__name__icontains=query)) 
+                )
             else: 
                 context['active_resources'] = context['filter'].qs.filter(is_active=True)
                 context['inactive_resources'] = context['filter'].qs.filter(is_active=False)
