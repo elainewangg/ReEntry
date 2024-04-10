@@ -31,7 +31,7 @@ Dashboard
         <br>
         <div class="card card-body">
             <form method="POST" action="{% url 'Dashboard' %}">
-                <table>
+                <table class="styled-table">
                     {{form}}
                 </table>
 
@@ -86,7 +86,7 @@ Dashboard
         <h2>Supervisors:</h2>
         {% if supervisors.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -131,7 +131,7 @@ Dashboard
         <h2>Reentry Coordinators:</h2>
         {% if reentry_coordinators.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -176,7 +176,7 @@ Dashboard
         <h2>Community Outreach Workers:</h2>
         {% if community_outreach_workers.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -221,7 +221,7 @@ Dashboard
         <h2>Service Providers:</h2>
         {% if service_providers.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -266,7 +266,7 @@ Dashboard
         <h2>Resource Coordinators:</h2>
         {% if resource_coordinators.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Username</th>
                     <th>First Name</th>
@@ -326,7 +326,7 @@ Dashboard
         <h2>Organizations:</h2>
         {% if orgs.count > 0 %}
         <div style="overflow-x: auto;">
-            <table>
+            <table class="styled-table">
                 <tr>
                     <th>Organization Name</th>
                     <th>Active?</th>
