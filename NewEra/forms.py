@@ -188,10 +188,7 @@ class EditUserForm(forms.ModelForm):
 	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
 	is_active = forms.BooleanField(required=False)
-	user_type = forms.MultipleChoiceField(choices=USER_TYPE_CHOICES,
-									   label='User Type',
-									   widget=forms.CheckboxSelectMultiple(attrs=MULTIPLE_CHOICE_ATTRIBUTES),
-									   )
+	user_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES), label='User Type')
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = User
@@ -230,7 +227,7 @@ class EditSelfUserForm(forms.ModelForm):
 	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	last_name  = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	organization = forms.ModelChoiceField(queryset=Organization.objects.all())
+	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
 
 	# Define the model and fields to include/exclude
 	class Meta:
@@ -499,11 +496,8 @@ class RegistrationForm(forms.Form):
 	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	organization = forms.ModelChoiceField(queryset=Organization.objects.all())
-	user_type = forms.MultipleChoiceField(choices=USER_TYPE_CHOICES,
-									   label='User Type',
-									   widget=forms.CheckboxSelectMultiple(attrs={'class': 'list-unstyled'})
-									)
+	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
+	user_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES), label='User Type')
 
 	# Define the model and fields to include/exclude
 	class Meta:
