@@ -724,7 +724,6 @@ def case_load(request):
         users = CaseLoadUser.objects.filter(user__in=User.objects.filter(organization=request.user.organization)).order_by('first_name', 'last_name')
     elif request.user.is_reentry_coordinator or request.user.is_community_outreach_worker or request.user.is_service_provider or request.user.is_resource_coordinator:
         users = CaseLoadUser.objects.filter(user=request.user).order_by('first_name', 'last_name')
-        print("HOLA")
     else:  
         raise Http404
 
