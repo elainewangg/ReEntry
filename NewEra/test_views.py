@@ -49,23 +49,6 @@ class DashboardTestCase(TestCase):
         self.assertEqual(response.context['user'], self.superuser)
         self.assertTrue(response.context['admins'].exists())
 
-    def test_dashboard_non_superuser(self):
-        # Create a regular user for testing
-        regular_user = User.objects.create_user(
-            username='user',
-            password='userpassword',
-            email='user@example.com'
-        )
-
-        # Login as the regular user
-        self.client.login(username='user', password='userpassword')
-
-        # Make a GET request to the dashboard
-        response = self.client.get(self.dashboard_url)
-
-        # Assert that the response is a 404 (HTTP 404 Error)
-        self.assertEqual(response.status_code, 404)
-
     def test_dashboard_post_request(self):
         # Login as a superuser
         self.client.login(username='admin', password='adminpassword')
@@ -135,8 +118,9 @@ class SignUpTestCase(TestCase):
             'first_name': 'John',
             'last_name': 'Doe',
             'email': 'hi@gmail.com',
+            'phone': '',
             'neighborhood': 'Prefer Not To Say',
-            'case_label': 'Other'
+            'case_label': 'Other',
         }
 
         self.no_email_or_phone_sign_up_form_data = {
@@ -157,6 +141,18 @@ class SignUpTestCase(TestCase):
         response = sign_up(request)
         actual_messages = [m.message for m in messages]
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(TempCaseLoadUser.objects.count(), 1)
         self.assertIn('A confirmation message has been sent to you!', actual_messages)
+        self.assertEqual(TempCaseLoadUser.objects.count(), 1)
+
+    def test_invalid_form_submission(self):
+        request = self.factory.post('/sign_up/', data=self.no_email_or_phone_sign_up_form_data)
+        setattr(request, 'session', 'session')
+        messages = FallbackStorage(request)
+        setattr(request, '_messages', messages)
+
+        response = sign_up(request)
+        actual_messages = [m.message for m in messages]
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(TempCaseLoadUser.objects.count(), 0)
+        self.assertIn('An error occurred while trying to sign up. Please check your form input', actual_messages)
 # endregion

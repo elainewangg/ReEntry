@@ -221,6 +221,7 @@ def sign_up(request):
             form = TempCaseLoadUserForm(request.POST, instance=load_user)
             if not form.is_valid():
                 context['form'] = form 
+                messages.error(request, 'An error occurred while trying to sign up. Please check your form input')
                 return render(request, 'NewEra/sign_up.html', context)
             form.save()
             load_user.save()
