@@ -107,6 +107,8 @@ def login(request):
 
         if user.is_superuser:
             return redirect(reverse('Dashboard'))
+        elif user.is_supervisor:
+            return redirect(reverse('Supervisor Dashboard'))
         else:
             return redirect(reverse('Resources'))
     except:
