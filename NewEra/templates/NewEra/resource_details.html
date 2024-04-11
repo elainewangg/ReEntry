@@ -1,0 +1,82 @@
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+
+
+    <!-- FOR ALL RESOURCES -->
+    <h1>{{ resource.name }}</h1>
+    {% if tags.count > 0 %}
+            {% for tag in tags %}
+                <p class="resource-tag">{{ tag.name }}</p>
+            {% endfor %}
+        {% endif %}
+        <br><br>
+        {% if resource.description %}
+            <p>{{ resource.description }}</p>
+        {% endif %}
+        <br>
+
+    <!-- VIDEO -->
+    {% with types='video' %}
+        {% if resource.resource_type in types.split %}
+            {% if resource.url %}
+                <div class="card-header embed-responsive embed-responsive-16by9">
+                    <iframe width="800" height="auto" src="https://www.youtube.com/embed/{{ youtube_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- ATTACHMENTS -->
+    {% with types='attachment' %}
+        {% if resource.resource_type in types.split %}
+            {% if resource.attachment %}
+                <div class="card-header embed-responsive embed-responsive-4by3">
+                    <iframe class="embed-responsive-item" height="800" src="{% url 'Attachment' resource.id %}" title="Attachment File" frameborder="0" allowfullscreen></iframe>
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- embedded content type taken out, duplicate of Youtube and file upload options -->
+    <!-- {% with types='embed' %}
+        {% if resource.resource_type in types.split %}
+            {% if resource.embedded_content %}
+                <div class="card-header">
+                
+                    {% autoescape off %}
+                        {{ resource.embedded_content }}
+                    {% endautoescape %}
+
+                    {% comment %} <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeVZc_P1Sczi1r6EiCYxc944dTwGkhW8H7MvzIUm-BngZY5ig/viewform?embedded=true" width="640" height="1445" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe> {% endcomment %}
+                
+                </div>
+            {% endif %}
+        {% endif %}
+    {% endwith %} -->
+        
+    <!-- ORAGANIZATIONS -->
+    {% with types='organization' %}
+        <br><hr>
+        {% if resource.url %}
+            <p><b>Website: </b><a href="{{resource.url}}" target="_blank" class="embedded-link">link</a></p>
+        {% endif %}
+        <!-- {% if resource.resource_type in types.split %} -->
+        {% if resource.street %}
+            {% if resource.street_secondary %}
+                <p><b>Address: </b>{{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+        
+            {% else %}
+                <p><b>Address: </b>{{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+            {% endif %}
+        {% endif %}
+
+        {% if resource.hours  %}
+            <p><b>Hours of Operation: </b>{{ resource.hours }}</p>
+        {% endif %}
+        <!-- {% endif %} -->
+    {% endwith %}
+
+    {% if resource.event_datetime %}
+        <p><b>Date &amp; Time: </b>{{ resource.event_datetime }}</p>
+    {% endif %}    
+    

@@ -11,170 +11,157 @@
 
     <div class="container main-page-container">
         <!-- Display attributes depending on if they're provided -->
-        <div class="side-by-side">
-            {% if resource.phone or resource.email or resource.contact_name%}
-            <!-- Display street address and hours of operation on a card to the side -->
-            <div class="col-lg-4">
-                {% if resource.image %}
-                    <div class="text-center">
-                        <img class="resource-img" src="{% url 'Image' resource.id %}"></img>
-                    </div>
-                    <br><br>
-                {% endif %}
+        <div class="container mt-5">
+            <div class="row align-items-start">
+                <!-- LEFT SIDE: IMAGE OR CONTACT INFO -->
+                <div class="col-md-3">
+                    {% if resource.image %}
+                        <div class="text-center">
+                            <img class="resource-img" src="{% url 'Image' resource.id %}"></img>
+                        </div>
+                        <br><br><br>
+                    {% endif %}
+                    
+                        
+                    {% if resource.phone or resource.email or resource.contact_name%}
+                        <h4>Contact Information</h4>
+                        <div class="contact-info">
+                            <div class="card-body">
+                                {% if resource.phone and resource.extension %}
+                                    <p><b>Phone: </b><a href="tel:{{resource.phone}}p{{resource.extension}}" target="_blank" class="embedded-link">{{ resource.phone }}x{{resource.extension}}</a></p>
+                                {% else %}
+                                    {% if resource.phone %}
+                                        <p><b>Phone: </b><a href="tel:{{resource.phone}}" target="_readblank"  class="embedded-link">{{ resource.phone }}</a></p>
+                                    {% endif %}
+                                {% endif %}
+
+                                {% if resource.email %}
+                                    <p><b>Email: </b><a href="mailto:{{resource.email}}" target="_blank" class="embedded-link">{{ resource.email }}</a></p>
+                                {% endif %}
+
+                                {% if resource.fax_number %}
+                                    <p><b>Fax: </b><a href="tel:{{resource.fax_number}}" target="_blank" class="embedded-link">{{ resource.fax_number }}</a></p>
+                                {% endif %}
+
+                                {% if resource.contact_name %}
+                                    {% if resource.contact_position %}
+                                        <p><b>Point of Contact: </b>{{ resource.contact_name }}, {{ resource.contact_position }}</p>
+                                    {% else %}
+                                        <p><b>Point of Contact: </b>{{ resource.contact_name }}</p>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div> 
                 
-                <h4>Contact Information</h4>
-                <div class="contact-info">
-                    <div class="card-body">
-                        {% with types='video attachment embed' %}
-                            {% if resource.resource_type in types.split %}
-                                <h1>{{ resource.name }}</h1>
-                                {% if tags.count > 0 %}
-                                    {% for tag in tags %}
-                                        <p>{{ tag.name }}</p>
-                                    {% endfor %}
-                                {% endif %}
-
-                                {% if resource.description %}
-                                    <p>{{ resource.description }}</p>
-                                {% endif %}
-
-                                {% if resource.url %}
-                                    <p><i class="material-icons">link</i><a href="{{resource.url}}" target="_blank"  class="embedded-link">{{ resource.url }}</a></p>
-                                {% endif %}
-                            {% endif %}
-                        {% endwith %}
-
-                        {% if resource.phone and resource.extension %}
-                            <p><i class="material-icons">phone</i>&nbsp;&nbsp;Phone: <a href="tel:{{resource.phone}}p{{resource.extension}}" target="_blank" class="embedded-link">{{ resource.phone }}x{{resource.extension}}</a></p>
-                        {% else %}
-                            {% if resource.phone %}
-                                <p><i class="material-icons">phone</i>Phone: <a href="tel:{{resource.phone}}" target="_readblank"  class="embedded-link">{{ resource.phone }}</a></p>
-                            {% endif %}
-                        {% endif %}
-
-                        {% if resource.email %}
-                            <p><i class="material-icons">email</i>Email: <a href="mailto:{{resource.email}}" target="_blank" class="embedded-link">{{ resource.email }}</a></p>
-                        {% endif %}
-
-                        <!-- {% if resource.fax_number %}
-                            <p>Fax: <a href="tel:{{resource.phone}}" target="_blank" class="read-link"><i class="material-icons">print</i>&nbsp;&nbsp;{{ resource.fax_number }}</a></p>
-                        {% else %}
-                            <p>&nbsp;</p>
-                        {% endif %} -->
-
-                        {% if resource.contact_name %}
-                            {% if resource.contact_position %}
-                                <p>Point of Contact: {{ resource.contact_name }}, {{ resource.contact_position }}</p>
-                            {% else %}
-                                <p>Point of Contact: {{ resource.contact_name }}</p>
-                            {% endif %}
-                        {% endif %}
-
-                       
-                    </div>
+                <div class="col-md-1">
+                    <p></p>
                 </div>
-            {% endif %}
-            </div>
-            <!-- Main card -->
-            <div>
-                {% with types='video' %}
-                    {% if resource.resource_type in types.split %}
-                        {% if resource.url %}
-                            <div class="card-header embed-responsive embed-responsive-16by9">
-                                <iframe width="560" height="315" src="https://www.youtube.com/embed/{{ youtube_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                            </div>
-                        {% endif %}
-                    {% endif %}
-                {% endwith %}
 
-                {% with types='attachment' %}
-                    {% if resource.resource_type in types.split %}
-                        {% if resource.attachment %}
-                            <div class="card-header embed-responsive embed-responsive-4by3">
-                                <iframe class="embed-responsive-item" height="800" src="{% url 'Attachment' resource.id %}" title="Attachment File" frameborder="0" allowfullscreen></iframe>
-                            </div>
+                <!-- right section -->
+                <div class="col-md-8">
+                    <!-- FOR ALL RESOURCES -->
+                    <h1>{{ resource.name }}</h1>
+                    {% if tags.count > 0 %}
+                            {% for tag in tags %}
+                                <p class="resource-tag">{{ tag.name }}</p>
+                            {% endfor %}
                         {% endif %}
-                    {% endif %}
-                {% endwith %}
-
-                {% with types='embed' %}
-                    {% if resource.resource_type in types.split %}
-                        {% if resource.embedded_content %}
-                            <div class="card-header">
-                            
-                                {% autoescape off %}
-                                    {{ resource.embedded_content }}
-                                {% endautoescape %}
-
-                                {% comment %} <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeVZc_P1Sczi1r6EiCYxc944dTwGkhW8H7MvzIUm-BngZY5ig/viewform?embedded=true" width="640" height="1445" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe> {% endcomment %}
-                            
-                            </div>
+                        <br><br>
+                        {% if resource.description %}
+                            <p>{{ resource.description }}</p>
                         {% endif %}
-                    {% endif %}
-                {% endwith %}
-                
-                <div class="card-body">
-                    {% with types='organization link' %}
+                        <br>
+
+                    <!-- VIDEO -->
+                    {% with types='video' %}
                         {% if resource.resource_type in types.split %}
-                            <h1>{{ resource.name }}</h1>
-                            {% if tags.count > 0 %}
-                                {% for tag in tags %}
-                                    <p class="resource-tag">{{ tag.name }}</p>
-                                {% endfor %}
-                            {% endif %}
-                            {% if resource.description %}
-                                <p style="font-size: 14px;">{{ resource.description }}</p>
-                            {% endif %}
-
                             {% if resource.url %}
-                                <p><i class="material-icons">link</i>Website: <a href="{{resource.url}}" target="_blank" class="read-link">{{ resource.url }}</a></p>
+                                <div class="card-header embed-responsive embed-responsive-16by9">
+                                    <iframe width="800" height="auto" src="https://www.youtube.com/embed/{{ youtube_id }}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                                </div>
                             {% endif %}
                         {% endif %}
                     {% endwith %}
 
-                    {% with types='organization' %}
+                    <!-- ATTACHMENTS -->
+                    {% with types='attachment' %}
                         {% if resource.resource_type in types.split %}
-                            {% if resource.street %}
-                                {% if resource.street_secondary %}
-                                    <p><i class="material-icons">location_on</i>Address: {{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
-                                {% else %}
-                                    <p><i class="material-icons">location_on</i>Address: {{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
-                                {% endif %}
-                            {% endif %}
-
-                            {% if resource.hours  %}
-                                <p>Hours of Operation: {{ resource.hours }}</p>
+                            {% if resource.attachment %}
+                                <div class="card-header embed-responsive embed-responsive-4by3">
+                                    <iframe class="embed-responsive-item" height="800" src="{% url 'Attachment' resource.id %}" title="Attachment File" frameborder="0" allowfullscreen></iframe>
+                                </div>
                             {% endif %}
                         {% endif %}
+                    {% endwith %}
+
+                    <!-- embedded content type taken out, duplicate of Youtube and file upload options -->
+                    <!-- {% with types='embed' %}
+                        {% if resource.resource_type in types.split %}
+                            {% if resource.embedded_content %}
+                                <div class="card-header">
+                                
+                                    {% autoescape off %}
+                                        {{ resource.embedded_content }}
+                                    {% endautoescape %}
+
+                                    {% comment %} <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeVZc_P1Sczi1r6EiCYxc944dTwGkhW8H7MvzIUm-BngZY5ig/viewform?embedded=true" width="640" height="1445" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe> {% endcomment %}
+                                
+                                </div>
+                            {% endif %}
+                        {% endif %}
+                    {% endwith %} -->
+                        
+                    <!-- ORAGANIZATIONS -->
+                    {% with types='organization' %}
+                        <br><hr>
+                        {% if resource.url %}
+                            <p><b>Website: </b><a href="{{resource.url}}" target="_blank" class="embedded-link">link</a></p>
+                        {% endif %}
+                        <!-- {% if resource.resource_type in types.split %} -->
+                        {% if resource.street %}
+                            {% if resource.street_secondary %}
+                                <p><b>Address: </b>{{ resource.street }} {{ resource.street_secondary }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                        
+                            {% else %}
+                                <p><b>Address: </b>{{ resource.street }}, {{ resource.city }}, {{ resource.state }} {{ resource.zip_code }}</p>
+                            {% endif %}
+                        {% endif %}
+
+                        {% if resource.hours  %}
+                            <p><b>Hours of Operation: </b>{{ resource.hours }}</p>
+                        {% endif %}
+                        <!-- {% endif %} -->
                     {% endwith %}
 
                     {% if resource.event_datetime %}
-                        <p>Date &amp; Time: {{ resource.event_datetime }}</p>
-                    {% endif %}
-
-                    
+                        <p><b>Date &amp; Time: </b>{{ resource.event_datetime }}</p>
+                    {% endif %}    
                 </div>
-            </div>
-            
+            </div>      
         </div>
-    </div>
-    <br><br><br>
-    <div class="admin-options">
-        {% if perms.resource.edit_resource %}
-        {% if resource.is_active %}
-            <p>Status: <b>Active</b></p>
-        {% else %}
-            <p>Status: <b>Inactive</b></p>
-        {% endif %}
-        {% endif %}
 
-        {% if perms.resource.edit_resource %}
-            <a href="{% url 'Edit Resource' resource.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
-        {% endif %}
+        <!-- ADMIN ACTIONS -->
+        <div>
+            <br><br><br>
+            {% if perms.resource.edit_resource %}
+            {% if resource.is_active %}
+                <p>Status: <b>Active</b></p>
+            {% else %}
+                <p>Status: <b>Inactive</b></p>
+            {% endif %}
+            {% endif %}
 
-        {% if perms.resource.delete_resource %}
-            <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
-        {% endif %}
+            {% if perms.resource.edit_resource %}
+                <a href="{% url 'Edit Resource' resource.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
+            {% endif %}
+
+            {% if perms.resource.delete_resource %}
+                <a href="{% url 'Delete Resource' resource.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
+            {% endif %}
+        </div>
+
     </div>
     <br><br><br><br>
 

@@ -21,7 +21,7 @@
             <br>
             <div class="card card-body">
                 <form method="POST" action="{% url 'Case Load' %}">
-                    <table>
+                    <table class="styled-table">
                         {{form}}
                     </table>
                     
@@ -59,7 +59,7 @@
             <!-- List the case load users in a table format -->
             {% if unassigned_caseload_users.count > 0 %}
                 <div style="overflow-x: auto;">
-                    <table>
+                    <table class="styled-table">
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
@@ -107,7 +107,7 @@
         <!-- List the case load users in a table format -->
         {% if caseload_users.count > 0 %}
             <div style="overflow-x: auto;">
-                <table>
+                <table class="styled-table">
                     <tr>
                         <th>Name</th>
                         <th>Email</th>

@@ -20,6 +20,9 @@ EVENT_ATTRIBUTES = {'class' : 'form-control common', 'placeholder': 'Event or De
 ATTACHMENT_ATTRIBUTES = {'class' : 'form-control attachment'}
 EMBEDDED_ATTRIBUTES = {'class' : 'form-control embed', 'placeholder': 'Paste <iframe>...</iframe> code here'}
 HIDDEN_ATTRIBUTES = {'class' : 'form-control hidden'}
+DATE_INPUT_ATTRIBUTES = {'class': 'form-control datepicker', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'}
+TIME_INPUT_ATTRIBUTES = {'class': 'form-control timepicker', 'style': 'width: 300px; height: 40px; margin-bottom: 20px;'}
+NOTES_INPUT_ATTRIBUTES = {'class' : 'form-control organization', 'style': 'width: 300px; height: 120px; margin-bottom: 20px;'	}
 
 TEXTAREA_ATTRIBUTES = { 'class': 'form-control', 'style': 'height: 200px; overflow-y: scroll;', 'cols': 40, 'rows': 40}
 MULTIPLE_CHOICE_ATTRIBUTES = {'class': 'form-control list-unstyled','style': 'padding: 50px; margin-top: 20px; margin-bottom: 20px;'}
@@ -53,8 +56,8 @@ class CaseLoadUserForm(forms.ModelForm):
 	phone = forms.CharField(label=('*Phone'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(),label='*Resource Interests')
+	neighborhood = forms.CharField(label=('*Neighborhood'), widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))	
+	case_label = forms.MultipleChoiceField(label='*Looking For', choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget())
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
@@ -114,8 +117,9 @@ class TempCaseLoadUserForm(forms.ModelForm):
 	phone = forms.CharField(label=('*Phone'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
-	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(),label='*Resource Interests')
+	neighborhood = forms.CharField(label=('*Neighborhood'), widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))	
+	
+	case_label = forms.MultipleChoiceField(label='*Looking For', choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget())
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	education = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=educations.EDUCATION_LIST), required=False)
@@ -166,7 +170,7 @@ class TempCaseLoadUserForm(forms.ModelForm):
 
 # Form to create new notes
 class CreateNoteForm(forms.ModelForm):
-    notes = forms.CharField(label=('*Notes'), max_length=1000, required=True, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
+    notes = forms.CharField(label=('*Notes'), max_length=1000, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
     date = forms.DateField(label=('*Date'), widget=DatePickerInput())
     class Meta:
         model = Note
@@ -174,7 +178,7 @@ class CreateNoteForm(forms.ModelForm):
 
 # Form to edit organizations
 class EditOrganizationForm(forms.ModelForm):
-	name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	name = forms.CharField(label=('*Name'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
 	is_active = forms.BooleanField(required=False)
 
 	class Meta:
@@ -184,13 +188,13 @@ class EditOrganizationForm(forms.ModelForm):
 # Form to edit users 
 class EditUserForm(forms.ModelForm):
 	# Set up attributes
-	email = forms.EmailField(max_length=254, widget=forms.EmailInput(attrs=INPUT_ATTRIBUTES))
-	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
+	email = forms.EmailField(label='*Email', max_length=254, widget=forms.EmailInput(attrs=INPUT_ATTRIBUTES))
+	first_name = forms.CharField(label='*First Name', max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label='*Last Name', max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label='*Phone', max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	organization = forms.ModelChoiceField(label='*Organization', queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
 	is_active = forms.BooleanField(required=False)
-	user_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES), label='User Type')
+	user_type = forms.CharField(label='*User Type', widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES))
 	# Define the model and fields to include/exclude
 	class Meta:
 		model = User
@@ -261,12 +265,12 @@ class EditSelfUserForm(forms.ModelForm):
 class CreateResourceForm(forms.ModelForm):
 	# Set up attributes
 	# Indicate the type of this resource to change the display mode
-	resource_type = forms.CharField(widget=forms.Select(choices=Resource.RESOURCE_TYPES_LIST, attrs=COMMON_ATTRIBUTES))
+	resource_type = forms.CharField(label=('*Resource Type'),widget=forms.Select(choices=Resource.RESOURCE_TYPES_LIST, attrs=COMMON_ATTRIBUTES))
 	is_active = forms.BooleanField(required=False, label="Active Resource")
 
 	# Common Fields
-	name = forms.CharField(max_length=100, required=True, widget=forms.TextInput(attrs=COMMON_ATTRIBUTES))
-	description = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=COMMON_ATTRIBUTES))
+	name = forms.CharField(label=('*Name'),max_length=100, widget=forms.TextInput(attrs=COMMON_ATTRIBUTES))
+	description = forms.CharField(label=('*Description'),max_length=1000, widget=forms.Textarea(attrs=COMMON_ATTRIBUTES))
 	image = forms.FileField(label=('Thumbnail'),required=False, widget=forms.ClearableFileInput(attrs=COMMON_ATTRIBUTES))
 	url = forms.URLField(label=('URL Link'), required=False, widget=forms.TextInput(attrs=COMMON_ATTRIBUTES))
 
@@ -317,7 +321,7 @@ class CreateResourceForm(forms.ModelForm):
 		'blank',
 		'hours', 'email', 'phone', 'extension', 'street', 'street_secondary', 'city', 'state', 'zip_code',
 		'contact_name', 'contact_position', 'fax_number', 'contact_email',
-		'attachment', 'embedded_content',
+		'attachment', "embedded_content",
 		)
 		# content_type is used to manage images, so the user should not manipulate it
 		exclude = (
@@ -407,7 +411,7 @@ class CreateResourceForm(forms.ModelForm):
 # Form only used to edit notes
 class EditReferralNotesForm(forms.ModelForm):
 	# Notes is the only attribute SOWs can freely edit
-	notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
+	notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=NOTES_INPUT_ATTRIBUTES))
 
 	# Define the model and fields to include/exclude
 	class Meta:
@@ -431,6 +435,7 @@ class TagForm(forms.ModelForm):
 	class Meta:
 		model = Tag
 		fields = ('name', 'tag_type')
+
 # Filter function for the resources; needs instantiation as a form
 class ResourceFilter(django_filters.FilterSet):
 	# Tags is the only attribute; uses the CheckboxSelectMultiple widget for easy selection
@@ -443,11 +448,14 @@ class ResourceFilter(django_filters.FilterSet):
 
 # Meeting Tracker Form
 class MeetingTrackerForm(forms.ModelForm):
-    notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-    date = forms.DateField(widget=DatePickerInput())
-    time = forms.TimeField(widget=TimePickerInput())
-    duration = forms.FloatField(label="Duration (hours)")
-
+    notes = forms.CharField(max_length=1000, required=False, widget=forms.Textarea(attrs=NOTES_INPUT_ATTRIBUTES))
+    date = forms.DateField(label="*Date", widget=DatePickerInput(attrs=DATE_INPUT_ATTRIBUTES))
+    time = forms.TimeField(label="*Time", widget=TimePickerInput(attrs=TIME_INPUT_ATTRIBUTES))
+    duration = forms.FloatField(label="*Duration (hours)", widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES))
+    with_who = forms.CharField(label="*With Who", widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+    purpose = forms.CharField(label="*Purpose", widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+    neighborhood = forms.CharField(label="*Neighborhood", widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
+    
     class Meta:
         model = MeetingTracker
         fields = ['with_who', 'purpose', 'neighborhood', 'duration', 'date', 'time', 'notes']
@@ -491,15 +499,15 @@ class RoleSwitchForm(forms.Form):
 # Form for an admin to add a user
 class RegistrationForm(forms.Form):
 	# Set up attributes
-	username = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	password = forms.CharField(max_length=50, label='Password', widget=forms.PasswordInput(attrs=INPUT_ATTRIBUTES))
-	confirm_password = forms.CharField(max_length=50, label='Confirm Password', widget=forms.PasswordInput(attrs=INPUT_ATTRIBUTES))
-	email = forms.EmailField(max_length=254, widget=forms.EmailInput(attrs=INPUT_ATTRIBUTES))
-	first_name = forms.CharField(max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	last_name = forms.CharField(max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	phone = forms.CharField(max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	organization = forms.ModelChoiceField(queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
-	user_type = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES), label='User Type')
+	username = forms.CharField(label='*Username', max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	password = forms.CharField(label='*Password', max_length=50, widget=forms.PasswordInput(attrs=INPUT_ATTRIBUTES))
+	confirm_password = forms.CharField(label='*Confirm Password', max_length=50, widget=forms.PasswordInput(attrs=INPUT_ATTRIBUTES))
+	email = forms.EmailField(label='*Email', max_length=254, widget=forms.EmailInput(attrs=INPUT_ATTRIBUTES))
+	first_name = forms.CharField(label='*First Name', max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label='*Last Name', max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label='*Phone', max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	organization = forms.ModelChoiceField(label='*Organization', queryset=Organization.objects.all(), widget=forms.Select(attrs=INPUT_ATTRIBUTES))
+	user_type = forms.CharField(label='*User Type', widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=USER_TYPE_CHOICES))
 
 	# Define the model and fields to include/exclude
 	class Meta:

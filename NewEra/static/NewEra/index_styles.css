@@ -1,5 +1,5 @@
 body {
-    background-color: #F6F6F6; /* Light gray background */
+    background-color: #F6F6F6; 
   }
 
 div.heading-banner {
@@ -104,7 +104,6 @@ h1.parallax-text {
 }
 
 .home-founder {
-    /* border: 2px solid b lack;  */
     padding: 50px 30px; 
     margin: 0px 50px;  
     color: black;
