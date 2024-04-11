@@ -19,14 +19,14 @@
                 {% if referral.caseUser.nickname %}
                     <h4 style="font-style: italic;">
                         Case Load User: 
-                        <a class="read-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
+                        <a class="embedded-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
                             {{ referral.caseUser.get_full_name }} ({{ referral.caseUser.nickname }})
                         </a>
                     </h4>
                 {% else %}
                     <h4 style="font-style: italic;">
                         Case Load User: 
-                        <a class="read-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
+                        <a class="embedded-link" style="text-decoration: underline;" href="{% url 'Show Case Load User' id=referral.caseUser.id %}">
                             {{ referral.caseUser.get_full_name }}
                         </a>
                     </h4>

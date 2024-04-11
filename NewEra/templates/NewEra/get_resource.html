@@ -39,25 +39,25 @@
                                 {% endif %}
 
                                 {% if resource.url %}
-                                    <p><i class="material-icons">link</i><a href="{{resource.url}}" class="read-link">{{ resource.url }}</a></p>
+                                    <p><i class="material-icons">link</i><a href="{{resource.url}}" target="_blank"  class="embedded-link">{{ resource.url }}</a></p>
                                 {% endif %}
                             {% endif %}
                         {% endwith %}
 
                         {% if resource.phone and resource.extension %}
-                            <p><i class="material-icons">phone</i>&nbsp;&nbsp;Phone: <a href="tel:{{resource.phone}}p{{resource.extension}}" class="read-link">{{ resource.phone }}x{{resource.extension}}</a></p>
+                            <p><i class="material-icons">phone</i>&nbsp;&nbsp;Phone: <a href="tel:{{resource.phone}}p{{resource.extension}}" target="_blank" class="embedded-link">{{ resource.phone }}x{{resource.extension}}</a></p>
                         {% else %}
                             {% if resource.phone %}
-                                <p><i class="material-icons">phone</i>Phone: <a href="tel:{{resource.phone}}" class="read-link">{{ resource.phone }}</a></p>
+                                <p><i class="material-icons">phone</i>Phone: <a href="tel:{{resource.phone}}" target="_readblank"  class="embedded-link">{{ resource.phone }}</a></p>
                             {% endif %}
                         {% endif %}
 
                         {% if resource.email %}
-                            <p><i class="material-icons">email</i>Email: <a href="mailto:{{resource.email}}" class="read-link">{{ resource.email }}</a></p>
+                            <p><i class="material-icons">email</i>Email: <a href="mailto:{{resource.email}}" target="_blank" class="embedded-link">{{ resource.email }}</a></p>
                         {% endif %}
 
                         <!-- {% if resource.fax_number %}
-                            <p>Fax: <a href="tel:{{resource.phone}}" class="read-link"><i class="material-icons">print</i>&nbsp;&nbsp;{{ resource.fax_number }}</a></p>
+                            <p>Fax: <a href="tel:{{resource.phone}}" target="_blank" class="read-link"><i class="material-icons">print</i>&nbsp;&nbsp;{{ resource.fax_number }}</a></p>
                         {% else %}
                             <p>&nbsp;</p>
                         {% endif %} -->
@@ -127,7 +127,7 @@
                             {% endif %}
 
                             {% if resource.url %}
-                                <p><i class="material-icons">link</i>Website: <a href="{{resource.url}}" class="read-link">{{ resource.url }}</a></p>
+                                <p><i class="material-icons">link</i>Website: <a href="{{resource.url}}" target="_blank" class="read-link">{{ resource.url }}</a></p>
                             {% endif %}
                         {% endif %}
                     {% endwith %}

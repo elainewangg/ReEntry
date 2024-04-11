@@ -174,18 +174,6 @@ a:hover {
     background-color: rgba(217, 208, 198, .3) ;
 }
 
-.read-link {
-    text-decoration: #636363;
-    color: grey;
-    margin: 0px
-}
-
-.read-link:hover {
-    color: #8b8b8b; 
-    text-decoration: none; 
-    cursor: pointer;  
-}
-
 .delete-link {
     text-decoration: none;
     color: #dd0000;

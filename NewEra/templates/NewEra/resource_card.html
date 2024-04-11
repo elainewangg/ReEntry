@@ -11,7 +11,7 @@
         <br><br>
         <p class="card-text">
             {{ r.description|truncatechars:150 }}
-            <a class="read-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
+            <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
         </p>
         
         <div class="resource-card-views">
