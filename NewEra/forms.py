@@ -118,7 +118,6 @@ class TempCaseLoadUserForm(forms.ModelForm):
 	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(label=('*Neighborhood'), widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))	
-	
 	case_label = forms.MultipleChoiceField(label='*Looking For', choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget())
 	age = forms.CharField(max_length=3, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	zip_code = forms.CharField(max_length=5, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
@@ -140,6 +139,13 @@ class TempCaseLoadUserForm(forms.ModelForm):
 		self.fields['is_employed'].label = "Employment Status"
 		# is_active field not defined above so it can be hidden on creation; if the case load user exists, is_active
 		self.fields['is_active'].widget.attrs=INPUT_ATTRIBUTES
+
+		# Hide the is_active field if the model is being created
+		# https://stackoverflow.com/questions/55994307/exclude-fields-for-django-model-only-on-creation
+		if not self.instance or self.instance.pk is None:
+			for name, field in self.fields.items():
+				if name in ['is_active', ] or name in ['nickname', ]:
+					field.widget = forms.HiddenInput()
 
 	# Validate the phone number entered
 	def clean_phone(self):

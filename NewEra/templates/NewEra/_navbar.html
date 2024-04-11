@@ -90,6 +90,14 @@
 						href="{{ supervisor_dashboard_url }}">Dashboard</a>
 				</li>
 				{% endif %}
+
+				<!-- Only show the sharepoint link if the user is logged in and an admin, supervisor, or reentry coordinator -->
+				{% if request.session.role == 'is_superuser' or request.session.role == 'is_reentry_coordinator' or request.session.role == 'is_supervisor' %}
+				<li class="nav-item">
+					<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
+						href="https://trwib.sharepoint.com/sites/YoungAdultReentryProject/SitePages/CollabHome.aspx">Sharepoint</a>
+				</li>
+				{% endif %}
 			{% endif %}
 
 			{% if not user.is_authenticated %}

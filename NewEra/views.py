@@ -79,7 +79,7 @@ def home(request):
 def login(request):
     try:
         if request.user.is_authenticated:
-            return redirect(reverse('Home'))
+            return redirect(reverse('Resources'))
 
         context = {}
 
@@ -107,8 +107,10 @@ def login(request):
 
         if user.is_superuser:
             return redirect(reverse('Dashboard'))
+        elif user.is_supervisor:
+            return redirect(reverse('Supervisor Dashboard'))
         else:
-            return redirect(reverse('Home'))
+            return redirect(reverse('Resources'))
     except:
         messages.error(request, 'Unable to login. Please check the username and password.')
         return render(request, 'NewEra/login.html', context)
@@ -221,6 +223,7 @@ def sign_up(request):
             form = TempCaseLoadUserForm(request.POST, instance=load_user)
             if not form.is_valid():
                 context['form'] = form 
+                messages.error(request, 'An error occurred while trying to sign up. Please check your form input')
                 return render(request, 'NewEra/sign_up.html', context)
             form.save()
             load_user.save()
@@ -660,10 +663,10 @@ def create_referral(request):
 
         messages.success(request, 'Successfully created a new referral.')
 
-        return redirect(reverse('Resources'))
+        return redirect(reverse('Referrals'))
     except:
         messages.error(request, 'An error occurred while trying to create a referral.')
-        return redirect(reverse('Resources'))
+        return redirect(reverse('Referrals'))
 
 
 
