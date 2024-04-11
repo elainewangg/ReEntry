@@ -1,37 +1,36 @@
 {% load static %}
 <link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+		
 
+<div id="resource-{{ r.id }}" class="card resource-card">
+    <div class="card-body">
+        <h4 class="card-title"><a href="{% url 'Show Resource' id=r.id %}">{{ r.name }}</a></h4>
+        {% for t in r.tags.all %}
+            <div class="tag-capsule"><a href="{% url 'Show Resource' id=r.id %}">{{ t.name }}</a></div>
+        {% endfor %}
+        <br><br>
+        <p class="card-text">
+            <a href="{% url 'Show Resource' id=r.id %}">{{ r.description|truncatechars:150 }}</a>
+            ... <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
+        </p>
+        
+        <div class="resource-card-views">
+            {% if perms.resource.create_resource %}
+                <p><em>Views: {{ r.clicks }}</em></p>
+            {% endif %}
+        </div>
+        
+                        
 
-        <div id="resource-{{ r.id }}" class="card resource-card">
-            <div class="card-body">
-                <a href="{% url 'Show Resource' id=r.id %}">
-                        <h4 class="card-title">{{ r.name }}</h4>
-                        {% for t in r.tags.all %}
-                            <div class="tag-capsule">{{ t.name }}</div>
-                        {% endfor %}
-                        <br><br>
-                        <p class="card-text">
-                            {{ r.description|truncatechars:150 }}
-                            <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
-                        </p>
-
-                        <div class="resource-card-views">
-                            {% if perms.resource.create_resource %}
-                                <p><em>Views: {{ r.clicks }}</em></p>
-                            {% endif %}
-                        </div>
-                </a>
-
+        <!-- <div class="row"> -->
+            <!-- <div class="col justify-content-end"> -->
                 <div class="resource-card-actions">
                         {% if perms.resource.edit_resource %}
-                            <!-- JavaScript needed to handle inner clicks if you keep these links -->
-                            <span class="warning-button"><i class="material-icons">edit</i></span>
+                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
                         {% endif %}
                         {% if perms.resource.delete_resource %}
-                            <!-- JavaScript needed to handle inner clicks if you keep these links -->
-                            <span class="danger-button"><i class="material-icons">delete</i></span>
+                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
                         {% endif %}
-                </div> <!-- resource-card-actions -->
-            </div> <!-- card  body -->
-        </div>
-    </a>
+                </div>
+    </div>
+</div>

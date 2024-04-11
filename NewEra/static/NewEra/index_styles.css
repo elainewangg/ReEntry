@@ -336,8 +336,7 @@ h1.parallax-text {
 }
 
 
-.embedded-link-white {
-    text-decoration: underline; 
+.embedded-link-white { 
     color: white;
 }
 
@@ -347,7 +346,6 @@ h1.parallax-text {
 }
 
 .embedded-link {
-    text-decoration: underline; 
     color: black;
 }
 

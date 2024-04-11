@@ -126,9 +126,10 @@
 
 			<!-- Inactive resource listing and pagination; seen by only admins -->
 			{% if perms.resource.create_resource %}
-				{% if inactive_resources.paginator.count > 0 %}
-					<h4><em>Inactive:</em></h4>
+				<h4><em>Inactive:</em></h4>
 					<br>
+				{% if inactive_resources.paginator.count > 0 %}
+					
 
 					<div class="row">
 	                    {% for r in inactive_resources %}
