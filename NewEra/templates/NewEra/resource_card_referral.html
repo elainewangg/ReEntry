@@ -1,0 +1,15 @@
+{% load static %}
+<link href="{% static 'NewEra/index_styles.css' %}" rel="stylesheet" type="text/css">
+
+<div id="resource-{{ r.id }}" class="card resource-card">
+    <div class="card-body">
+        <h4 class="card-title">{{ r.name }}</h4>
+        {% for t in r.tags.all %}
+            <div class="tag-capsule">{{ t.name }}</div>
+        {% endfor %}
+        <br><br><br>
+            {% if r.url %}<p><a href="{{ r.url }}" target="_blank" class="embedded-link"><i class="material-icons">link</i>website</a></p>{% endif %}
+            {% if r.email %}<p><a href="mailto:{{r.email}}" target="_blank" class="embedded-link"><i class="material-icons">email</i>{{ r.email }}</a></p>{% endif %}
+            {% if r.phone %}<p><a href="tel:{{r.phone}}" target="_blank" class="embedded-link"><i class="material-icons">phone</i>{{ r.phone }}</a></p>{% endif %}
+    </div>
+</div>
