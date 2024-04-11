@@ -51,9 +51,53 @@
         
         <br><br><hr><br>
 
-        <!-- List all case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
+            <!-- List all unassigned case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
+            {% if user.is_superuser %}
+                <h2>Unassigned Users:</h2>
+            {% endif %}
+    
+            <!-- List the case load users in a table format -->
+            {% if unassigned_caseload_users.count > 0 %}
+                <div style="overflow-x: auto;">
+                    <table>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Assignee</th>
+                            <th>Active?</th>
+                        </tr>
+                        {% for caseload_user in unassigned_caseload_users %}
+                            <tr>
+                                <td>{{ caseload_user.get_full_name }}</td>
+                                <td>{{ caseload_user.email }}</td>
+                                <td>{{ caseload_user.phone }}</td>
+                                {% if user.is_superuser %}
+                                    <td>None</td>
+                                {% endif %}
+                                {% if caseload_user.is_active %}
+                                    <td>&#10004;</td>
+                                {% else %}
+                                    <td>&#10060;</td>
+                                {% endif %}
+                                <td class="button-cell"><a href="{% url 'Show Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-primary"><i class="material-icons">description</i>Details</a></td>
+                                <td class="button-cell"><a href="{% url 'Edit Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-warning"><i class="material-icons">edit</i>Edit</a></td>
+                                <td class="button-cell"><a href="{% url 'Delete Case Load User' id=caseload_user.id %}" class="btn btn-sm btn-danger"><i class="material-icons">delete</i>Delete</a></td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            {% else %}
+                {% if perms.resource.edit_resource %}
+                    <em><p style="margin: auto;">There are currently no unassigned case load users.</p></em>
+                {% endif %}
+            {% endif %}
+            
+        <br></br>
+
+        <!-- List all assigned case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
         {% if user.is_superuser %}
-            <h2>All Users:</h2>
+            <h2>Assigned Users:</h2>
         {% else %}
             <h2>Your Caseload:</h2>
         {% endif %}
@@ -89,14 +133,13 @@
                             <td class="button-cell"><a href="{% url 'Show Case Load User' id=caseload_user.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>
                             <td class="button-cell"><a href="{% url 'Edit Case Load User' id=caseload_user.id %}" class="btn btn-sm warning-button"><i class="material-icons">edit</i>Edit</a></td>
                             <td class="button-cell"><a href="{% url 'Delete Case Load User' id=caseload_user.id %}" class="btn btn-sm danger-button"><i class="material-icons">delete</i>Delete</a></td>
-                            <td class="button-cell"><a href="{% url 'Export CaseLoadUser Data' id=caseload_user.id %}" class="btn btn-sm download-button"><i class="material-icons">download</i>Export Data</a></td>
                         </tr>
                     {% endfor %}
                 </table>
             </div>
         {% else %}
             {% if perms.resource.edit_resource %}
-                <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are currently no case load users.</em></p>
+                <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There are currently no assigned case load users.</em></p>
             {% else %}
                 <p style="margin: auto; margin-top: 50px; text-align: center;"><em>There is no one currently on your case load.</em></p>
             {% endif %}

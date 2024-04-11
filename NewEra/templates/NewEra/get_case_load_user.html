@@ -30,7 +30,7 @@
             {% endif %}
 
             {% if request.user.is_superuser %}
-                <h4>SOW:</h4>
+                <h3>Assignee</h3>
                 <p>{{ case_load_user.user }}</p><br>
             {% endif %}
 
@@ -44,7 +44,13 @@
             <p>{{ case_load_user.neighborhood }}</p><br>
 
             <h4>Case Label:</h4>
-             <p>{{ case_load_user.case_label }}</p><br>
+            <p>{{ case_load_user.case_label }}</p><br>
+
+            <h4>Voter Registration Status:</h4>
+            <p>{{ case_load_user.is_vote_registered }}</p><br>
+            
+            <h4>Employment Status:</h4>
+            <p>{{ case_load_user.is_employed }}</p><br>
 
             <h4>Notes:</h4><br>
             <a href="{% url 'Create Note' case_load_user.id %}" class="orange-button"><i class="material-icons">add</i>Add Note</a><br>
@@ -67,7 +73,6 @@
         <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
         <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
         <a href="{% url 'Export CaseLoadUser Data' case_load_user.id %}" class="download-button"><i class="material-icons">download</i>Export Data</a>
-
     </div>
     <br><br><br><br>
 
