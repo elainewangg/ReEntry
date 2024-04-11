@@ -79,7 +79,7 @@ def home(request):
 def login(request):
     try:
         if request.user.is_authenticated:
-            return redirect(reverse('Home'))
+            return redirect(reverse('Resources'))
 
         context = {}
 
@@ -108,7 +108,7 @@ def login(request):
         if user.is_superuser:
             return redirect(reverse('Dashboard'))
         else:
-            return redirect(reverse('Home'))
+            return redirect(reverse('Resources'))
     except:
         messages.error(request, 'Unable to login. Please check the username and password.')
         return render(request, 'NewEra/login.html', context)
@@ -661,10 +661,10 @@ def create_referral(request):
 
         messages.success(request, 'Successfully created a new referral.')
 
-        return redirect(reverse('Resources'))
+        return redirect(reverse('Referrals'))
     except:
         messages.error(request, 'An error occurred while trying to create a referral.')
-        return redirect(reverse('Resources'))
+        return redirect(reverse('Referrals'))
 
 
 
