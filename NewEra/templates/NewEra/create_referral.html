@@ -21,33 +21,41 @@
         </div>
     </div>
 
+    <div class="parallax-subpage">
+	</div>
+
     <div class="container" style="padding-top: 5%; padding-bottom: 5%;">
         <h4 class="text-left"><b>Let's finish the referral:</b></h4>
         <br><br>
 
         <div class="text-left">
-            <h4>Referrals</h4>
             <p style="font-size: 1.15em">First, verify that the correct resources have been selected. You can delete any if necessary:</p>
             <br />
 
             <!-- Loop through the resources being referred and display their names, descriptions, URL, and a delete option -->
-            {% for r in resources %}
-                <div class="row">
-                    <div class="col">
-                    <div id="resource-{{r.id}}" class="card resource-card border-0 shadow">
-                        <div class="card-body">
-                            <h5 class="card-title">{{r.name}}</h5>
-                            <p class="card-text">{{r.description|truncatewords:35}}</p>
-                            <a href="{{r.url}}" class="read-link">{{r.url}}</a>
-                            <br><br>
-                            <a id="{{r.id}}-del" href="#!" class="delete-link" onclick="deleteResource({{r.id}})"><b>Remove</b></a>
-                        </div>  
+            <div class="row">
+                {% for r in resources %}
+                    <div class="col-lg-4 mb-3">
+                        <div id="resource-{{r.id}}" class="card resource-card">
+                            <div class="card-body">
+                                <h4 class="card-title">{{ r.name }}</h4>
+                                {% for t in r.tags.all %}
+                                    <div class="tag-capsule">{{ t.name }}</div>
+                                {% endfor %}
+                                <br><br>
+                                
+                                <p class="card-text">{{ r.description|truncatechars:100 }}</p>
+                                <br>
+                                {% if r.url %}<p><a href="{{ r.url }}" target="_blank" class="embedded-link"><i class="material-icons">link</i>website</a></p>{% endif %}
+                                <br>
+                                <a id="{{r.id}}-del" href="#!" class="delete-link" onclick="deleteResource({{r.id}})"><b>Remove</b></a>    
+                            </div>
+                        </div>
                     </div>
-                    </div>
-                </div>
-                <input type="hidden" name="resources[]" value="{{ r.id }}">
-                <br>
-            {% endfor %}
+                    <input type="hidden" name="resources[]" value="{{ r.id }}">
+                    <br>
+                {% endfor %}
+            </div>
             <br>
             <h4>Recipient Info</h4>
             <p style="font-size: 1.15em;">We just need the details about the recipient. Please click one:</p>
@@ -72,7 +80,7 @@
 
                             <br>
                             <label><b class="inline-label">Select User(s):</b>
-                                <p>Start typing to search</p>
+                                <p>Start typing to search:</p>
                                 <select class="js-example-basic-multiple" name="user_ids[]" multiple="multiple" id="e1">
                                     {% for r in recipients %}
                                         {% if r.user == request.user and r.nickname %}
@@ -88,7 +96,7 @@
                             <br>
                             <br>
                             <label><b>Add Notes:</b></label><br>
-                            <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><hr>
+                            <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><br>
 
                             {% csrf_token %}
                             <button type="submit" class="orange-button">Make Referral</button>
@@ -120,7 +128,7 @@
                         <input id="outOfSystemEmail" type="email" name="email" placeholder="Enter an email..." class="form-control">
 
                         <label><b>Add Notes:</b></label><br>
-                        <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><hr>
+                        <textarea type="text" name="notes" class="form-control" placeholder=" Add a notification note..."></textarea><br><br>
 
                         {% csrf_token %}
                         <!-- Perform a validation check when the form is submitted -->
@@ -158,5 +166,5 @@
 </script>
 
 {% endif %}
-
+<br><br><br><br>
 {% endblock %}

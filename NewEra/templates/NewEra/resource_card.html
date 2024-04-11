@@ -20,17 +20,13 @@
             {% endif %}
         </div>
         
-                        
-
-        <!-- <div class="row"> -->
-            <!-- <div class="col justify-content-end"> -->
-                <div class="resource-card-actions">
-                        {% if perms.resource.edit_resource %}
-                            <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
-                        {% endif %}
-                        {% if perms.resource.delete_resource %}
-                            <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
-                        {% endif %}
-                </div>
+        <div class="resource-card-actions">
+                {% if perms.resource.edit_resource %}
+                    <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
+                {% endif %}
+                {% if perms.resource.delete_resource %}
+                    <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
+                {% endif %}
+        </div>
     </div>
 </div>

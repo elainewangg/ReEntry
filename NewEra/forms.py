@@ -28,7 +28,7 @@ EMBEDDED_ATTRIBUTES = {'class' : 'form-control embed', 'placeholder': 'Paste <if
 HIDDEN_ATTRIBUTES = {'class' : 'form-control hidden'}
 
 TEXTAREA_ATTRIBUTES = { 'class': 'form-control', 'style': 'height: 200px; overflow-y: scroll;', 'cols': 40, 'rows': 40}
-MULTIPLE_CHOICE_ATTRIBUTES = {'class': 'form-control list-unstyled','style': 'padding: 50px; margin-top: 20px;'}
+MULTIPLE_CHOICE_ATTRIBUTES = {'class': 'form-control list-unstyled','style': 'padding: 50px; margin-top: 20px; margin-bottom: 20px;'}
 
 MAX_IMAGE_UPLOAD_SIZE = 2500000 #2.5mb
 MAX_ATTACHMENT_UPLOAD_SIZE = 20000000 #20mb
@@ -116,10 +116,10 @@ class CaseLoadUserForm(forms.ModelForm):
 # Form used to create and edit a TempCaseLoadUser
 class TempCaseLoadUserForm(forms.ModelForm):
 	# Set up attributes
-	first_name = forms.CharField(label=('First Name *'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	last_name = forms.CharField(label=('Last Name *'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
-	phone = forms.CharField(label=('Phone *'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
-	email = forms.EmailField(label=('Email *'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	first_name = forms.CharField(label=('*First Name'), max_length=30, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	last_name = forms.CharField(label=('*Last Name'), max_length=150, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+	phone = forms.CharField(label=('*Phone'), max_length=11, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
+	email = forms.EmailField(label=('*Email'), max_length=254, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	nickname = forms.CharField(max_length=100, widget=forms.TextInput(attrs=INPUT_ATTRIBUTES), required=False)
 	neighborhood = forms.CharField(widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
 	case_label = forms.MultipleChoiceField(choices=case_labels.CASE_LABEL_LIST, widget=Select2MultipleWidget(attrs={'style':'width: 99%; border-1px solid #ced4da;'}))
@@ -173,11 +173,13 @@ class TempCaseLoadUserForm(forms.ModelForm):
 			raise forms.ValidationError('You must input either a phone number or an email address for this user.')
 
 		return cleaned_data
+	
+	
 
 # Form to create new notes
 class CreateNoteForm(forms.ModelForm):
-    notes = forms.CharField(max_length=1000, required=True, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
-    date = forms.DateField(widget=DatePickerInput())
+    notes = forms.CharField(label=('*Notes'), max_length=1000, required=True, widget=forms.Textarea(attrs=INPUT_ATTRIBUTES))
+    date = forms.DateField(label=('*Date'), widget=DatePickerInput())
     class Meta:
         model = Note
         fields = ['notes', 'date', 'activity_type', 'hours']

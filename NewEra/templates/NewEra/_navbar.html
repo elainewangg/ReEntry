@@ -110,7 +110,7 @@
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
-				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Contact Us</a>
+				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Sign Up</a>
 			</li>
 
 
