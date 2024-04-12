@@ -344,9 +344,7 @@ class Resource(models.Model):
     RESOURCE_TYPES_LIST = [
         ("organization", "Organization"),
         ("video", "Video Link (YouTube only)"),
-        ("attachment", "File Attachment (PDF, Image, Video)"),
-        ("embed", "Embedded Content (iframe)"),
-        ("link", "Link to External Website")
+        ("attachment", "File Attachment (PDF, Image, Video)")
     ]
 
     # Attributes

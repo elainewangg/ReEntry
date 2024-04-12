@@ -1,4 +1,4 @@
-# <a href="http://newera412.com/" target="_blank">NewERA412 Platform</a>
+# <a href="http://realisticreentry.com/" target="_blank">Realistic ReEntry Platform</a>
 
 * Organization: RealisticReEntry
 * Client Contact: <a href="mailto:bvbaseball42@gmail.com">`Taili Thompson`</a>
@@ -65,7 +65,11 @@ If you are running on a fresh linux environment, you need to also install these 
 * in your terminal, enter  `./manage.py runserver` , and then click on the link provided in terminal (something like http://127.0.0.1:8000/)
 * To create an admin user, `./manage.py createsuperuser` 
 
-
+###### After each git pull/merge if there were changges to the database:
+* Install all dependencies: `pip install -r requirements.txt`
+* in your terminal, enter `./manage.py makemigrations NewEra`  to make migration
+* in your terminal, enter `./manage.py migrate`  to migrate
+* in your terminal, enter `./manage.py collectstatic`  to generate static files
 
 ###### First Time: 
 

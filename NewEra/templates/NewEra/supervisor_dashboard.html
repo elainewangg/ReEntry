@@ -10,17 +10,17 @@
 {% endblock %}
 
 {% block content %}
-    <h1 style="margin: auto; margin-top: 50px; text-align: center;">
-        Supervisor Dashboard
-    </h1>
+<div class="parallax-subpage">
+    <h1 class="text-black parallax-text">Welcome, {{user.first_name}}!</h1>
+</div>
 
-    <div class="container">  
-        <hr><br>
+    <div class="container main-page-container">  
+        
         <!-- SOW table display -->
         <h2>SOWs:</h2>
         {% if sows.count > 0 %}
             <div style="overflow-x: auto;">
-                <table>
+                <table class="styled-table">
                     <tr>
                         <th>Username</th>
                         <th>First Name</th>
@@ -58,6 +58,7 @@
 
         <!-- Supervisor table display -->
         <h2>Supervisors:</h2>
+        <br>
         {% if supervisors.count > 0 %}
             <div style="overflow-x: auto;">
                 <table>
@@ -94,4 +95,5 @@
             <em><p style="margin: auto;">There are no Supervisors in the system.</p></em>
         {% endif %}
     </div>
+    <br><br><br><br>
 {% endblock %}

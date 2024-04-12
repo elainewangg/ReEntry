@@ -72,7 +72,15 @@
 					<a class="nav-link {% if request.path == maps_url %}active{% endif %}" href="{{ maps_url }}">Maps</a>
 				</li>
 				{% endif %}
-				
+
+				<!-- Only show the sharepoint link if the user is logged in and an admin, supervisor, or reentry coordinator -->
+				{% if request.session.role == 'is_superuser' or request.session.role == 'is_reentry_coordinator' or request.session.role == 'is_supervisor' %}
+				<li class="nav-item">
+					<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
+						href="https://trwib.sharepoint.com/sites/YoungAdultReentryProject/SitePages/CollabHome.aspx" target="_blank" >Sharepoint</a>
+				</li>
+				{% endif %}
+
 				<!-- Only show the dashboard link if the user is logged in and an admin -->
 				{% if request.session.role == 'is_superuser' %}
 				<li class="nav-item">
@@ -91,13 +99,6 @@
 				</li>
 				{% endif %}
 
-				<!-- Only show the sharepoint link if the user is logged in and an admin, supervisor, or reentry coordinator -->
-				{% if request.session.role == 'is_superuser' or request.session.role == 'is_reentry_coordinator' or request.session.role == 'is_supervisor' %}
-				<li class="nav-item">
-					<a class="nav-link {% if request.path == dashboard_url %}active{% endif %}"
-						href="https://trwib.sharepoint.com/sites/YoungAdultReentryProject/SitePages/CollabHome.aspx">Sharepoint</a>
-				</li>
-				{% endif %}
 			{% endif %}
 
 			{% if not user.is_authenticated %}
@@ -109,7 +110,6 @@
 				</a>
                 <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <li><a class="dropdown-item" href="{% url 'yarp' %}">Young Adults ReEntry Program</a></li>
-                    <li><a class="dropdown-item" href="{% url 'obb' %}">Operation Better Block</a></li>
                     <li><a class="dropdown-item" href="{% url 'partners' %}">Our Partners</a></li>
                 </ul>
             </li>
@@ -124,7 +124,7 @@
 			<!-- Only show the log in link if the user is logged out -->
 			<li class="nav-item">
 				{% url 'Sign Up' as sign_up_url %}
-				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Contact Us</a>
+				<a class="nav-link {% if request.path == sign_up_url %}active{% endif %}" href="{{ sign_up_url }}">Sign Up</a>
 			</li>
 
 

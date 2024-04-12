@@ -9,8 +9,8 @@
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
 
 	<div class="parallax-subpage">
-        <h1 class="text-black parallax-text" style="font-size: 4vw;">Resources</h1>
-    </div>
+		<h1 class="text-black parallax-text">Resources</h1>
+	</div>
 	<!-- only for users: Display referral information -->
 		{% if request.user.is_authenticated %}
 			<div class="container main-page-container">
@@ -66,7 +66,7 @@
 
         {% if active_resources.paginator.count > 0 or inactive_resources.count > 0 %}
             {% if perms.resource.edit_resource %}
-                <h4>Active:</h4>
+                <h4><em>Active:</em></h4>
                 <br>
             {% endif %}
 
@@ -126,9 +126,10 @@
 
 			<!-- Inactive resource listing and pagination; seen by only admins -->
 			{% if perms.resource.create_resource %}
-				{% if inactive_resources.paginator.count > 0 %}
-					<h4>Inactive:</h4>
+				<h4><em>Inactive:</em></h4>
 					<br>
+				{% if inactive_resources.paginator.count > 0 %}
+					
 
 					<div class="row">
 	                    {% for r in inactive_resources %}

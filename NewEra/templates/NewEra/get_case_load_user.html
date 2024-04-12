@@ -35,10 +35,10 @@
             {% endif %}
 
             <h4>Phone:</h4>
-            <p><a href="tel:{{case_load_user.phone}}">{{ case_load_user.phone }}</a></p><br>
+            <p><a href="tel:{{case_load_user.phone}}" target="_blank" class="embedded-link">{{ case_load_user.phone }}</a></p><br>
 
             <h4>Email:</h4>
-            <p><a href="mailto:{{case_load_user.email}}">{{ case_load_user.email }}</a></p><br>
+            <p><a href="mailto:{{case_load_user.email}}" target="_blank" class="embedded-link">{{ case_load_user.email }}</a></p><br>
 
             <h4>Neighborhood:</h4>
             <p>{{ case_load_user.neighborhood }}</p><br>
@@ -72,8 +72,7 @@
         <br><hr><br>
         <a href="{% url 'Edit Case Load User' case_load_user.id %}" class="warning-button"><i class="material-icons">edit</i>Edit</a>
         <a href="{% url 'Delete Case Load User' case_load_user.id %}" class="danger-button"><i class="material-icons">delete</i>Delete</a>
-        <a href="{% url 'Export CaseLoadUser Data' case_load_user.id %}" class="btn btn-sm download-button">Export Data</a></td>
-
+        <a href="{% url 'Export CaseLoadUser Data' case_load_user.id %}" class="download-button"><i class="material-icons">download</i>Export Data</a>
     </div>
     <br><br><br><br>
 
