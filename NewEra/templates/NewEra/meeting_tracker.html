@@ -30,13 +30,13 @@
             <div style="overflow-x: auto;">
                 <table class="styled-table">
                     <tr>
-                        <th>Name</th>
+                        <th>With Who</th>
                         <th>Purpose</th>
                         <th>Date</th>
                     </tr>
                     {% for r in responses %}
                         <tr>
-                            <td>{{ r.user.get_full_name }}</td>
+                            <td>{{ r.with_who }}</td>
                             <td>{{ r.purpose }}</td>
                             <td>{{ r.date }}</td>
                             <td class="button-cell"><a href="{% url 'Show Meeting Tracker Response' id=r.id %}" class="btn btn-sm details-button"><i class="material-icons">description</i>Details</a></td>

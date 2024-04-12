@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate
 from django.core.files.uploadedfile import UploadedFile
 from django.forms.widgets import CheckboxSelectMultiple
 
-from NewEra import case_labels, neighborhoods, educations, registrations, tags, employments
+from NewEra import case_labels, neighborhoods, educations, registrations, tags, employments, with_who
 from NewEra.models import (CaseLoadUser, TempCaseLoadUser, MeetingTracker, Note,
                            Organization, Referral, Resource, Tag,
                            User)
@@ -458,7 +458,7 @@ class MeetingTrackerForm(forms.ModelForm):
     date = forms.DateField(label="*Date", widget=DatePickerInput(attrs=DATE_INPUT_ATTRIBUTES))
     time = forms.TimeField(label="*Time", widget=TimePickerInput(attrs=TIME_INPUT_ATTRIBUTES))
     duration = forms.FloatField(label="*Duration (hours)", widget=forms.NumberInput(attrs=INPUT_ATTRIBUTES))
-    with_who = forms.CharField(label="*With Who", widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
+    with_who = forms.CharField(label="*With Who", widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=with_who.WITH_WHO_LIST))
     purpose = forms.CharField(label="*Purpose", widget=forms.TextInput(attrs=INPUT_ATTRIBUTES))
     neighborhood = forms.CharField(label="*Neighborhood", widget=forms.Select(attrs=INPUT_ATTRIBUTES, choices=neighborhoods.NEIGHBORHOOD_LIST))
     

@@ -91,13 +91,13 @@
 				{% endif %}
 
 				<!-- Only show the dashboard link if the user is logged in and a supervisor -->
-				{% if request.session.role == 'is_supervisor' %}
+				<!-- {% if request.session.role == 'is_supervisor' %}
 				<li class="nav-item">
 					{% url 'Supervisor Dashboard' as supervisor_dashboard_url %}
 					<a class="nav-link {% if request.path == supervisor_dashboard_url %}active{% endif %}"
 						href="{{ supervisor_dashboard_url }}">Dashboard</a>
 				</li>
-				{% endif %}
+				{% endif %} -->
 
 			{% endif %}
 
