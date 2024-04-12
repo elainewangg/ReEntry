@@ -79,7 +79,7 @@ def home(request):
 def login(request):
     try:
         if request.user.is_authenticated:
-            return redirect(reverse('Resources'))
+            return redirect('Resources')
 
         context = {}
 
@@ -106,11 +106,11 @@ def login(request):
             request.session['role'] = role
 
         if user.is_superuser:
-            return redirect(reverse('Dashboard'))
+            return redirect('Dashboard')
         elif user.is_supervisor:
-            return redirect(reverse('Supervisor Dashboard'))
+            return redirect('Supervisor Dashboard')
         else:
-            return redirect(reverse('Resources'))
+            return redirect('Resources')
     except:
         messages.error(request, 'Unable to login. Please check the username and password.')
         return render(request, 'NewEra/login.html', context)
@@ -204,10 +204,10 @@ def confirm_user(request):
             new_case_load.save()
 
         sendEmail(new_case_load)
-        return redirect(reverse('Home'))
+        return redirect('Home')
     except:
         messages.error(request, '{} {} is unable to sign up. Please try confirming again'.format(tempUser.first_name, tempUser.last_name))
-        return redirect(reverse('Home'))
+        return redirect('Home')
 
 # function to sign up
 def sign_up(request):
@@ -239,17 +239,17 @@ def sign_up(request):
 
 
         context['form'] = TempCaseLoadUserForm()
-        return redirect(reverse('Home'))
+        return redirect('Home')
     except:
         messages.error(request, 'An error occurred while trying to sign up. Please try again')
-        return redirect(reverse('Home'))
+        return redirect('Home')
 
 # function to logout
 @login_required
 def logout(request):
     auth_logout(request)
     messages.success(request, 'Successfully logged out.')
-    return redirect(reverse('Login'))
+    return redirect('Login')
 
 # function to display about page
 def about_us(request):
@@ -585,7 +585,7 @@ def resetViews(request):
         if request.method == 'POST':
             Resource.objects.all().update(clicks=0)
             messages.success(request, 'Reset all resource views')
-            return redirect(reverse('Dashboard'))
+            return redirect('Dashboard')
         return render(request, 'NewEra/reset_view_counts.html', {})
     except:
         messages.error(request, 'An error occurred while trying to reset resources.')
@@ -663,10 +663,10 @@ def create_referral(request):
 
         messages.success(request, 'Successfully created a new referral.')
 
-        return redirect(reverse('Referrals'))
+        return redirect('Referrals')
     except:
         messages.error(request, 'An error occurred while trying to create a referral.')
-        return redirect(reverse('Referrals'))
+        return redirect('Referrals')
 
 
 
@@ -686,7 +686,7 @@ def load_referrals(request, referrals, template_name):
         return render(request, template_name, context)
     except:
         messages.error(request, 'An error occurred while trying to load referrals.')
-        return redirect(reverse('Resources'))
+        return redirect('Resources')
 
 @login_required
 def referrals(request):
@@ -715,7 +715,7 @@ def referrals(request):
         return render(request, 'NewEra/referrals.html', context)
     except:
         messages.error(request, 'An error occurred while trying to display referrals.')
-        return redirect(reverse('Resources'))
+        return redirect('Resources')
 
 
 @login_required
@@ -728,7 +728,7 @@ def get_referral(request, id):
         return render(request, 'NewEra/get_referral.html', context)
     except:
         messages.error(request, 'An error occurred while trying to get a referral.')
-        return redirect(reverse('Referrals'))
+        return redirect('Referrals')
 
 def edit_referral_notes(request, id):
     try:
@@ -798,7 +798,7 @@ def case_load(request):
         return render(request, 'NewEra/case_load.html', context)
     except:
         messages.error(request, 'An error occurred while trying to display caseload users.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
 
 @login_required
 def get_case_load_user(request, id):
@@ -812,7 +812,7 @@ def get_case_load_user(request, id):
         return render(request, 'NewEra/get_case_load_user.html', context)
     except:
         messages.error(request, 'An error occurred while trying to get a caseload user.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 @login_required
 def edit_case_load_user(request, id):
@@ -838,7 +838,7 @@ def edit_case_load_user(request, id):
         return render(request, 'NewEra/edit_case_load_user.html', {'form': form, 'case_load_user': case_load_user, 'action': 'Edit'})
     except:
         messages.error(request, 'An error occurred while trying to edit caseload users.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 @login_required
 def delete_case_load_user(request, id):
@@ -864,7 +864,7 @@ def delete_case_load_user(request, id):
         return render(request, 'NewEra/delete_case_load_user.html', {'case_load_user': case_load_user})
     except:
         messages.error(request, 'An error occurred while trying to delete caseload users.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 @login_required
 def create_note(request, id):
@@ -899,7 +899,7 @@ def create_note(request, id):
         return render(request, 'NewEra/edit_note.html', context)
     except:
         messages.error(request, 'An error occurred while trying to create a note.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 @login_required
 def edit_note(request, id):
@@ -930,7 +930,7 @@ def edit_note(request, id):
         return render(request, 'NewEra/edit_note.html', context)
     except:
         messages.error(request, 'An error occurred while trying to edit a note.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 @login_required
 def delete_note(request, id):    
@@ -947,7 +947,7 @@ def delete_note(request, id):
         return render(request, 'NewEra/delete_note.html', {'note': note})
     except:
         messages.error(request, 'An error occurred while trying to delete a note.')
-        return render(redirect('Case Load'))
+        return redirect('Case Load')
 
 # endregion
 
@@ -999,7 +999,7 @@ def get_maps(request):
         return response
     except:
         messages.error(request, 'An error occurred while trying to display the map.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
 
 def is_pittsburgh(neighborhood):
     if 'hood' in neighborhood['properties']:
@@ -1087,7 +1087,7 @@ def dashboard(request):
         return render(request, 'NewEra/dashboard.html', context)
     except:
         messages.error(request, 'An error occurred while trying to display the dashboard.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
 
 @login_required
 def supervisor_dashboard(request): 
@@ -1113,7 +1113,7 @@ def supervisor_dashboard(request):
         return render(request, 'NewEra/supervisor_dashboard.html', context)
     except:
         messages.error(request, 'An error occurred while trying to display the supervisor dashboard.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
 
 @login_required
 def edit_user(request, id):
@@ -1160,7 +1160,7 @@ def edit_user(request, id):
         return render(request, 'NewEra/edit_user.html', {'form': form, 'user': user, 'action': 'Edit'})
     except:
         messages.error(request, 'An error occurred while trying to edit the user.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 @login_required
 def edit_org(request, id):
@@ -1186,7 +1186,7 @@ def edit_org(request, id):
         return render(request, 'NewEra/edit_org.html', {'form': form, 'org': org, 'action': 'Edit'})
     except:
         messages.error(request, 'An error occurred while trying to edit the organization.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 @login_required
 def delete_user(request, id):
@@ -1211,7 +1211,7 @@ def delete_user(request, id):
         return render(request, 'NewEra/delete_user.html', {'user': user})
     except:
         messages.error(request, 'An error occurred while trying to delete the user.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 @login_required
 def delete_org(request, id):
@@ -1228,7 +1228,7 @@ def delete_org(request, id):
         return render(request, 'NewEra/delete_org.html', {'org': org})
     except:
         messages.error(request, 'An error occurred while trying to delete the organization.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 # endregion
 
@@ -1249,7 +1249,7 @@ def meeting_tracker(request):
         context['responses'] = MeetingTracker.objects.filter(user=request.user).order_by('-date')
     else:  
         messages.error(request, 'User is unauthorized.')
-        return render(redirect('Home'))
+        return redirect('Home')
     return render(request, 'NewEra/meeting_tracker.html', context)
 
 @login_required
@@ -1284,7 +1284,7 @@ def create_meeting_tracker_response(request):
         return render(request, 'NewEra/edit_meeting_tracker_response.html', context)
     except:
         messages.error(request, 'An error occurred while trying to create a meeting tracker response.')
-        return render(redirect('Meeting Tracker'))
+        return redirect('Meeting Tracker')
 
 @login_required
 def edit_meeting_tracker_response(request, id):
@@ -1312,7 +1312,7 @@ def edit_meeting_tracker_response(request, id):
         return render(request, 'NewEra/edit_meeting_tracker_response.html', context)
     except:
         messages.error(request, 'An error occurred while trying to edit a meeting tracker response.')
-        return render(redirect('Meeting Tracker'))
+        return redirect('Meeting Tracker')
 
 @login_required
 def get_meeting_tracker_response(request, id):
@@ -1325,7 +1325,7 @@ def get_meeting_tracker_response(request, id):
         return render(request, 'NewEra/meeting_tracker_response.html', context)
     except:
         messages.error(request, 'An error occurred while trying to get a meeting tracker response.')
-        return render(redirect('Meeting Tracker'))
+        return redirect('Meeting Tracker')
 
 @login_required
 def delete_meeting_tracker_response(request, id):
@@ -1341,7 +1341,7 @@ def delete_meeting_tracker_response(request, id):
         return render(request, 'NewEra/delete_meeting_tracker_response.html', {'response': response})
     except:
         messages.error(request, 'An error occurred while trying to delete a meeting tracker response.')
-        return render(redirect('Meeting Tracker'))
+        return redirect('Meeting Tracker')
 
 # endregion
 
@@ -1355,7 +1355,7 @@ def delete_meeting_tracker_response(request, id):
 def tags(request):
     if not request.user.is_superuser:
         messages.error(request, 'User is unauthorized to view tags.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
     context = {
         'tags': Tag.objects.all()
     }
@@ -1366,7 +1366,7 @@ def create_tag(request):
     try:
         if not request.user.is_superuser:
             messages.error(request, 'User is unauthorized to create tags.')
-            return render(redirect('Resources'))
+            return redirect('Resources')
         context = {}
         form = TagForm()
         context['form'] = form
@@ -1390,7 +1390,7 @@ def create_tag(request):
         return render(request, 'NewEra/edit_tag.html', context)
     except:
         messages.error(request, 'An error occurred while trying to create a tag.')
-        return render(redirect('Tags'))
+        return redirect('Tags')
 
 
 @login_required
@@ -1398,7 +1398,7 @@ def edit_tag(request, id):
     try:
         if not request.user.is_superuser:
             messages.error(request, 'User is unauthorized to edit tags.')
-            return render(redirect('Resources'))
+            return redirect('Resources')
         tag = get_object_or_404(Tag, id=id)
 
         if request.method == "POST":
@@ -1415,14 +1415,14 @@ def edit_tag(request, id):
         return render(request, 'NewEra/edit_tag.html', {'form': form, 'tag': tag, 'action': 'Edit'})
     except:
         messages.error(request, 'An error occurred while trying to edit a tag.')
-        return render(redirect('Tags'))
+        return redirect('Tags')
 
 @login_required
 def delete_tag(request, id):
     try:
         if not request.user.is_superuser:
             messages.error(request, 'User is unauthorized to delete tags.')
-            return render(redirect('Resources'))
+            return redirect('Resources')
         tag = get_object_or_404(Tag, id=id)
 
         if request.method == 'POST':
@@ -1433,7 +1433,7 @@ def delete_tag(request, id):
         return render(request, 'NewEra/delete_tag.html', {'tag': tag})
     except:
         messages.error(request, 'An error occurred while trying to delete a tag.')
-        return render(redirect('Tags'))
+        return redirect('Tags')
 
 # endregion
 
@@ -1447,14 +1447,14 @@ def delete_tag(request, id):
 def select_data(request):
     if not request.user.is_superuser:
         messages.error(request, 'User is unauthorized to select data.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
     form = SelectDataTimeframe()
     return render(request, 'NewEra/select_data.html', {'form': form})
 
 def select_referral_data(request):
     if not request.user.is_superuser:
         messages.error(request, 'User is unauthorized to select referral data.')
-        return render(redirect('Resources'))
+        return redirect('Resources')
     form = SelectDataTimeframe()
     return render(request, 'NewEra/select_referral_data.html', {'form': form})
 
@@ -1463,7 +1463,7 @@ def export_selected_data(request):
     try:
         if not request.user.is_superuser:
             messages.error(request, 'User is unauthorized to export data.')
-            return render(redirect('Resources'))
+            return redirect('Resources')
         if request.method == "GET":
             form = SelectDataTimeframe()
             return render(request, 'NewEra/select_data.html', {'form': form})
@@ -1586,10 +1586,10 @@ def export_selected_data(request):
                 return response
             else:
                 messages.error(request, 'An error occurred while trying to export data.')
-                return render(redirect('Dashboard'))
+                return redirect('Dashboard')
     except:
         messages.error(request, 'An error occurred while trying to export data.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 
 # Export data on each caseload user's meeting notes
@@ -1648,7 +1648,7 @@ def export_data(request):
     try:
         if not request.user.is_superuser:
             messages.error(request, 'User is unauthorized to export data.')
-            return render(redirect('Resources'))
+            return redirect('Resources')
         if request.method == "GET":
             form = SelectDataTimeframe()
             return render(request, 'NewEra/select_referral_data.html', {'form': form})
@@ -1952,7 +1952,7 @@ def export_data(request):
                 return Http404
     except:
         messages.error(request, 'An error occurred while trying to export data.')
-        return render(redirect('Dashboard'))
+        return redirect('Dashboard')
 
 # Helper method to export attributes in a sheet
 def export_attribute(attr, attr_set, referrals_dict, accessed_referrals_dict, case_load_dict, last_referral_dict, r):
