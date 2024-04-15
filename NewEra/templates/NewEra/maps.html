@@ -64,7 +64,7 @@ Activity Map
         */
         map.data.addListener('click', function (event) {
             let name = event.feature.getProperty("hood") || event.feature.getProperty("LABEL");
-            // TODO: Update to use string interpolation
+            let clickedLocation = event.latLng;
             let html = "<p>"
                 + "<h3>" + name + "</h3>"
                 + "<h5> Latest Risk Assessment: " + event.feature.getProperty("x_risk") + " </h5>"
@@ -74,7 +74,7 @@ Activity Map
             infowindow.setContent(html); // show the html variable in the infowindow
             console.log(event.feature)
             console.log(event.feature.getGeometry())
-            infowindow.setPosition({ lat: Number(event.feature.getProperty("intptlat10")), lng: Number(event.feature.getProperty("intptlon10")) }); // anchor the infowindow at the marker
+            infowindow.setPosition(clickedLocation);
             infowindow.setOptions({ pixelOffset: new google.maps.Size(0, -30) }); // move the infowindow up slightly to the top of the marker icon
             infowindow.open(map);
         });
