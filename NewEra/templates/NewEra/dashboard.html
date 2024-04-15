@@ -287,9 +287,9 @@ Dashboard
                     {% else %}
                     <td>&#10060;</td>
                     {% endif %}
-                    <td class="button-cell"><a href="{% url 'Edit User' id resource_coordinator.id %}"
+                    <td class="button-cell"><a href="{% url 'Edit User' id=resource_coordinator.id %}"
                             class="warning-button"><i class="material-icons">edit</i>Edit</a></td>
-                    <td class="button-cell"><a href="{% url 'Delete User' id resource_coordinator.id %}"
+                    <td class="button-cell"><a href="{% url 'Delete User' id=resource_coordinator.id %}"
                             class="danger-button"><i class="material-icons">delete</i>Delete</a></td>
                 </tr>
                 {% endfor %}
@@ -303,9 +303,9 @@ Dashboard
         {% endif %}
 
         <br>
-        <br>
-    </div>
+        <hr><br>
 
+        
     <div class="collapse {{ modalStatus }}" id="collapseOrg">
         <br>
         <div class="card card-body">

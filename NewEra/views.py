@@ -1041,7 +1041,6 @@ def dashboard(request):
             'form': RegistrationForm(), 
             'user' : request.user
         }
-
         if request.method == 'POST':
             if 'username' in request.POST:
                 form = RegistrationForm(request.POST)
@@ -1059,7 +1058,6 @@ def dashboard(request):
                                                 last_name=form.cleaned_data['last_name'],
                                                 organization=form.cleaned_data['organization'])
                 user.is_superuser = False
-                user.is_supervisor = False
 
                 # User role checkboxes
                 if 'user_type' in request.POST:
