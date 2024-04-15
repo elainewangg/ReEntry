@@ -64,7 +64,7 @@
 
     <div class="container" style="padding-left: 0vh;">
 
-        {% if active_resources.paginator.count > 0 or inactive_resources.count > 0 %}
+        {% if active_resources.paginator.count > 0 or inactive_resources.paginator.count > 0 %}
             {% if perms.resource.edit_resource %}
                 <h4><em>Active:</em></h4>
                 <br>
@@ -122,6 +122,7 @@
 
 			{% else %}
 				<p style="margin: auto; margin-top: 50px; text-align: cennter;"><em>There are no active resources at this time.</em></p>
+				<br>
 			{% endif %}
 
 			<!-- Inactive resource listing and pagination; seen by only admins -->

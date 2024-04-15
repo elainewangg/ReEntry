@@ -28,7 +28,7 @@
                         {% if perms.resource.edit_resource %}
                             <a href="{% url 'Edit Resource' r.id %}" class="warning-button"><i class="material-icons">edit</i></a>
                         {% endif %}
-                        {% if perms.resource.delete_resource %}
+                        {% if perms.resource.delete_resource and r.is_active %}
                             <a href="{% url 'Delete Resource' r.id %}" class="danger-button"><i class="material-icons">delete</i></a>
                         {% endif %}
                 </div>
