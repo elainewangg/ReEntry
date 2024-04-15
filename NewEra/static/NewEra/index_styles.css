@@ -276,7 +276,6 @@ h1.parallax-text {
 .styled-table {
     width: 100%;
     border-collapse: collapse;
-    border-radius: 8px;
     margin: 25px 0;
     font-size: 0.9em;
     background-color: white;

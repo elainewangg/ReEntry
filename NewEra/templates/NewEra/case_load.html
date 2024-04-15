@@ -21,7 +21,7 @@
             <br>
             <div class="card card-body">
                 <form method="POST" action="{% url 'Case Load' %}">
-                    <table class="styled-table">
+                    <table>
                         {{form}}
                     </table>
                     
@@ -50,10 +50,9 @@
         </div> <!-- end of dropdown -->
         
         <br><br><hr><br>
-
             <!-- List all unassigned case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
             {% if user.is_superuser %}
-                <h2>Unassigned Users:</h2>
+                <h4><em>Unassigned Users:</em></h4>
             {% endif %}
     
             <!-- List the case load users in a table format -->
@@ -98,7 +97,7 @@
 
         <!-- List all assigned case load users if the admin is logged in; otherwise, only those who are on the case load of the current logged in user -->
         {% if user.is_superuser %}
-            <h2>Assigned Users:</h2>
+            <h4><em>Assigned Users:</em></h4>
         {% else %}
             <h2>Your Caseload:</h2>
         {% endif %}
