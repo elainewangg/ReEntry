@@ -5,17 +5,22 @@
 {% endblock %}{% endblock %}
 
 {% block content %}
-    <div style="margin: auto; margin-top: 4%; width: 80%;">
-        <h3>Select Risk Assessment Data Timeframe:</h3>
-        <hr/>
+<div class="parallax-subpage">
+    <h1 class="text-black parallax-text">Data Management</h1>
+</div>
+
+<div class="container main-page-container">
+    <h3>Select risk data timeframe:</h3>
+    <br>
         <form method="POST" action="{% url 'Select Risk Data' %}">
             <table>
                 {{form}}
             </table>
             {% csrf_token %}
             <br>
-            <button id="id_risk_button" class="orange-button" type="submit">Download Data</button>
+            <p><button  id="id_risk_button" class="orange-button" type="submit">Download Data</button>
+            <a href="javascript:history.back()" class="btn">Cancel</a></p>
         </form>
-        <br/>
+        <br><br><br><br>
     </div>
 {% endblock %}

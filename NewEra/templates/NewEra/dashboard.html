@@ -54,6 +54,7 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
                 </tr>
                 {% for admin in admins %}
                 <tr>
@@ -96,6 +97,8 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for supervisor in supervisors %}
                 <tr>
@@ -141,6 +144,8 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for reentry_coordinator in reentry_coordinators %}
                 <tr>
@@ -186,6 +191,8 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for community_outreach_worker in community_outreach_workers %}
                 <tr>
@@ -231,6 +238,8 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for service_provider in service_providers %}
                 <tr>
@@ -276,6 +285,8 @@ Dashboard
                     <th>Phone</th>
                     <th>Organization</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for resource_coordinator in resource_coordinators %}
                 <tr>
@@ -315,6 +326,7 @@ Dashboard
             <form method="POST" action="{% url 'Dashboard' %}">
                 <div style="display: flex; align-items: center;">
                     <label for="orgs">Organization Name: </label>&nbsp;&nbsp;
+                    <br>
                     <input type="text" id="name" name="org_name" class="form-control organization" style="width: 300px; height: 40px; margin-bottom: 20px;">
                     {% csrf_token %}
                 </div>
@@ -327,10 +339,12 @@ Dashboard
         <h2>Organizations:</h2>
         {% if orgs.count > 0 %}
         <div style="overflow-x: auto;">
-            <table class="small-styled-table">
+            <table class="styled-table">
                 <tr>
                     <th>Organization Name</th>
                     <th>Active?</th>
+                    <th>Actions</th>
+                    <th></th>
                 </tr>
                 {% for org in orgs %}
                 <tr>

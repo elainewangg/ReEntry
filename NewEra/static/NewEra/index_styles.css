@@ -200,16 +200,26 @@ h1.parallax-text {
     transform: translateX(-1px), translateY(-1px);
 }
 
+
+/* SMALL BUTTONS FOR DETAILS, EDIT, DELETE, EXPORT */
+
 .download-button {
-    background-color: #F0430D;
-    color: white;
-    border: 0px;
+    background-color: white;
+    color: black;
+    border: 1px solid darkgray; 
     padding: 5px 8px;
     border-radius: 8px;
     transition: background-color 0.3s, color 0.3s, border-color 0.3s;
 }
 
-/* SMALL BUTTONS FOR DETAILS, EDIT, AND DELETE */
+
+.download-button:hover {
+    background-color: rgb(240, 240, 240);
+    color: black; 
+    border-color: black; 
+    transform: translateX(-1px), translateY(-1px);
+}
+
 .details-button {
     background-color: #498cff;
     color: white;
@@ -266,12 +276,17 @@ h1.parallax-text {
 .styled-table {
     width: 100%;
     border-collapse: collapse;
+    border-radius: 8px;
     margin: 25px 0;
     font-size: 0.9em;
     background-color: white;
 }
 
-.styled-table th,
+.styled-table th{
+    padding: 12px 15px;
+    border-bottom: 1px solid darkGray;
+}
+
 .styled-table td {
     padding: 12px 15px;
 }
@@ -284,15 +299,10 @@ h1.parallax-text {
     background-color: #ffffff;
 }
 
-.styled-table tbody tr:last-of-type {
-    border-bottom: 1px solid darkGray; 
-}
-
 .styled-table tbody tr.active-row {
     font-weight: bold;
     color: #ffffff; 
 }
-
 
 .resource-card {
     background-color: white;
