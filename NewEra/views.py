@@ -125,8 +125,8 @@ def sendEmail(load_user):
 
     # Set recipient
     # to = settings.EMAIL_HOST_USER
-    to = "aeli@andrew.cmu.edu"
-
+    to = "tthompson@obbinc.org"
+    
     # Send the email
     mail.send_mail(subject, plain_message, from_email, [to], html_message=html_message, fail_silently=True)
 
