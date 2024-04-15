@@ -1576,7 +1576,7 @@ def export_selected_data(request):
                 ws.auto_filter.ref = ws.dimensions
 
                 response = HttpResponse(content_type='application/vnd.ms-excel')
-                response['Content-Disposition'] = "attachment; filename=newera412_selected_data_spreadsheet.xlsx"
+                response['Content-Disposition'] = "attachment; filename=reentry_selected_data_spreadsheet.xlsx"
                 wb.save(response)
 
                 return response
@@ -1940,7 +1940,7 @@ def export_data(request):
 
                 # Save and download the Excel file
                 response = HttpResponse(content_type='application/vnd.ms-excel')
-                response['Content-Disposition'] = f"attachment; filename=newera412_referral_data_{start_date}_to_{end_date}.xlsx"
+                response['Content-Disposition'] = f"attachment; filename=reentry_referral_data_{start_date}_to_{end_date}.xlsx"
                 wb.save(response)
 
                 return response
