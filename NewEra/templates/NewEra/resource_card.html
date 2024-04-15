@@ -9,10 +9,17 @@
             <div class="tag-capsule"><a href="{% url 'Show Resource' id=r.id %}">{{ t.name }}</a></div>
         {% endfor %}
         <br><br>
-        <p class="card-text">
-            <a href="{% url 'Show Resource' id=r.id %}">{{ r.description|truncatechars:150 }}</a>
-            ... <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
-        </p>
+        {% if request.user.is_authenticated %}
+            <p class="card-text">
+                <a href="{% url 'Show Resource' id=r.id %}">{{ r.description|truncatechars:150 }}</a>
+                <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
+            </p>
+        {% else %}
+            <p class="card-text">
+                <a href="{% url 'Show Resource' id=r.id %}">{{ r.description|truncatechars:230 }}</a>
+                 <a class="embedded-link" href="{% url 'Show Resource' id=r.id %}"><em>read more</em></a>
+            </p>
+        {% endif %}
         
         <div class="resource-card-views">
             {% if perms.resource.create_resource %}
