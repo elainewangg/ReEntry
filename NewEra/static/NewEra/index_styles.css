@@ -255,22 +255,6 @@ h1.parallax-text {
     transform: translateX(-1px), translateY(-1px);
 }
 
-.download-button{
-    background-color: white;
-    border-color: black;
-    padding: 5px 8px;
-    border-radius: 8px;
-    border: 1px solid darkgray; 
-    transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-}
-
-
-.download-button:hover {
-    background-color: rgb(240, 240, 240);
-    color: black; 
-    border-color: black; 
-}
-
 .beige {
     background-color: #ECF1EF;
 }
