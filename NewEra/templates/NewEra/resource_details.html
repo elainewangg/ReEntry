@@ -58,7 +58,7 @@
     {% with types='organization' %}
         <br><hr>
         {% if resource.url %}
-            <p><b>Website: </b><a href="{{resource.url}}" target="_blank" class="embedded-link">link</a></p>
+            <p><b>Website: </b><a href="{{resource.url}}" target="_blank" class="embedded-link">{{resource.url}}</a></p>
         {% endif %}
         <!-- {% if resource.resource_type in types.split %} -->
         {% if resource.street %}
